@@ -1,0 +1,653 @@
+import bg1 from "@/assets/bg1.png";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Activity, ArrowUpRight, Layout, Sparkles } from "lucide-react";
+import { motion } from "motion/react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import EISMobileDashboard from "./EISMobileDashboard";
+import { nodes, paths, SCENE_H, SCENE_W } from "./dashboard-data";
+
+/** Isometric cube (SVG) */
+function IsoCube({
+  w = 40,
+  h = 20,
+  z = 20,
+  color,
+  leftColor,
+  rightColor,
+  className = "",
+}: {
+  w?: number;
+  h?: number;
+  z?: number;
+  color: string;
+  leftColor: string;
+  rightColor: string;
+  className?: string;
+}) {
+  return (
+    <svg
+      width={w}
+      height={h + z}
+      viewBox={`0 0 ${w} ${h + z}`}
+      className={`overflow-visible drop-shadow-2xl ${className}`}
+      aria-hidden
+    >
+      <polygon
+        points={`0,${h / 2} ${w / 2},0 ${w},${h / 2} ${w / 2},${h}`}
+        fill={color}
+      />
+      <polygon
+        points={`0,${h / 2} ${w / 2},${h} ${w / 2},${h + z} 0,${h / 2 + z}`}
+        fill={leftColor}
+      />
+      <polygon
+        points={`${w / 2},${h} ${w},${h / 2} ${w},${h / 2 + z} ${w / 2},${h + z}`}
+        fill={rightColor}
+      />
+    </svg>
+  );
+}
+
+function CircularIcon({
+  icon,
+  strokeColor,
+}: {
+  icon: React.ReactNode;
+  strokeColor: string;
+}) {
+  return (
+    <div className="relative h-12 w-12 shrink-0 flex items-center justify-center group/ring">
+      <svg
+        className="absolute inset-0 h-full w-full"
+        viewBox="0 0 48 48"
+      >
+        <circle
+          cx="24"
+          cy="24"
+          r="20"
+          fill="none"
+          className="stroke-slate-200 dark:stroke-[#2e303a] transition-colors duration-500"
+          strokeWidth="2.5"
+        />
+        <motion.circle
+          cx="24"
+          cy="24"
+          r="20"
+          fill="none"
+          stroke={strokeColor}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          animate={{
+            strokeDasharray: ["1, 150", "120, 150", "1, 150"],
+            strokeDashoffset: [0, -120, -240],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+          className="drop-shadow-[0_0_8px_var(--stroke-color)]"
+          style={{ "--stroke-color": strokeColor } as any}
+        />
+      </svg>
+      <div
+        className="relative z-10 p-2 rounded-full transition-transform duration-500 group-hover/ring:scale-110 flex flex-col items-center justify-center gap-0"
+        style={{ color: strokeColor }}
+      >
+        <div className="scale-90">{icon}</div>
+        <span className="text-[7px] font-black uppercase tracking-tighter -mt-1 opacity-80">CDC</span>
+      </div>
+    </div>
+  );
+}
+
+function FloatingCard({
+  title,
+  subtitle,
+  children,
+  className,
+}: {
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45 }}
+      className={`pointer-events-auto z-30 flex min-w-[240px] max-w-[min(92vw,280px)] items-center justify-between gap-4 rounded-2xl border border-slate-200 dark:border-[#2e303a] bg-white/90 dark:bg-[#14151a]/85 p-3.5 shadow-xl dark:shadow-[0_8px_32px_rgba(0,0,0,0.45)] backdrop-blur-md transition-colors duration-500 ${className ?? ""}`}
+    >
+      <div className="min-w-0">
+        <h3 className="text-sm font-semibold tracking-tight text-slate-800 dark:text-[#f3f4f6] transition-colors duration-500">
+          {title}
+        </h3>
+        <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-[#9ca3af] transition-colors duration-500">
+          {subtitle}
+        </p>
+      </div>
+      {children}
+    </motion.div>
+  );
+}
+
+// All nodes and paths data moved to dashboard-data.tsx
+
+export default function EISDashboard2() {
+  const navigate = useNavigate();
+  const [selectedNode, setSelectedNode] = useState<(typeof nodes)[0] | null>(
+    null,
+  );
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark"),
+  );
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener("resize", handleResize);
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "class") {
+          setIsDark(document.documentElement.classList.contains("dark"));
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      observer.disconnect();
+    };
+  }, []);
+
+  if (isMobile) return <EISMobileDashboard />;
+
+  return (
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-100 dark:bg-[#0a0a0a] transition-colors duration-500 font-sans text-slate-800 dark:text-[#e5e7eb]">
+      {/* Subtle map texture */}
+      <div
+        className={`pointer-events-none absolute inset-0 transition-opacity duration-500 ${isDark ? "opacity-[0.12] grayscale" : "opacity-20 grayscale contrast-125 invert"}`}
+      >
+        <img
+          src={bg1}
+          alt=""
+          className="h-full w-full object-cover grayscale"
+        />
+      </div>
+
+      {/* Isometric grid */}
+      <svg
+        className={`pointer-events-none absolute inset-0 h-full w-full transition-opacity duration-500 ${isDark ? "opacity-[0.18]" : "opacity-[0.08]"}`}
+        aria-hidden
+      >
+        <defs>
+          <pattern
+            id="iso-grid"
+            width="56"
+            height="56"
+            patternUnits="userSpaceOnUse"
+            patternTransform="skewY(26)"
+          >
+            <path
+              d="M0 0 H56 M0 28 H56"
+              className="stroke-slate-400 dark:stroke-[#4b5563]"
+              strokeWidth="0.5"
+              fill="none"
+            />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#iso-grid)" />
+      </svg>
+
+      <div className="relative z-10 flex w-[min(96vw,1240px)] max-w-full shrink-0 flex-col items-center px-2 py-0">
+        <div
+          className="relative aspect-1200/800 w-full max-w-[1200px] overflow-visible"
+          style={{ minHeight: "min(70vh, 800px)" }}
+        >
+          <div
+            className="absolute inset-0 scale-[0.58] sm:scale-[0.72] md:scale-[0.88] lg:scale-100"
+            style={{ transformOrigin: "center center" }}
+          >
+            <div className="relative h-[800px] w-[1200px]">
+              {/* Corner cards mapping dynamically moved to Nodes */}
+
+              <svg
+                viewBox={`0 0 ${SCENE_W} ${SCENE_H}`}
+                className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+                aria-hidden
+              >
+                <defs>
+                  <filter
+                    id="line-glow"
+                    x="-50%"
+                    y="-50%"
+                    width="200%"
+                    height="200%"
+                  >
+                    <feGaussianBlur stdDeviation="1.2" result="b" />
+                    <feMerge>
+                      <feMergeNode in="b" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                  <linearGradient
+                    id="iot-grad-blue"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="100%"
+                  >
+                    <stop offset="0%" stopColor="#3b82f6" />
+                    <stop offset="100%" stopColor="#ff8c42" />
+                  </linearGradient>
+                  <linearGradient
+                    id="iot-grad-orange"
+                    x1="0%"
+                    y1="100%"
+                    x2="100%"
+                    y2="0%"
+                  >
+                    <stop offset="0%" stopColor="#f97316" />
+                    <stop offset="100%" stopColor="#ff8c42" />
+                  </linearGradient>
+                  <linearGradient
+                    id="iot-grad-green"
+                    x1="0%"
+                    y1="100%"
+                    x2="100%"
+                    y2="0%"
+                  >
+                    <stop offset="0%" stopColor="#10b981" />
+                    <stop offset="100%" stopColor="#ff8c42" />
+                  </linearGradient>
+                  <linearGradient
+                    id="iot-grad-gray"
+                    x1="100%"
+                    y1="100%"
+                    x2="0%"
+                    y2="0%"
+                  >
+                    <stop offset="0%" stopColor="#64748b" />
+                    <stop offset="100%" stopColor="#ff8c42" />
+                  </linearGradient>
+                  <linearGradient
+                    id="iot-grad-purple"
+                    x1="100%"
+                    y1="100%"
+                    x2="0%"
+                    y2="0%"
+                  >
+                    <stop offset="0%" stopColor="#a855f7" />
+                    <stop offset="100%" stopColor="#ff8c42" />
+                  </linearGradient>
+                  <linearGradient
+                    id="iot-grad-yellow"
+                    x1="100%"
+                    y1="0%"
+                    x2="0%"
+                    y2="100%"
+                  >
+                    <stop offset="0%" stopColor="#eab308" />
+                    <stop offset="100%" stopColor="#ff8c42" />
+                  </linearGradient>
+                </defs>
+
+                {/* Ground ring under hub */}
+                <ellipse
+                  cx={600}
+                  cy={465}
+                  rx={98}
+                  ry={40}
+                  fill="none"
+                  stroke="#ff8c42"
+                  strokeWidth="2"
+                  opacity={0.55}
+                  filter="url(#line-glow)"
+                />
+
+                {paths.map((p, i) => (
+                  <motion.path
+                    key={p.d}
+                    d={p.d}
+                    fill="none"
+                    stroke={p.stroke}
+                    strokeWidth={3}
+                    filter="url(#line-glow)"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 0.88 }}
+                    transition={{
+                      duration: 1.8,
+                      delay: i * 0.12,
+                      ease: "easeOut",
+                    }}
+                  />
+                ))}
+
+                {paths.map((p, i) => (
+                  <motion.circle
+                    key={`pkt-${i}`}
+                    r={3}
+                    fill={isDark ? "#f8fafc" : "#334155"}
+                    className={isDark ? "" : "drop-shadow-none"}
+                    opacity={isDark ? 0.85 : 0.6}
+                    animate={{
+                      offsetDistance: ["0%", "100%"],
+                      opacity: [0, isDark ? 1 : 0.8, 0],
+                    }}
+                    transition={{
+                      duration: 3.2 + (i % 3) * 0.4,
+                      repeat: Infinity,
+                      ease: "linear",
+                      delay: i * 0.35,
+                    }}
+                    style={{ offsetPath: `path('${p.d}')` }}
+                  />
+                ))}
+              </svg>
+
+              {nodes.map((node) => {
+                const leftPct = (node.x / SCENE_W) * 100;
+                const topPct = (node.y / SCENE_H) * 100;
+
+                if (node.kind === "hub") {
+                  return (
+                    <div
+                      key={node.id}
+                      className="absolute z-20 -translate-x-1/2 -translate-y-1/2"
+                      style={{ left: `${leftPct}%`, top: `${topPct}%` }}
+                    >
+                      <div
+                        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-45 blur-[14px]"
+                        style={{
+                          width: 120,
+                          height: 56,
+                          backgroundColor: node.color,
+                          transform: "translate(-50%, -40%) rotateX(58deg)",
+                        }}
+                      />
+                      <div className="relative drop-shadow-[0_18px_24px_rgba(255,140,66,0.35)]">
+                        <div className="absolute -top-16 left-1/2 -translate-x-1/2 mb-4">
+                          <div
+                            className={`w-14 h-14 rounded-full flex items-center justify-center relative shadow-[0_0_20px_rgba(255,140,66,0.6)] ${isDark ? "bg-[#ff8c42]" : "bg-[#e66c1f]"}`}
+                          >
+                            <Activity
+                              size={28}
+                              className={
+                                isDark ? "text-[#0a0a0c]" : "text-white"
+                              }
+                            />
+                            <div
+                              className={`absolute inset-0 rounded-full border-2 animate-ping opacity-60 ${isDark ? "border-[#ff8c42]" : "border-[#e66c1f]"}`}
+                            ></div>
+                          </div>
+                        </div>
+                        <IsoCube
+                          w={84}
+                          h={42}
+                          z={62}
+                          color={node.color}
+                          leftColor={node.left}
+                          rightColor={node.right}
+                        />
+                        <div className="absolute bottom-0 right-[-8px]">
+                          <IsoCube
+                            w={42}
+                            h={22}
+                            z={34}
+                            color={node.color}
+                            leftColor={node.left}
+                            rightColor={node.right}
+                          />
+                        </div>
+                      </div>
+                      <div className="absolute left-1/2 top-full z-10 mt-5 w-max -translate-x-1/2 rounded-full border border-slate-300 dark:border-[#2e303a] bg-white/90 dark:bg-[#1c1d22]/90 px-4 py-1.5 text-sm font-medium text-slate-800 dark:text-[#f3f4f6] shadow-lg backdrop-blur-md transition-colors duration-500">
+                        {node.label}
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (node.kind === "sector") {
+                  // Position all cards consistently above the node to prevent screen overflow
+                  const cardPosClass =
+                    "absolute bottom-[110%] left-1/2 -translate-x-1/2 mb-4";
+
+                  return (
+                    <div
+                      key={node.id}
+                      className="absolute z-20 -translate-x-1/2 -translate-y-1/2 group cursor-pointer hover:scale-105 transition-transform duration-300"
+                      style={{ left: `${leftPct}%`, top: `${topPct}%` }}
+                      onClick={() => setSelectedNode(node as any)}
+                    >
+                      <div className="relative drop-shadow-xl">
+                        {/* Glow Behind */}
+                        <div
+                          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-30 blur-[10px]"
+                          style={{
+                            width: 60,
+                            height: 30,
+                            backgroundColor: node.color,
+                            transform: "translate(-50%, -40%) rotateX(60deg)",
+                          }}
+                        />
+                        <IsoCube
+                          w={48}
+                          h={24}
+                          z={28}
+                          color={node.color}
+                          leftColor={node.left}
+                          rightColor={node.right}
+                        />
+
+                        {/* Attached Floating Card */}
+                        <div
+                          className={`pointer-events-none z-30 transition-all duration-300 ${cardPosClass}`}
+                        >
+                          <FloatingCard
+                            title={node.title}
+                            subtitle={node.subtitle}
+                            className="w-max min-w-[200px]"
+                          >
+                            <CircularIcon
+                              strokeColor={node.color}
+                              icon={node.icon}
+                            />
+                          </FloatingCard>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return null;
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Identical Side Panel logic ported over for feature-parity */}
+      <Sheet
+        open={!!selectedNode}
+        onOpenChange={(open) => !open && setSelectedNode(null)}
+      >
+        <SheetContent className="w-[400px] sm:w-[540px] p-0 bg-white dark:bg-[#14151a] border-l-slate-200 dark:border-l-[#2e303a] text-slate-800 dark:text-[#f3f4f6] transition-colors duration-500 overflow-hidden">
+          <ScrollArea className="h-full w-full">
+            <div className="p-8">
+              <SheetHeader className="mb-8 pl-1">
+                <div className="flex items-center gap-4">
+                  <div
+                    className="w-14 h-14 rounded-full flex items-center justify-center text-white shadow-xl"
+                    style={{ backgroundColor: selectedNode?.color }}
+                  >
+                    {selectedNode?.icon}
+                  </div>
+                  <div className="text-left">
+                    <SheetTitle className="text-3xl text-slate-900 dark:text-[#f3f4f6] font-black tracking-tight transition-colors duration-500">
+                      {selectedNode?.title}
+                    </SheetTitle>
+                    <SheetDescription className="text-slate-500 dark:text-[#9ca3af] font-medium transition-colors duration-500">
+                      {selectedNode?.subtitle}
+                    </SheetDescription>
+                  </div>
+                </div>
+              </SheetHeader>
+
+              {selectedNode && (
+                <div className="space-y-8">
+                  {/* CDC Activity Monitor Card (Sync from Mobile version) */}
+                  <div className="p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 shadow-inner">
+                    <div className="flex justify-between items-center mb-5">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                          CDC Activity Monitor
+                        </span>
+                        <div className="flex items-center gap-2.5 mt-1.5">
+                          <motion.div 
+                            animate={{ opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="size-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                          />
+                          <span className="text-xs font-black text-emerald-500 uppercase tracking-wider">
+                            Real-time Streaming
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Latency</span>
+                        <span className="text-lg font-black text-slate-800 dark:text-slate-100">12ms</span>
+                      </div>
+                    </div>
+                    
+                    {/* Visual Stream Animation */}
+                    <div className="flex items-center gap-1.5 h-12 px-3 bg-white/50 dark:bg-slate-950/50 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 overflow-hidden backdrop-blur-sm">
+                      {[...Array(24)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          animate={{ 
+                            height: [
+                              "25%", 
+                              `${30 + Math.random() * 60}%`, 
+                              `${15 + Math.random() * 50}%`, 
+                              "25%"
+                            ] 
+                          }}
+                          transition={{ 
+                            duration: 0.6 + Math.random() * 0.4, 
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: i * 0.05
+                          }}
+                          className="w-full min-w-[4px] rounded-full"
+                          style={{ backgroundColor: selectedNode.color, opacity: 0.2 + (i / 24) * 0.8 }}
+                        />
+                      ))}
+                    </div>
+                    <div className="mt-4 flex justify-between items-center px-1">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Capture Engine: v2.4</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Healthy</span>
+                    </div>
+                  </div>
+
+                  {selectedNode.menuItems && (
+                    <div className="pt-2">
+                      <div className="flex items-center gap-2 mb-6 pl-1">
+                        <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                          <Layout size={16} />
+                        </div>
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-[#6b7280]">
+                          Sistem Navigasi Cepat
+                        </h4>
+                      </div>
+                      <div className="grid gap-3">
+                        {selectedNode.menuItems.map((item, idx) => (
+                          <motion.button
+                            key={idx}
+                            whileHover={{ x: 6 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() =>
+                              item.path !== "#" && navigate(item.path)
+                            }
+                            className={`group relative flex items-center justify-between p-5 rounded-[1.5rem] border transition-all duration-300 ${
+                              item.path === "#"
+                                ? "opacity-50 cursor-not-allowed bg-slate-50/50 dark:bg-[#1c1d22]/50 border-transparent shadow-none"
+                                : "bg-white dark:bg-[#1c1d22] border-slate-200/60 dark:border-[#2e303a] hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/10 shadow-sm"
+                            }`}
+                          >
+                            <div className="flex items-center gap-4">
+                              <div
+                                className={`size-10 rounded-full flex items-center justify-center transition-all duration-500 ${
+                                  item.path === "#"
+                                    ? "bg-slate-200 dark:bg-slate-800"
+                                    : "bg-primary/5 group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/30"
+                                }`}
+                              >
+                                <Sparkles
+                                  size={16}
+                                  className={
+                                    item.path === "#" ? "opacity-20" : ""
+                                  }
+                                />
+                              </div>
+                              <span className="font-black text-sm tracking-tight text-slate-700 dark:text-[#f3f4f6] group-hover:text-primary transition-colors">
+                                {item.label}
+                              </span>
+                            </div>
+                            <div
+                              className={`p-2 rounded-full transition-all duration-500 ${
+                                item.path === "#"
+                                  ? "bg-transparent"
+                                  : "bg-slate-50 dark:bg-slate-800/50 group-hover:bg-primary/10 group-hover:translate-x-1"
+                              }`}
+                            >
+                              {item.path === "#" ? (
+                                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">
+                                  Soon
+                                </span>
+                              ) : (
+                                <ArrowUpRight
+                                  size={16}
+                                  className="text-primary group-hover:rotate-45 transition-transform duration-500"
+                                />
+                              )}
+                            </div>
+                          </motion.button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Diagnostic Log Detail - Moved below Quick Navigation */}
+                  <div className="space-y-3 px-1 pt-4 border-t border-slate-100 dark:border-white/5">
+                    <div className="flex items-center gap-2">
+                       <Activity size={16} className="text-slate-400" />
+                       <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                        Diagnostic Log
+                      </h4>
+                    </div>
+                    <p className="text-sm leading-relaxed text-slate-600 dark:text-[#9ca3af] font-medium bg-slate-50/50 dark:bg-white/5 p-4 rounded-2xl border border-slate-100 dark:border-white/5">
+                      {selectedNode.details}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}

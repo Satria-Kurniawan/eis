@@ -11,4 +11,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      "/api": {
+        target: "https://service-eis.dwiproject.xyz",
+        changeOrigin: true,
+      },
+    },
+  },
 });
