@@ -51,7 +51,7 @@ const MetricRow = ({
         <Progress
           value={score}
           className="h-2 bg-primary/5"
-          indicatorClassName={`bg-${status.color}-500`}
+          // indicatorClassName={`bg-${status.color}-500`}
         />
 
         <div className="flex justify-between text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">

@@ -2,15 +2,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { usePerangkatPembelajaran } from "@/hooks/akademik/use-perangkat-pembelajaran";
-import {
-  BookCopy,
-  ClipboardCheck,
-  FileCheck,
-  GraduationCap,
-  Info,
-  Layout,
-  TrendingUp,
-} from "lucide-react";
+import { GraduationCap, Info, Layout, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
 import { columns } from "./PerangkatPembelajaran/columns";
 import { PerpemTable } from "./PerangkatPembelajaran/perpem-table";
@@ -21,10 +13,10 @@ export default function PerangkatPembelajaranPage() {
   const { tahun, semester } = usePeriod();
 
   // Calculate completion percentage for docs
-  const totalItems = data?.datas.length || 0;
-  const itemsWithRps = data?.datas.filter((d) => !!d.rps).length || 0;
-  const completionRate =
-    totalItems > 0 ? Math.round((itemsWithRps / totalItems) * 100) : 0;
+  // const totalItems = data?.datas.length || 0;
+  // const itemsWithRps = data?.datas.filter((d) => !!d.rps).length || 0;
+  // const completionRate =
+  //   totalItems > 0 ? Math.round((itemsWithRps / totalItems) * 100) : 0;
 
   return (
     <motion.div
@@ -63,58 +55,6 @@ export default function PerangkatPembelajaranPage() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          {
-            label: "Total Mata Kuliah",
-            value: data?.pagination.total || 0,
-            icon: BookCopy,
-            color: "blue",
-            sub: "Semester ini",
-          },
-          {
-            label: "Kelengkapan RPS",
-            value: `${completionRate}%`,
-            icon: FileCheck,
-            color: "emerald",
-            sub: `${itemsWithRps} terunggah`,
-          },
-          {
-            label: "Sudah Diverifikasi",
-            value: "24",
-            icon: ClipboardCheck,
-            color: "amber",
-            sub: "Proses audit",
-          },
-        ].map((stat, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.1 }}
-            className="flex items-start justify-between p-6 rounded-[2rem] border bg-card/40 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all border-primary/5 group"
-          >
-            <div>
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1">
-                {stat.label}
-              </p>
-              <p className="text-3xl font-black text-foreground mb-1">
-                {stat.value}
-              </p>
-              <p className="text-xs font-medium text-muted-foreground/60">
-                {stat.sub}
-              </p>
-            </div>
-            <div
-              className={`p-3 rounded-2xl bg-${stat.color}-500/10 text-${stat.color}-600 dark:text-${stat.color}-400`}
-            >
-              <stat.icon className="size-6" />
-            </div>
-          </motion.div>
-        ))}
       </div>
 
       {isError && (

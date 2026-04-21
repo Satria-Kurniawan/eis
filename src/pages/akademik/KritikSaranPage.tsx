@@ -1,22 +1,14 @@
-import { useKritikSaran } from "@/hooks/akademik/use-kritik-saran";
-import { createColumns } from "./KritikSaran/columns";
-import { KritikTable } from "./KritikSaran/kritik-table";
-import { KritikDetailDialog } from "./KritikSaran/kritik-detail-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
-import { motion } from "motion/react";
-import {
-  MessageSquare,
-  GraduationCap,
-  Info,
-  TrendingUp,
-  Target,
-  Users2,
-  FileText
-} from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useState, useMemo } from "react";
+import { useKritikSaran } from "@/hooks/akademik/use-kritik-saran";
 import { type KritikSaran } from "@/services/akademik/kritikSaran";
+import { GraduationCap, Info, MessageSquare, TrendingUp } from "lucide-react";
+import { motion } from "motion/react";
+import { useMemo, useState } from "react";
+import { createColumns } from "./KritikSaran/columns";
+import { KritikDetailDialog } from "./KritikSaran/kritik-detail-dialog";
+import { KritikTable } from "./KritikSaran/kritik-table";
 
 export default function KritikSaranPage() {
   const { data, isLoading, isError, error, page, setPage, limit, setLimit } =
@@ -34,15 +26,18 @@ export default function KritikSaranPage() {
   const columns = useMemo(() => createColumns(handleOpenDetail), []);
 
   // Calculate statistics
-  const stats = useMemo(() => {
-    if (!data?.datas) return { totalSaran: 0, avgSaran: 0, totalDosen: 0 };
-    
-    const totalSaran = data.datas.reduce((acc, curr) => acc + curr.saran.length, 0);
-    const totalDosen = data.pagination.total;
-    const avgSaran = totalDosen > 0 ? (totalSaran / totalDosen).toFixed(1) : 0;
-    
-    return { totalSaran, avgSaran, totalDosen };
-  }, [data]);
+  // const stats = useMemo(() => {
+  //   if (!data?.datas) return { totalSaran: 0, avgSaran: 0, totalDosen: 0 };
+
+  //   const totalSaran = data.datas.reduce(
+  //     (acc, curr) => acc + curr.saran.length,
+  //     0,
+  //   );
+  //   const totalDosen = data.pagination.total;
+  //   const avgSaran = totalDosen > 0 ? (totalSaran / totalDosen).toFixed(1) : 0;
+
+  //   return { totalSaran, avgSaran, totalDosen };
+  // }, [data]);
 
   return (
     <motion.div
@@ -62,7 +57,8 @@ export default function KritikSaranPage() {
             Kritik & Saran
           </h1>
           <p className="text-muted-foreground font-medium max-w-xl text-lg">
-            Kumpulan masukan dan saran dari civitas akademika untuk perbaikan institusi.
+            Kumpulan masukan dan saran dari civitas akademika untuk perbaikan
+            institusi.
           </p>
         </div>
 
@@ -80,58 +76,6 @@ export default function KritikSaranPage() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          {
-            label: "Total Masukan",
-            value: stats.totalSaran,
-            icon: FileText,
-            color: "blue",
-            sub: "Semester Ini",
-          },
-          {
-            label: "Dosen Terdampak",
-            value: stats.totalDosen,
-            icon: Users2,
-            color: "emerald",
-            sub: "Responden Aktif",
-          },
-          {
-            label: "Rata-rata Saran",
-            value: stats.avgSaran,
-            icon: Target,
-            color: "amber",
-            sub: "Per Dosen",
-          },
-        ].map((stat, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.1 }}
-            className="flex items-start justify-between p-7 rounded-[2rem] border bg-card/40 backdrop-blur-sm shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all border-primary/5 group"
-          >
-            <div>
-              <p className="text-[11px] font-black text-muted-foreground/50 uppercase tracking-[0.2em] mb-2">
-                {stat.label}
-              </p>
-              <p className="text-4xl font-black text-foreground mb-1 tracking-tighter">
-                {stat.value}
-              </p>
-              <p className="text-xs font-bold text-muted-foreground/60">
-                {stat.sub}
-              </p>
-            </div>
-            <div
-              className={`p-4 rounded-2xl bg-${stat.color}-500/10 text-${stat.color}-600 dark:text-${stat.color}-400 group-hover:rotate-12 transition-transform`}
-            >
-              <stat.icon className="size-7" />
-            </div>
-          </motion.div>
-        ))}
       </div>
 
       {isError && (
@@ -183,7 +127,10 @@ export default function KritikSaranPage() {
       <div className="flex justify-center pt-4">
         <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full border bg-card/60 backdrop-blur-md text-[11px] font-black text-muted-foreground/70 shadow-lg uppercase tracking-[0.2em] hover:border-primary/20 transition-all cursor-default group">
           <div className="size-2 rounded-full bg-blue-500 animate-ping" />
-          Feedback Stream: <span className="text-foreground group-hover:text-primary transition-colors">{new Date().toLocaleTimeString('id-ID')}</span>
+          Feedback Stream:{" "}
+          <span className="text-foreground group-hover:text-primary transition-colors">
+            {new Date().toLocaleTimeString("id-ID")}
+          </span>
         </div>
       </div>
     </motion.div>

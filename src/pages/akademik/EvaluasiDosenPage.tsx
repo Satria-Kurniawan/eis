@@ -1,22 +1,14 @@
-import { useEvaluasiDosen } from "@/hooks/akademik/use-evaluasi-dosen";
-import { createColumns } from "./EvaluasiDosen/columns";
-import { EvaluasiTable } from "./EvaluasiDosen/evaluasi-table";
-import { EvaluasiDetailDialog } from "./EvaluasiDosen/evaluasi-detail-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
-import { motion } from "motion/react";
-import {
-  Users,
-  GraduationCap,
-  Info,
-  PieChart,
-  TrendingUp,
-  Target,
-  FileText,
-} from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useState, useMemo } from "react";
+import { useEvaluasiDosen } from "@/hooks/akademik/use-evaluasi-dosen";
 import { type EvaluasiDosen } from "@/services/akademik/evaluasiDosen";
+import { GraduationCap, Info, PieChart, TrendingUp } from "lucide-react";
+import { motion } from "motion/react";
+import { useMemo, useState } from "react";
+import { createColumns } from "./EvaluasiDosen/columns";
+import { EvaluasiDetailDialog } from "./EvaluasiDosen/evaluasi-detail-dialog";
+import { EvaluasiTable } from "./EvaluasiDosen/evaluasi-table";
 
 export default function EvaluasiDosenPage() {
   const { data, isLoading, isError, error, page, setPage, limit, setLimit } =
@@ -70,58 +62,6 @@ export default function EvaluasiDosenPage() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          {
-            label: "Total Evaluasi",
-            value: data?.pagination.total || 0,
-            icon: FileText,
-            color: "blue",
-            sub: "Responden Terdata",
-          },
-          {
-            label: "Rata-rata Indeks",
-            value: "84.2%",
-            icon: Target,
-            color: "emerald",
-            sub: "Kualitas Mengajar",
-          },
-          {
-            label: "Dosen Teruji",
-            value: data?.datas.length || 0,
-            icon: Users,
-            color: "amber",
-            sub: "Semester Aktif",
-          },
-        ].map((stat, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.1 }}
-            className="flex items-start justify-between p-7 rounded-[2rem] border bg-card/40 backdrop-blur-sm shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all border-primary/5 group"
-          >
-            <div>
-              <p className="text-[11px] font-black text-muted-foreground/50 uppercase tracking-[0.2em] mb-2">
-                {stat.label}
-              </p>
-              <p className="text-4xl font-black text-foreground mb-1 tracking-tighter">
-                {stat.value}
-              </p>
-              <p className="text-xs font-bold text-muted-foreground/60">
-                {stat.sub}
-              </p>
-            </div>
-            <div
-              className={`p-4 rounded-2xl bg-${stat.color}-500/10 text-${stat.color}-600 dark:text-${stat.color}-400 group-hover:rotate-12 transition-transform`}
-            >
-              <stat.icon className="size-7" />
-            </div>
-          </motion.div>
-        ))}
       </div>
 
       {isError && (

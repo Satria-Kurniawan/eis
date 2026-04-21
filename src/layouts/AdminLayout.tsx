@@ -44,6 +44,7 @@ import {
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
+import { GlobalUnitFilter } from "@/components/GlobalUnitFilter";
 
 export default function AdminLayout() {
   const [isDark, setIsDark] = useState(false);
@@ -287,30 +288,117 @@ export default function AdminLayout() {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#">
-                    <Users />
-                    <span>Kemahasiswaan</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#">
-                    <GraduationCap />
-                    <span>Alumni</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#">
-                    <Building />
-                    <span>Umum & Kepegawaian</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              <Collapsible asChild className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip="Kemahasiswaan">
+                      <Users />
+                      <span>Kemahasiswaan</span>
+                      <ChevronDown className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={
+                            location.pathname === "/kemahasiswaan/mahasiswa"
+                          }
+                        >
+                          <Link to="/kemahasiswaan/mahasiswa">
+                            <span>Mahasiswa</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={
+                            location.pathname === "/kemahasiswaan/beasiswa"
+                          }
+                        >
+                          <Link to="/kemahasiswaan/beasiswa">
+                            <span>Beasiswa</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={
+                            location.pathname === "/kemahasiswaan/dashboard"
+                          }
+                        >
+                          <Link to="/kemahasiswaan/dashboard">
+                            <span>Dashboard Mahasiswa</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+              <Collapsible asChild className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip="Alumni">
+                      <GraduationCap />
+                      <span>Alumni</span>
+                      <ChevronDown className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={location.pathname === "/alumni/data-tracer"}
+                        >
+                          <Link to="/alumni/data-tracer">
+                            <span>Data Tracer</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+              <Collapsible asChild className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip="Umum & Kepegawaian">
+                      <Building />
+                      <span>Umum & Kepegawaian</span>
+                      <ChevronDown className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={location.pathname === "/kepegawaian/dosen"}
+                        >
+                          <Link to="/kepegawaian/dosen">
+                            <span>Data Dosen</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={location.pathname === "/kepegawaian/pegawai"}
+                        >
+                          <Link to="/kepegawaian/pegawai">
+                            <span>Data Pegawai</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <a href="#">
@@ -335,8 +423,10 @@ export default function AdminLayout() {
         <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4 justify-between">
           <div className="flex items-center gap-4">
             <SidebarTrigger />
-            <div className="flex items-center gap-2">
-              <h1 className="font-semibold text-sm mr-4">EIS Dashboard</h1>
+            <div className="flex items-center gap-4">
+              <h1 className="font-semibold text-sm mr-2">EIS Dashboard</h1>
+              
+              <GlobalUnitFilter />
 
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-linear-to-r from-primary to-purple-600 rounded-full blur-sm opacity-20 group-hover:opacity-40 transition duration-1000"></div>

@@ -1,19 +1,11 @@
-import { useAngketMahasiswa } from "@/hooks/akademik/use-angket-mahasiswa";
-import { columns } from "./AngketMahasiswa/columns";
-import { AngketTable } from "./AngketMahasiswa/angket-table";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
+import { useAngketMahasiswa } from "@/hooks/akademik/use-angket-mahasiswa";
+import { ClipboardCheck, GraduationCap, Info, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
-import {
-  ClipboardCheck,
-  GraduationCap,
-  Info,
-  TrendingUp,
-  Target,
-  Users2,
-  FileSpreadsheet
-} from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AngketTable } from "./AngketMahasiswa/angket-table";
+import { columns } from "./AngketMahasiswa/columns";
 import { useMemo } from "react";
 
 export default function AngketMahasiswaPage() {
@@ -21,10 +13,11 @@ export default function AngketMahasiswaPage() {
     useAngketMahasiswa();
   const { tahun, semester } = usePeriod();
 
-  // Calculate unique prodis from current data batch
+  // Calculate stats for overview
+  const totalData = data?.pagination.total || 0;
   const uniqueProdis = useMemo(() => {
     if (!data?.datas) return 0;
-    return new Set(data.datas.map(d => d.unit.prd_kode)).size;
+    return new Set(data.datas.map((d) => d.unit.prd_kode)).size;
   }, [data]);
 
   return (
@@ -45,7 +38,8 @@ export default function AngketMahasiswaPage() {
             Angket Mahasiswa
           </h1>
           <p className="text-muted-foreground font-medium max-w-xl text-lg">
-            Pantau hasil penilaian mahasiswa terhadap kualitas pelayanan dan sarana prasarana.
+            Pantau hasil penilaian mahasiswa terhadap kualitas pelayanan dan
+            sarana prasarana.
           </p>
         </div>
 
@@ -65,53 +59,71 @@ export default function AngketMahasiswaPage() {
         </div>
       </div>
 
-      {/* Stats Overview */}
+      {/* Statistics Dashboard */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
           {
-            label: "Total Respon",
-            value: data?.pagination.total || 0,
-            icon: FileSpreadsheet,
-            color: "blue",
-            sub: "Responden Terdata",
+            label: "Total Data Angket",
+            value: totalData.toLocaleString(),
+            icon: ClipboardCheck,
+            color: "text-blue-500",
+            bg: "bg-blue-500/5",
+            border: "border-blue-500/10",
+            desc: "Total partisipasi mahasiswa",
           },
           {
-            label: "Dosen Dinilai",
-            value: data?.datas.length || 0,
-            icon: Users2,
-            color: "emerald",
-            sub: "Batch Semester Ini",
-          },
-          {
-            label: "Prodi Terintegrasi",
+            label: "Sebaran Prodi",
             value: uniqueProdis,
-            icon: Target,
-            color: "amber",
-            sub: "Cakupan Unit",
+            icon: GraduationCap,
+            color: "text-emerald-500",
+            bg: "bg-emerald-500/5",
+            border: "border-emerald-500/10",
+            desc: "Program studi yang terlibat",
+          },
+          {
+            label: "Monitoring Status",
+            value: "Active",
+            icon: TrendingUp,
+            color: "text-amber-500",
+            bg: "bg-amber-500/5",
+            border: "border-amber-500/10",
+            desc: "Sistem berjalan normal",
           },
         ].map((stat, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.1 }}
-            className="flex items-start justify-between p-7 rounded-[2rem] border bg-card/40 backdrop-blur-sm shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all border-primary/5 group"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 + 0.2 }}
+            className={`group relative overflow-hidden rounded-[2.5rem] border ${stat.border} ${stat.bg} p-8 backdrop-blur-xl transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1`}
           >
-            <div>
-              <p className="text-[11px] font-black text-muted-foreground/50 uppercase tracking-[0.2em] mb-2">
-                {stat.label}
-              </p>
-              <p className="text-4xl font-black text-foreground mb-1 tracking-tighter">
-                {stat.value}
-              </p>
-              <p className="text-xs font-bold text-muted-foreground/60">
-                {stat.sub}
-              </p>
-            </div>
-            <div
-              className={`p-4 rounded-2xl bg-${stat.color}-500/10 text-${stat.color}-600 dark:text-${stat.color}-400 group-hover:rotate-12 transition-transform`}
-            >
-              <stat.icon className="size-7" />
+            <div className="flex items-start justify-between relative z-10">
+              <div className="space-y-4">
+                <div className="p-3 rounded-2xl bg-background/50 border border-primary/5 w-fit shadow-inner">
+                  <stat.icon className={`size-6 ${stat.color}`} />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">
+                    {stat.label}
+                  </p>
+                  <div className="flex items-baseline gap-2">
+                    <h3 className="text-4xl font-black tracking-tighter text-foreground">
+                      {stat.value}
+                    </h3>
+                  </div>
+                  <p className="text-xs font-medium text-muted-foreground mt-2 flex items-center gap-1.5">
+                    <span className="size-1 rounded-full bg-primary/30" />
+                    {stat.desc}
+                  </p>
+                </div>
+              </div>
+
+              {/* Decorative accent */}
+              <div
+                className={`absolute -right-4 -top-4 size-32 opacity-[0.03] grayscale transition-all duration-700 group-hover:opacity-[0.08] group-hover:scale-110 group-hover:rotate-12`}
+              >
+                <stat.icon className="size-full" />
+              </div>
             </div>
           </motion.div>
         ))}

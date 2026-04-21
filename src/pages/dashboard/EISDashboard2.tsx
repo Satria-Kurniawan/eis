@@ -65,10 +65,7 @@ function CircularIcon({
 }) {
   return (
     <div className="relative h-12 w-12 shrink-0 flex items-center justify-center group/ring">
-      <svg
-        className="absolute inset-0 h-full w-full"
-        viewBox="0 0 48 48"
-      >
+      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 48 48">
         <circle
           cx="24"
           cy="24"
@@ -86,13 +83,13 @@ function CircularIcon({
           strokeWidth="2.5"
           strokeLinecap="round"
           animate={{
-            strokeDasharray: ["1, 150", "120, 150", "1, 150"],
-            strokeDashoffset: [0, -120, -240],
+            strokeDasharray: ["1, 150", "150, 150"],
+            strokeDashoffset: [0, -126],
           }}
           transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "linear",
+            duration: 2.5,
+            repeat: 0,
+            ease: "easeOut",
           }}
           className="drop-shadow-[0_0_8px_var(--stroke-color)]"
           style={{ "--stroke-color": strokeColor } as any}
@@ -103,7 +100,9 @@ function CircularIcon({
         style={{ color: strokeColor }}
       >
         <div className="scale-90">{icon}</div>
-        <span className="text-[7px] font-black uppercase tracking-tighter -mt-1 opacity-80">CDC</span>
+        <span className="text-[7px] font-black uppercase tracking-tighter -mt-1 opacity-80">
+          CDC
+        </span>
       </div>
     </div>
   );
@@ -516,8 +515,11 @@ export default function EISDashboard2() {
                           CDC Activity Monitor
                         </span>
                         <div className="flex items-center gap-2.5 mt-1.5">
-                          <motion.div 
-                            animate={{ opacity: [1, 0.4, 1], scale: [1, 1.2, 1] }}
+                          <motion.div
+                            animate={{
+                              opacity: [1, 0.4, 1],
+                              scale: [1, 1.2, 1],
+                            }}
                             transition={{ duration: 2, repeat: Infinity }}
                             className="size-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
                           />
@@ -527,38 +529,49 @@ export default function EISDashboard2() {
                         </div>
                       </div>
                       <div className="flex flex-col items-end">
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Latency</span>
-                        <span className="text-lg font-black text-slate-800 dark:text-slate-100">12ms</span>
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                          Latency
+                        </span>
+                        <span className="text-lg font-black text-slate-800 dark:text-slate-100">
+                          12ms
+                        </span>
                       </div>
                     </div>
-                    
+
                     {/* Visual Stream Animation */}
                     <div className="flex items-center gap-1.5 h-12 px-3 bg-white/50 dark:bg-slate-950/50 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 overflow-hidden backdrop-blur-sm">
                       {[...Array(24)].map((_, i) => (
                         <motion.div
                           key={i}
-                          animate={{ 
+                          animate={{
                             height: [
-                              "25%", 
-                              `${30 + Math.random() * 60}%`, 
-                              `${15 + Math.random() * 50}%`, 
-                              "25%"
-                            ] 
+                              "25%",
+                              `${30 + Math.random() * 60}%`,
+                              `${15 + Math.random() * 50}%`,
+                              "25%",
+                            ],
                           }}
-                          transition={{ 
-                            duration: 0.6 + Math.random() * 0.4, 
+                          transition={{
+                            duration: 0.6 + Math.random() * 0.4,
                             repeat: Infinity,
                             ease: "easeInOut",
-                            delay: i * 0.05
+                            delay: i * 0.05,
                           }}
                           className="w-full min-w-[4px] rounded-full"
-                          style={{ backgroundColor: selectedNode.color, opacity: 0.2 + (i / 24) * 0.8 }}
+                          style={{
+                            backgroundColor: selectedNode.color,
+                            opacity: 0.2 + (i / 24) * 0.8,
+                          }}
                         />
                       ))}
                     </div>
                     <div className="mt-4 flex justify-between items-center px-1">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Capture Engine: v2.4</span>
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Healthy</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                        Capture Engine: v2.4
+                      </span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                        Healthy
+                      </span>
                     </div>
                   </div>
 
@@ -633,8 +646,8 @@ export default function EISDashboard2() {
                   {/* Diagnostic Log Detail - Moved below Quick Navigation */}
                   <div className="space-y-3 px-1 pt-4 border-t border-slate-100 dark:border-white/5">
                     <div className="flex items-center gap-2">
-                       <Activity size={16} className="text-slate-400" />
-                       <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                      <Activity size={16} className="text-slate-400" />
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
                         Diagnostic Log
                       </h4>
                     </div>

@@ -2,14 +2,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { useAgendaMengajar } from "@/hooks/akademik/use-agenda-mengajar";
-import {
-  BookOpen,
-  Clock,
-  GraduationCap,
-  Info,
-  Users2,
-  TrendingUp,
-} from "lucide-react";
+import { BookOpen, GraduationCap, Info, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
 import { AgendaTable } from "./AgendaMengajar/agenda-table";
 import { columns } from "./AgendaMengajar/columns";
@@ -56,52 +49,6 @@ export default function AgendaMengajarPage() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          {
-            label: "Total Agenda",
-            value: data?.pagination.total || 0,
-            icon: BookOpen,
-            color: "blue",
-          },
-          {
-            label: "Kelas Aktif",
-            value: data?.datas.length || 0,
-            icon: Users2,
-            color: "emerald",
-          },
-          {
-            label: "Periode Perkuliahan",
-            value: `${tahun}/${parseInt(tahun) + 1}`,
-            icon: Clock,
-            color: "orange",
-          },
-        ].map((stat, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.1 }}
-            className="flex items-center gap-4 p-5 rounded-[2rem] border bg-card/50 shadow-sm hover:shadow-md transition-all border-primary/5 group"
-          >
-            <div
-              className={`p-3 rounded-xl bg-${stat.color}-500/10 text-${stat.color}-600 dark:text-${stat.color}-400 group-hover:scale-110 transition-transform`}
-            >
-              <stat.icon className="size-6" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                {stat.label}
-              </p>
-              <p className="text-2xl font-black text-foreground">
-                {stat.value}
-              </p>
-            </div>
-          </motion.div>
-        ))}
       </div>
 
       {isError && (
