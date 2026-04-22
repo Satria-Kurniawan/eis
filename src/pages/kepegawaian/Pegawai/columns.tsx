@@ -1,14 +1,12 @@
-import { type ColumnDef } from "@tanstack/react-table";
-import { type Pegawai } from "@/services/kepegawaian/pegawai";
 import { Badge } from "@/components/ui/badge";
-import { 
-  User, 
-  Building2, 
-  ShieldCheck, 
-  UserCheck, 
+import { type Pegawai } from "@/services/kepegawaian/pegawai";
+import { type ColumnDef } from "@tanstack/react-table";
+import {
+  Building2,
+  IdCard,
+  ShieldCheck,
   TrendingUp,
-  School,
-  IdCard
+  UserCheck,
 } from "lucide-react";
 
 export const columns: ColumnDef<Pegawai>[] = [
@@ -28,7 +26,9 @@ export const columns: ColumnDef<Pegawai>[] = [
             </span>
           </div>
           <div className="flex items-center gap-1.5 ml-0.5 opacity-50">
-             <span className="text-[9px] font-medium tracking-wider">NIP: {nip}</span>
+            <span className="text-[9px] font-medium tracking-wider">
+              NIP: {nip}
+            </span>
           </div>
         </div>
       );
@@ -43,7 +43,10 @@ export const columns: ColumnDef<Pegawai>[] = [
           {row.original.nama}
         </span>
         <div className="flex items-center gap-1.5">
-          <Badge variant="outline" className="px-1.5 py-0 h-4 text-[9px] font-black border-emerald-500/20 bg-emerald-500/5 text-emerald-600">
+          <Badge
+            variant="outline"
+            className="px-1.5 py-0 h-4 text-[9px] font-black border-emerald-500/20 bg-emerald-500/5 text-emerald-600"
+          >
             {row.original.last_strata || "N/A"}
           </Badge>
         </div>
@@ -86,8 +89,8 @@ export const columns: ColumnDef<Pegawai>[] = [
         </div>
         <div className="flex items-center gap-2">
           <UserCheck className="size-3.5 text-emerald-500" />
-          <Badge 
-            variant="secondary" 
+          <Badge
+            variant="secondary"
             className="text-[9px] font-black uppercase tracking-widest px-2 py-0 h-4 bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
           >
             {row.original.status_keaktifan}

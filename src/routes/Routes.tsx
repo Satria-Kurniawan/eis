@@ -19,6 +19,12 @@ import LandingPage from "@/pages/landing/LandingPage";
 import TracerPage from "@/pages/alumni/TracerPage";
 import DosenPage from "@/pages/kepegawaian/DosenPage";
 import PegawaiPage from "@/pages/kepegawaian/PegawaiPage";
+import BukuPage from "@/pages/kinerja/BukuPage";
+import HKIPage from "@/pages/kinerja/HKIPage";
+import JurnalPage from "@/pages/kinerja/JurnalPage";
+import PenelitianPage from "@/pages/kinerja/PenelitianPage";
+import PengabdianPage from "@/pages/kinerja/PengabdianPage";
+import ProsidingPage from "@/pages/kinerja/ProsidingPage";
 import { createBrowserRouter } from "react-router-dom";
 
 export const router = createBrowserRouter([
@@ -105,6 +111,30 @@ export const router = createBrowserRouter([
       {
         path: "kepegawaian/pegawai",
         Component: PegawaiPage,
+      },
+      {
+        path: "kinerja/buku",
+        Component: BukuPage,
+      },
+      {
+        path: "kinerja/pengabdian",
+        Component: PengabdianPage,
+      },
+      {
+        path: "kinerja/jurnal",
+        Component: JurnalPage,
+      },
+      {
+        path: "kinerja/hki",
+        Component: HKIPage,
+      },
+      {
+        path: "kinerja/prosiding",
+        Component: ProsidingPage,
+      },
+      {
+        path: "kinerja/penelitian",
+        Component: PenelitianPage,
       },
     ],
   },

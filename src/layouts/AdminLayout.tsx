@@ -388,7 +388,9 @@ export default function AdminLayout() {
                       <SidebarMenuSubItem>
                         <SidebarMenuSubButton
                           asChild
-                          isActive={location.pathname === "/kepegawaian/pegawai"}
+                          isActive={
+                            location.pathname === "/kepegawaian/pegawai"
+                          }
                         >
                           <Link to="/kepegawaian/pegawai">
                             <span>Data Pegawai</span>
@@ -399,14 +401,81 @@ export default function AdminLayout() {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#">
-                    <LineChart />
-                    <span>Kinerja</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              <Collapsible asChild className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip="Kinerja">
+                      <LineChart />
+                      <span>Kinerja</span>
+                      <ChevronDown className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={location.pathname === "/kinerja/buku"}
+                        >
+                          <Link to="/kinerja/buku">
+                            <span>Buku</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={location.pathname === "/kinerja/pengabdian"}
+                        >
+                          <Link to="/kinerja/pengabdian">
+                            <span>Pengabdian</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={location.pathname === "/kinerja/jurnal"}
+                        >
+                          <Link to="/kinerja/jurnal">
+                            <span>Jurnal</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={location.pathname === "/kinerja/hki"}
+                        >
+                          <Link to="/kinerja/hki">
+                            <span>HKI</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={location.pathname === "/kinerja/prosiding"}
+                        >
+                          <Link to="/kinerja/prosiding">
+                            <span>Prosiding</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={location.pathname === "/kinerja/penelitian"}
+                        >
+                          <Link to="/kinerja/penelitian">
+                            <span>Penelitian</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <a href="#">
@@ -425,7 +494,7 @@ export default function AdminLayout() {
             <SidebarTrigger />
             <div className="flex items-center gap-4">
               <h1 className="font-semibold text-sm mr-2">EIS Dashboard</h1>
-              
+
               <GlobalUnitFilter />
 
               <div className="relative group">
