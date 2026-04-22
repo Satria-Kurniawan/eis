@@ -103,7 +103,9 @@ export default function AdminLayout() {
           <div className="size-8 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 shrink-0">
             <Activity className="size-5" />
           </div>
-          <span className="font-bold text-lg select-none truncate">EIS Admin</span>
+          <span className="font-bold text-lg select-none truncate">
+            EIS Admin
+          </span>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
