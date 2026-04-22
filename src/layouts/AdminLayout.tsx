@@ -99,8 +99,11 @@ export default function AdminLayout() {
   return (
     <SidebarProvider defaultOpen={false}>
       <Sidebar>
-        <SidebarHeader className="h-16 flex items-center px-4">
-          <span className="font-bold text-lg select-none">EIS Admin</span>
+        <SidebarHeader className="h-16 flex items-center px-4 gap-3">
+          <div className="size-8 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 shrink-0">
+            <Activity className="size-5" />
+          </div>
+          <span className="font-bold text-lg select-none truncate">EIS Admin</span>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
@@ -490,20 +493,22 @@ export default function AdminLayout() {
       </Sidebar>
       <SidebarInset>
         <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4 justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <SidebarTrigger />
-            <div className="flex items-center gap-4">
-              <h1 className="font-semibold text-sm mr-2">EIS Dashboard</h1>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <h1 className="font-semibold text-xs sm:text-sm mr-2 hidden md:block">
+                EIS Dashboard
+              </h1>
 
               <GlobalUnitFilter />
 
-              <div className="relative group">
+              <div className="relative group shrink-0">
                 <div className="absolute -inset-0.5 bg-linear-to-r from-primary to-purple-600 rounded-full blur-sm opacity-20 group-hover:opacity-40 transition duration-1000"></div>
                 <Select
                   value={currentPeriod.label}
                   onValueChange={handlePeriodChange}
                 >
-                  <SelectTrigger className="relative w-[220px] h-10 rounded-full border-primary/20 bg-background/50 backdrop-blur-md shadow-sm hover:border-primary/40 transition-all font-bold text-xs uppercase tracking-wider pl-4">
+                  <SelectTrigger className="relative w-[130px] sm:w-[220px] h-10 rounded-full border-primary/20 bg-background/50 backdrop-blur-md shadow-sm hover:border-primary/40 transition-all font-bold text-[10px] sm:text-xs uppercase tracking-wider pl-3 sm:pl-4">
                     <div className="flex items-center gap-2 truncate">
                       <Calendar className="size-4 text-primary animate-pulse" />
                       <SelectValue placeholder="Pilih Periode" />
