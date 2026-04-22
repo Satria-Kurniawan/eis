@@ -70,7 +70,7 @@ export default function LandingPage() {
           magnetRadius={15}
           ringRadius={12}
           particleVariance={1.2}
-          particleSize={0.4}
+          particleSize={0.7}
           autoAnimate={true}
         />
       </div>
@@ -109,7 +109,7 @@ export default function LandingPage() {
       {/* NORMAL FLOW LAYOUT (z-10 ensures UI clicks don't fall through) */}
       <div className="relative z-10 flex flex-col w-full px-6 lg:px-16 pt-[25vh] pb-32 pointer-events-none">
         {/* HERO SECTION */}
-        <motion.div className="pointer-events-auto flex flex-col items-center justify-center text-center min-h-[50vh] max-w-5xl mx-auto">
+        <motion.div className="flex flex-col items-center justify-center text-center min-h-[50vh] max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -179,7 +179,7 @@ export default function LandingPage() {
         </motion.div>
 
         {/* FEATURES SECTION */}
-        <motion.div className="pointer-events-auto mt-24 flex flex-col items-center w-full">
+        <motion.div className="mt-24 flex flex-col items-center w-full">
           {/* Subtle line separator */}
           <div className="w-px h-24 bg-linear-to-b from-transparent via-slate-300 dark:via-slate-700 to-transparent mb-16 opacity-50 pointer-events-none" />
 
@@ -213,7 +213,7 @@ export default function LandingPage() {
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.8, delay: i * 0.1 }}
                 whileHover={{ y: -8 }}
-                className="group relative flex flex-col p-8 rounded-[2rem] border border-slate-200 dark:border-white/5 bg-white/50 dark:bg-[#0a0a0a]/50 backdrop-blur-xl transition-all duration-500 hover:shadow-[0_12px_40px_rgba(0,0,0,0.02)] dark:hover:shadow-[0_12px_40px_rgba(255,255,255,0.02)] hover:border-slate-300 dark:hover:border-white/10"
+                className="pointer-events-auto group relative flex flex-col p-8 rounded-[2rem] border border-slate-200 dark:border-white/5 bg-white/50 dark:bg-[#0a0a0a]/50 backdrop-blur-xl transition-all duration-500 hover:shadow-[0_12px_40px_rgba(0,0,0,0.02)] dark:hover:shadow-[0_12px_40px_rgba(255,255,255,0.02)] hover:border-slate-300 dark:hover:border-white/10"
               >
                 <div className="mb-6 opacity-60 group-hover:opacity-100 transition-opacity duration-300">
                   <card.icon
@@ -238,7 +238,7 @@ export default function LandingPage() {
             transition={{ duration: 1 }}
             className="w-full max-w-4xl mt-16 grid grid-cols-1 md:grid-cols-2 gap-4"
           >
-            <div className="flex items-center gap-6 p-6 rounded-3xl border border-slate-200 dark:border-white/5 bg-transparent group hover:bg-slate-50 dark:hover:bg-white/2 transition-colors duration-500">
+            <div className="pointer-events-auto flex items-center gap-6 p-6 rounded-3xl border border-slate-200 dark:border-white/5 bg-transparent group hover:bg-slate-50 dark:hover:bg-white/2 transition-colors duration-500">
               <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-300 text-slate-800 dark:text-sky-400">
                 <Zap className="size-5" />
               </div>
@@ -251,7 +251,7 @@ export default function LandingPage() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-6 p-6 rounded-3xl border border-slate-200 dark:border-white/5 bg-transparent group hover:bg-slate-50 dark:hover:bg-white/2 transition-colors duration-500">
+            <div className="pointer-events-auto flex items-center gap-6 p-6 rounded-3xl border border-slate-200 dark:border-white/5 bg-transparent group hover:bg-slate-50 dark:hover:bg-white/2 transition-colors duration-500">
               <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-300 text-slate-800 dark:text-amber-400">
                 <ShieldCheck className="size-5" />
               </div>

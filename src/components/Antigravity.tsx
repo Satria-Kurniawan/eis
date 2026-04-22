@@ -160,8 +160,8 @@ const AntigravityInner = ({
   useEffect(() => {
     if (!meshRef.current) return;
     
-    // Google / Antigravity themed color palette
-    const palette = ["#4285F4", "#EA4335", "#FBBC05", "#34A853", "#8E24AA", "#0ea5e9"];
+    // Darker Google / Antigravity themed color palette
+    const palette = ["#1e40af", "#991b1b", "#b45309", "#166534", "#581c87", "#075985"];
     
     for (let i = 0; i < count; i++) {
       const randomColorStr = palette[Math.floor(Math.random() * palette.length)];
