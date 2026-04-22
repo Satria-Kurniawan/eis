@@ -33,9 +33,11 @@ export const fetchKritikSaran = async (
   tahun: string,
   semester: string,
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  search: string = ""
 ) => {
   return apiClient<KritikSaranResponse>(
-    `/api/v1/kritik-saran?tahun=${tahun}&semester=${semester}&page=${page}&limit=${limit}`
+    `/api/v1/kritik-saran?tahun=${tahun}&semester=${semester}&page=${page}&limit=${limit}&search=${search}`
   );
 };
+

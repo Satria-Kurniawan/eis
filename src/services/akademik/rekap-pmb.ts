@@ -48,8 +48,10 @@ export const fetchRekapPmb = async (
   semester: string,
   page: number = 1,
   limit: number = 10,
+  search: string = ""
 ) => {
   return apiClient<RekapPmbResponse>(
-    `/api/v1/rekap-pmb?tahun=${tahun}&semester=${semester}&page=${page}&limit=${limit}`,
+    `/api/v1/rekap-pmb?tahun=${tahun}&semester=${semester}&page=${page}&limit=${limit}&search=${search}`
   );
 };
+

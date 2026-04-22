@@ -2,21 +2,39 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { useKritikSaran } from "@/hooks/akademik/use-kritik-saran";
+import { useDebounce } from "@/hooks/use-debounce";
+import { Input } from "@/components/ui/input";
 import { type KritikSaran } from "@/services/akademik/kritikSaran";
-import { GraduationCap, Info, MessageSquare, TrendingUp } from "lucide-react";
+import { GraduationCap, Info, MessageSquare, Search, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createColumns } from "./KritikSaran/columns";
 import { KritikDetailDialog } from "./KritikSaran/kritik-detail-dialog";
 import { KritikTable } from "./KritikSaran/kritik-table";
 
 export default function KritikSaranPage() {
-  const { data, isLoading, isError, error, page, setPage, limit, setLimit } =
-    useKritikSaran();
   const { tahun, semester } = usePeriod();
+  const [searchValue, setSearchValue] = useState("");
+  const debouncedSearch = useDebounce(searchValue, 500);
+
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    page,
+    setPage,
+    limit,
+    setLimit,
+  } = useKritikSaran(debouncedSearch);
 
   const [selectedData, setSelectedData] = useState<KritikSaran | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, setPage]);
 
   const handleOpenDetail = (item: KritikSaran) => {
     setSelectedData(item);
@@ -24,20 +42,6 @@ export default function KritikSaranPage() {
   };
 
   const columns = useMemo(() => createColumns(handleOpenDetail), []);
-
-  // Calculate statistics
-  // const stats = useMemo(() => {
-  //   if (!data?.datas) return { totalSaran: 0, avgSaran: 0, totalDosen: 0 };
-
-  //   const totalSaran = data.datas.reduce(
-  //     (acc, curr) => acc + curr.saran.length,
-  //     0,
-  //   );
-  //   const totalDosen = data.pagination.total;
-  //   const avgSaran = totalDosen > 0 ? (totalSaran / totalDosen).toFixed(1) : 0;
-
-  //   return { totalSaran, avgSaran, totalDosen };
-  // }, [data]);
 
   return (
     <motion.div
@@ -93,6 +97,26 @@ export default function KritikSaranPage() {
           </AlertDescription>
         </Alert>
       )}
+
+      {/* Modern Filter Toolbar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card/40 backdrop-blur-md p-4 rounded-3xl border border-primary/5 shadow-sm">
+        <div className="relative w-full sm:w-96 group">
+          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors">
+            <Search className="size-4" />
+          </div>
+          <Input
+            placeholder="Cari Dosen atau Masukan..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="pl-11 h-12 rounded-2xl border-primary/10 bg-background/50 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+          />
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="px-4 py-2 rounded-2xl bg-muted/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground border border-transparent hover:border-primary/10 transition-all">
+            Search Active: {debouncedSearch || "None"}
+          </div>
+        </div>
+      </div>
 
       {/* Main Table Area */}
       <div className="space-y-4">

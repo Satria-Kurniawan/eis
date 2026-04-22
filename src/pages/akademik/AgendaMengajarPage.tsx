@@ -2,15 +2,34 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { useAgendaMengajar } from "@/hooks/akademik/use-agenda-mengajar";
-import { BookOpen, GraduationCap, Info, TrendingUp } from "lucide-react";
+import { useDebounce } from "@/hooks/use-debounce";
+import { Input } from "@/components/ui/input";
+import { BookOpen, GraduationCap, Info, Search, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
+import { useEffect, useState } from "react";
 import { AgendaTable } from "./AgendaMengajar/agenda-table";
 import { columns } from "./AgendaMengajar/columns";
 
 export default function AgendaMengajarPage() {
-  const { data, isLoading, isError, error, page, setPage, limit, setLimit } =
-    useAgendaMengajar();
   const { tahun, semester } = usePeriod();
+  const [searchValue, setSearchValue] = useState("");
+  const debouncedSearch = useDebounce(searchValue, 500);
+
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    page,
+    setPage,
+    limit,
+    setLimit,
+  } = useAgendaMengajar(debouncedSearch);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, setPage]);
 
   return (
     <motion.div
@@ -66,6 +85,26 @@ export default function AgendaMengajarPage() {
           </AlertDescription>
         </Alert>
       )}
+
+      {/* Modern Filter Toolbar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card/40 backdrop-blur-md p-4 rounded-3xl border border-primary/5 shadow-sm">
+        <div className="relative w-full sm:w-96 group">
+          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors">
+            <Search className="size-4" />
+          </div>
+          <Input
+            placeholder="Cari Dosen atau Mata Kuliah..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="pl-11 h-12 rounded-2xl border-primary/10 bg-background/50 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+          />
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="px-4 py-2 rounded-2xl bg-muted/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground border border-transparent hover:border-primary/10 transition-all">
+            Search Active: {debouncedSearch || "None"}
+          </div>
+        </div>
+      </div>
 
       {/* Main Content Area */}
       <div className="space-y-4">

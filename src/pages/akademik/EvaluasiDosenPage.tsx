@@ -2,21 +2,39 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { useEvaluasiDosen } from "@/hooks/akademik/use-evaluasi-dosen";
+import { useDebounce } from "@/hooks/use-debounce";
+import { Input } from "@/components/ui/input";
 import { type EvaluasiDosen } from "@/services/akademik/evaluasiDosen";
-import { GraduationCap, Info, PieChart, TrendingUp } from "lucide-react";
+import { GraduationCap, Info, PieChart, Search, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createColumns } from "./EvaluasiDosen/columns";
 import { EvaluasiDetailDialog } from "./EvaluasiDosen/evaluasi-detail-dialog";
 import { EvaluasiTable } from "./EvaluasiDosen/evaluasi-table";
 
 export default function EvaluasiDosenPage() {
-  const { data, isLoading, isError, error, page, setPage, limit, setLimit } =
-    useEvaluasiDosen();
   const { tahun, semester } = usePeriod();
+  const [searchValue, setSearchValue] = useState("");
+  const debouncedSearch = useDebounce(searchValue, 500);
+
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    page,
+    setPage,
+    limit,
+    setLimit,
+  } = useEvaluasiDosen(debouncedSearch);
 
   const [selectedData, setSelectedData] = useState<EvaluasiDosen | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, setPage]);
 
   const handleOpenDetail = (item: EvaluasiDosen) => {
     setSelectedData(item);
@@ -69,16 +87,40 @@ export default function EvaluasiDosenPage() {
           variant="destructive"
           className="rounded-3xl border-destructive/20 shadow-2xl animate-in zoom-in-95 duration-500"
         >
-          <Info className="h-5 w-5" />
-          <AlertTitle className="font-black uppercase tracking-widest text-xs mb-1">
-            System Error
-          </AlertTitle>
-          <AlertDescription className="font-medium opacity-90">
-            {(error as Error).message ||
-              "Gagal mengsinkronisasi data evaluasi dosen."}
-          </AlertDescription>
+          <div className="flex items-start gap-4">
+            <Info className="h-5 w-5 mt-0.5" />
+            <div>
+              <AlertTitle className="font-black uppercase tracking-widest text-xs mb-1">
+                System Error
+              </AlertTitle>
+              <AlertDescription className="font-medium opacity-90">
+                {(error as Error).message ||
+                  "Gagal mengsinkronisasi data evaluasi dosen."}
+              </AlertDescription>
+            </div>
+          </div>
         </Alert>
       )}
+
+      {/* Modern Filter Toolbar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card/40 backdrop-blur-md p-4 rounded-3xl border border-primary/5 shadow-sm">
+        <div className="relative w-full sm:w-96 group">
+          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors">
+            <Search className="size-4" />
+          </div>
+          <Input
+            placeholder="Cari Dosen atau Mata Kuliah..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="pl-11 h-12 rounded-2xl border-primary/10 bg-background/50 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+          />
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="px-4 py-2 rounded-2xl bg-muted/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground border border-transparent hover:border-primary/10 transition-all">
+            Search Active: {debouncedSearch || "None"}
+          </div>
+        </div>
+      </div>
 
       {/* Table Container */}
       <div className="space-y-4">

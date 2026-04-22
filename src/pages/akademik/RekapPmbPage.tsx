@@ -2,43 +2,38 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { useRekapPmb } from "@/hooks/akademik/use-rekap-pmb";
-import { BarChart3, GraduationCap, Info, TrendingUp } from "lucide-react";
+import { useDebounce } from "@/hooks/use-debounce";
+import { Input } from "@/components/ui/input";
+import { BarChart3, GraduationCap, Info, Search, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { columns as columnDefs } from "./RekapPmb/columns";
 import { PmbTable } from "./RekapPmb/pmb-table";
 
 export default function RekapPmbPage() {
-  const { data, isLoading, isError, error, page, setPage, limit, setLimit } =
-    useRekapPmb();
   const { tahun, semester } = usePeriod();
+  const [searchValue, setSearchValue] = useState("");
+  const debouncedSearch = useDebounce(searchValue, 500);
+
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    page,
+    setPage,
+    limit,
+    setLimit,
+  } = useRekapPmb(debouncedSearch);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, setPage]);
 
   // Memoize columns and source data for RevoGrid performance
   const columns = useMemo(() => columnDefs, []);
   const source = useMemo(() => data?.datas || [], [data?.datas]);
-
-  // Calculate totals from the current view for stats overview
-  // const totalPeminat = useMemo(
-  //   () =>
-  //     source.reduce(
-  //       (acc, curr) => acc + (parseInt(curr.jumlah.peminat) || 0),
-  //       0,
-  //     ),
-  //   [source],
-  // );
-  // const totalLulus = useMemo(
-  //   () =>
-  //     source.reduce((acc, curr) => acc + (parseInt(curr.jumlah.lulus) || 0), 0),
-  //   [source],
-  // );
-  // const totalDaftar = useMemo(
-  //   () =>
-  //     source.reduce(
-  //       (acc, curr) => acc + (parseInt(curr.jumlah.daftar) || 0),
-  //       0,
-  //     ),
-  //   [source],
-  // );
 
   // Flatten nested data for RevoGrid compatibility
   const flattenedSource = useMemo(() => {
@@ -129,6 +124,26 @@ export default function RekapPmbPage() {
           </div>
         </Alert>
       )}
+
+      {/* Modern Filter Toolbar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card/40 backdrop-blur-md p-4 rounded-3xl border border-primary/5 shadow-sm">
+        <div className="relative w-full sm:w-96 group">
+          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors">
+            <Search className="size-4" />
+          </div>
+          <Input
+            placeholder="Cari Program Studi..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="pl-11 h-12 rounded-2xl border-primary/10 bg-background/50 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+          />
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="px-4 py-2 rounded-2xl bg-muted/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground border border-transparent hover:border-primary/10 transition-all">
+            Search Active: {debouncedSearch || "None"}
+          </div>
+        </div>
+      </div>
 
       {/* Main Content Area */}
       <div className="space-y-4">

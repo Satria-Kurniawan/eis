@@ -2,6 +2,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { useKerjasama } from "@/hooks/akademik/use-kerjasama";
+import { useDebounce } from "@/hooks/use-debounce";
+import { Input } from "@/components/ui/input";
 import {
   GraduationCap,
   Handshake,
@@ -10,11 +12,15 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { motion } from "motion/react";
+import { useEffect, useState } from "react";
 import { columns } from "./Kerjasama/columns";
 import { KerjasamaTable } from "./Kerjasama/kerjasama-table";
 
 export default function KerjasamaPage() {
   const { tahun, semester } = usePeriod();
+  const [searchValue, setSearchValue] = useState("");
+  const debouncedSearch = useDebounce(searchValue, 500);
+
   const {
     data,
     isLoading,
@@ -26,13 +32,12 @@ export default function KerjasamaPage() {
     setLimit,
     refetch,
     isFetching,
-  } = useKerjasama();
+  } = useKerjasama(debouncedSearch);
 
-  // const totalPartners = data?.pagination.total || 0;
-  // const foreignPartners =
-  //   data?.datas.filter((d) =>
-  //     d.jns_asalmitra_nama.toLowerCase().includes("luar"),
-  //   ).length || 0;
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, setPage]);
 
   return (
     <motion.div
@@ -92,25 +97,30 @@ export default function KerjasamaPage() {
 
       {/* Main Table Area */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between pb-2">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-primary/10 text-primary">
-              <Search className="size-5" />
+        {/* Modern Filter Toolbar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card/40 backdrop-blur-md p-4 rounded-3xl border border-primary/5 shadow-sm">
+          <div className="relative w-full sm:w-96 group">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors">
+              <Search className="size-4" />
             </div>
-            <h2 className="text-xl font-bold tracking-tight">
-              Portfolio Kerjasama
-            </h2>
-          </div>
-
-          <button
-            onClick={() => refetch()}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${isFetching ? "bg-primary/20 text-primary animate-pulse" : "bg-muted hover:bg-muted/80 text-muted-foreground"}`}
-          >
-            <RefreshCw
-              className={`size-3 ${isFetching ? "animate-spin" : ""}`}
+            <Input
+              placeholder="Cari Mitra, Deskripsi, atau Negara..."
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              className="pl-11 h-12 rounded-2xl border-primary/10 bg-background/50 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
             />
-            {isFetching ? "Syncing..." : "Refresh"}
-          </button>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => refetch()}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${isFetching ? "bg-primary/20 text-primary animate-pulse" : "bg-muted border border-transparent hover:border-primary/20 text-muted-foreground hover:bg-muted/80 hover:text-foreground"}`}
+            >
+              <RefreshCw
+                className={`size-3 ${isFetching ? "animate-spin" : ""}`}
+              />
+              {isFetching ? "Syncing..." : "Refresh Data"}
+            </button>
+          </div>
         </div>
 
         {isLoading ? (

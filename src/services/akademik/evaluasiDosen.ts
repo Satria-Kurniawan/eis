@@ -68,9 +68,11 @@ export const fetchEvaluasiDosen = async (
   tahun: string,
   semester: string,
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  search: string = ""
 ) => {
   return apiClient<EvaluasiDosenResponse>(
-    `/api/v1/evaluasi-dosen?tahun=${tahun}&semester=${semester}&page=${page}&limit=${limit}`
+    `/api/v1/evaluasi-dosen?tahun=${tahun}&semester=${semester}&page=${page}&limit=${limit}&search=${search}`
   );
 };
+

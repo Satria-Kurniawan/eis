@@ -41,8 +41,10 @@ export const fetchKaryaAkhir = async (
   semester: string,
   page: number = 1,
   limit: number = 10,
+  search: string = ""
 ) => {
   return apiClient<KaryaAkhirResponse>(
-    `/api/v1/karya-akhir?tahun=${tahun}&semester=${semester}&page=${page}&limit=${limit}`,
+    `/api/v1/karya-akhir?tahun=${tahun}&semester=${semester}&page=${page}&limit=${limit}&search=${search}`
   );
 };
+

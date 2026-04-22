@@ -36,9 +36,11 @@ export const fetchAngketMahasiswa = async (
   tahun: string,
   semester: string,
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  search: string = ""
 ) => {
   return apiClient<AngketMahasiswaResponse>(
-    `/api/v1/angket-mhs?tahun=${tahun}&semester=${semester}&page=${page}&limit=${limit}`
+    `/api/v1/angket-mhs?tahun=${tahun}&semester=${semester}&page=${page}&limit=${limit}&search=${search}`
   );
 };
+
