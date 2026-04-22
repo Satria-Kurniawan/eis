@@ -69,7 +69,7 @@ export const nodes = [
       },
       { label: "Evaluasi Dosen", path: "/akademik/evaluasi-dosen" },
       { label: "Angket Mahasiswa", path: "/akademik/angket-mahasiswa" },
-      { label: "Kritik & Saran", path: "/akademik/kritik-saran" },
+      { label: "Kritik Saran", path: "/akademik/kritik-saran" },
       { label: "Agenda Mengajar", path: "/akademik/agenda-mengajar" },
       { label: "Mahasiswa Wisuda", path: "/akademik/mahasiswa-wisuda" },
       { label: "Rekap Pmb", path: "/akademik/rekap-pmb" },
@@ -98,9 +98,9 @@ export const nodes = [
     details:
       "Kafka-based CDC Engine active for student activity logs. Mechanism: Debezium Event Streaming. Tidak terdeteksi adanya lag pada pipeline pendaftaran beasiswa dan UKM. Metadata prestasi nasional sedang direplikasi ke EIS Data Warehouse melalui Kafka topics.",
     menuItems: [
-      { label: "Beasiswa", path: "#" },
-      { label: "Kegiatan UKM", path: "#" },
-      { label: "Validasi SKPI", path: "#" },
+      { label: "Mahasiswa", path: "/kemahasiswaan/mahasiswa" },
+      { label: "Beasiswa", path: "/kemahasiswaan/beasiswa" },
+      { label: "Dashboard Mahasiswa", path: "/kemahasiswaan/dashboard" },
     ],
   },
   {
@@ -117,11 +117,7 @@ export const nodes = [
     progress: 100,
     details:
       "Real-time Change Data Capture via Debezium aktif pada tabel Tracer Study. Setiap feedback dari alumni langsung memicu pembaruan dashboard di EIS melalui Kafka Stream processing. Status replikasi: Healthy. Latensi: 8ms.",
-    menuItems: [
-      { label: "Tracer Study 2026", path: "#" },
-      { label: "Database Alumni", path: "#" },
-      { label: "Legalisir Online", path: "#" },
-    ],
+    menuItems: [{ label: "Data Tracer", path: "/alumni/data-tracer" }],
   },
   {
     id: "umum",
@@ -138,9 +134,8 @@ export const nodes = [
     details:
       "Monitoring CDC Debezium pada log absensi dan inventaris aset. Kafka data stream mengalir stabil tanpa interupsi. Sinkronisasi data kepegawaian melalui Kafka cluster terakhir dilakukan 0.2 detik yang lalu (Real-time).",
     menuItems: [
-      { label: "Monitoring Absensi", path: "#" },
-      { label: "Inventaris Aset", path: "#" },
-      { label: "Portal Pegawai", path: "#" },
+      { label: "Data Dosen", path: "/kepegawaian/dosen" },
+      { label: "Data Pegawai", path: "/kepegawaian/pegawai" },
     ],
   },
   {
@@ -158,9 +153,12 @@ export const nodes = [
     details:
       "Pipeline CDC Debezium untuk data IKU dan BKD SISTER sedang memproses Kafka topics terbaru. Sinkronisasi metadata kinerja dosen berjalan di background dengan throughput 200 msg/sec. Status: Kafka cluster all streams healthy.",
     menuItems: [
-      { label: "Dashboard IKU", path: "#" },
-      { label: "Evaluasi BKD", path: "#" },
-      { label: "Monitoring SISTER", path: "#" },
+      { label: "Buku", path: "/kinerja/buku" },
+      { label: "Pengabdian", path: "/kinerja/pengabdian" },
+      { label: "Jurnal", path: "/kinerja/jurnal" },
+      { label: "HKI", path: "/kinerja/hki" },
+      { label: "Prosiding", path: "/kinerja/prosiding" },
+      { label: "Penelitian", path: "/kinerja/penelitian" },
     ],
   },
   {
