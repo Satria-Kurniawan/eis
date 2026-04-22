@@ -24,6 +24,15 @@ export default function LandingPage() {
     document.documentElement.classList.contains("dark"),
   );
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Synchronize global theme
   useEffect(() => {
     const isDarkGlobal = localStorage.getItem("theme") === "dark";
@@ -70,7 +79,7 @@ export default function LandingPage() {
           magnetRadius={15}
           ringRadius={12}
           particleVariance={1.2}
-          particleSize={0.7}
+          particleSize={isMobile ? 0.3 : 0.7}
           autoAnimate={true}
         />
       </div>
