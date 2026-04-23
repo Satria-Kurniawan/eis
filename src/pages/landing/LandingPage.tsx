@@ -79,7 +79,7 @@ export default function LandingPage() {
           magnetRadius={15}
           ringRadius={12}
           particleVariance={1.2}
-          particleSize={isMobile ? 0.3 : 0.7}
+          particleSize={isMobile ? 0.3 : 0.5}
           autoAnimate={true}
         />
       </div>
@@ -137,7 +137,7 @@ export default function LandingPage() {
             transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }}
             className="text-5xl sm:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[0.95] text-slate-900 dark:text-white mb-6"
           >
-            Executive Information System
+            Executive Information <span className="text-sky-400">System</span>
           </motion.h1>
 
           <motion.p

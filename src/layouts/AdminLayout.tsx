@@ -1,15 +1,23 @@
+import logoUndiksha from "@/assets/logo-undiksha.png";
+import { GlobalUnitFilter } from "@/components/GlobalUnitFilter";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Sidebar,
   SidebarContent,
@@ -27,6 +35,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { usePeriod } from "@/contexts/PeriodContext";
+import { cn } from "@/lib/utils";
 import {
   Activity,
   BookOpen,
@@ -34,6 +43,7 @@ import {
   Calendar,
   ChevronDown,
   GraduationCap,
+  Home,
   LineChart,
   Moon,
   Sparkles,
@@ -41,13 +51,13 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "motion/react";
-import { GlobalUnitFilter } from "@/components/GlobalUnitFilter";
 
 export default function AdminLayout() {
   const [isDark, setIsDark] = useState(false);
+  const [isPeriodOpen, setIsPeriodOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const period = usePeriod();
@@ -494,52 +504,101 @@ export default function AdminLayout() {
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4 justify-between">
+        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur-md px-4 justify-between">
           <div className="flex items-center gap-2 sm:gap-4">
             <SidebarTrigger />
-            <div className="flex items-center gap-2 sm:gap-4">
-              <h1 className="font-semibold text-xs sm:text-sm mr-2 hidden md:block">
-                EIS Dashboard
+            <Link
+              to="/"
+              className="p-2 rounded-xl hover:bg-muted transition-all text-slate-500 hover:text-primary group active:scale-90 shrink-0"
+              title="Kembali ke Beranda"
+            >
+              <Home className="size-5 group-hover:scale-110 transition-transform" />
+            </Link>
+
+            <div className="h-6 w-px bg-border hidden md:block mx-1" />
+
+            <div className="flex items-center gap-3 shrink-0">
+              <img
+                src={logoUndiksha}
+                alt="Logo Undiksha"
+                className="h-7 w-7 object-contain hidden sm:block drop-shadow-sm"
+              />
+              <h1 className="font-bold text-xs sm:text-sm tracking-tight text-slate-900 dark:text-white hidden lg:block">
+                EIS <span className="text-primary">Undiksha</span>
               </h1>
-
-              <GlobalUnitFilter />
-
-              <div className="relative group shrink-0">
-                <div className="absolute -inset-0.5 bg-linear-to-r from-primary to-purple-600 rounded-full blur-sm opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-                <Select
-                  value={currentPeriod.label}
-                  onValueChange={handlePeriodChange}
-                >
-                  <SelectTrigger className="relative w-[130px] sm:w-[220px] h-10 rounded-full border-primary/20 bg-background/50 backdrop-blur-md shadow-sm hover:border-primary/40 transition-all font-bold text-[10px] sm:text-xs uppercase tracking-wider pl-3 sm:pl-4">
-                    <div className="flex items-center gap-2 truncate">
-                      <Calendar className="size-4 text-primary animate-pulse" />
-                      <SelectValue placeholder="Pilih Periode" />
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-primary/10 shadow-2xl backdrop-blur-xl">
-                    {academicPeriods.map((p) => (
-                      <SelectItem
-                        key={p.label}
-                        value={p.label}
-                        className="rounded-xl focus:bg-primary/10 focus:text-primary transition-colors py-2.5 my-1"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="size-3 text-amber-500" />
-                          <span className="font-bold">{p.label}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
           </div>
-          <button
-            onClick={toggleSidebarTheme}
-            className="p-2 rounded-md hover:bg-muted transition-colors"
-          >
-            {isDark ? <Sun className="size-5" /> : <Moon className="size-5" />}
-          </button>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <GlobalUnitFilter />
+
+            <div className="relative group shrink-0">
+              <div className="absolute -inset-0.5 bg-linear-to-r from-primary to-purple-600 rounded-full blur-sm opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+              <Popover open={isPeriodOpen} onOpenChange={setIsPeriodOpen}>
+                <PopoverTrigger asChild>
+                  <button className="relative flex items-center justify-center h-10 px-3 sm:px-4 rounded-full border border-primary/20 bg-background/50 backdrop-blur-md shadow-sm hover:border-primary/40 hover:bg-primary/5 transition-all text-[10px] sm:text-xs font-bold uppercase tracking-wider group shrink-0">
+                    <Calendar className="size-4 text-primary sm:mr-2 group-hover:scale-110 transition-transform" />
+                    <span className="hidden sm:inline">
+                      {currentPeriod.label}
+                    </span>
+                    <ChevronDown
+                      size={14}
+                      className="ml-2 text-slate-400 group-hover:text-primary transition-colors"
+                    />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[240px] p-0 rounded-2xl border-primary/10 backdrop-blur-2xl">
+                  <Command className="rounded-2xl">
+                    <CommandInput
+                      placeholder="Cari Periode..."
+                      className="h-11 font-bold"
+                    />
+                    <CommandList>
+                      <CommandEmpty className="py-6 text-center text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                        Tidak ditemukan.
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {academicPeriods.map((p) => (
+                          <CommandItem
+                            key={p.label}
+                            value={p.label}
+                            onSelect={() => {
+                              handlePeriodChange(p.label);
+                              setIsPeriodOpen(false);
+                            }}
+                            className="rounded-xl font-bold py-3 my-1 cursor-pointer"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Sparkles
+                                className={cn(
+                                  "size-3 text-amber-500",
+                                  currentPeriod.label === p.label
+                                    ? "opacity-100"
+                                    : "opacity-30",
+                                )}
+                              />
+                              {p.label}
+                            </div>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <button
+              onClick={toggleSidebarTheme}
+              className="p-2 rounded-xl hover:bg-muted transition-all text-slate-500 hover:text-primary active:scale-90 shrink-0"
+              title={isDark ? "Mode Terang" : "Mode Gelap"}
+            >
+              {isDark ? (
+                <Sun className="size-5" />
+              ) : (
+                <Moon className="size-5" />
+              )}
+            </button>
+          </div>
         </header>
         <main className="flex-1 overflow-y-auto relative">
           <Outlet />

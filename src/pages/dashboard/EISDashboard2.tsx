@@ -6,11 +6,19 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Activity, ArrowUpRight, Layout, Sparkles } from "lucide-react";
-import { motion } from "motion/react";
+import {
+  Activity,
+  ArrowUpRight,
+  BarChart3,
+  Layout,
+  LayoutDashboard,
+  Sparkles,
+} from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import EISMobileDashboard from "./EISMobileDashboard";
+import StatsView from "./StatsView";
 import { nodes, paths, SCENE_H, SCENE_W } from "./dashboard-data";
 
 /** Isometric cube (SVG) */
@@ -145,11 +153,15 @@ export default function EISDashboard2() {
   const [selectedNode, setSelectedNode] = useState<(typeof nodes)[0] | null>(
     null,
   );
+  const [isHubOpen, setIsHubOpen] = useState(false);
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark"),
   );
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const [activeView, setActiveView] = useState<"dashboard" | "stats">(
+    "dashboard",
+  );
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -173,8 +185,134 @@ export default function EISDashboard2() {
 
   if (isMobile) return <EISMobileDashboard />;
 
+  const sectors = nodes.filter((n) => n.kind === "sector");
+
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white dark:bg-[#0a0a0a] transition-colors duration-500 font-sans text-slate-800 dark:text-[#e5e7eb]">
+      {/* Hub Portal Overlay */}
+      <AnimatePresence>
+        {isHubOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-200 flex items-center justify-center p-4 sm:p-8"
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsHubOpen(false)}
+              className="absolute inset-0 bg-slate-950/40 dark:bg-black/60 backdrop-blur-md"
+            />
+
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative w-full max-w-7xl max-h-[90vh] bg-white dark:bg-[#14151a] rounded-[3rem] shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col"
+              style={{ willChange: "transform, opacity" }}
+            >
+              {/* Portal Header */}
+              <div className="p-8 sm:p-12 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 text-primary">
+                    <Activity size={24} className="animate-pulse" />
+                    <span className="text-xs font-black uppercase tracking-[0.4em]">
+                      Central Intelligence Portal
+                    </span>
+                  </div>
+                  <h2 className="text-4xl sm:text-5xl font-black tracking-tighter text-slate-900 dark:text-white">
+                    EIS Core <span className="text-primary">Hub</span>
+                  </h2>
+                  <p className="text-slate-500 dark:text-slate-400 font-medium max-w-xl">
+                    Pusat komando seluruh modul eksekutif. Akses cepat ke setiap
+                    departemen dan analitik strategis dalam satu antarmuka.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsHubOpen(false)}
+                  className="group relative px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-slate-900/20"
+                >
+                  Tutup Portal
+                </button>
+              </div>
+
+              {/* Portal Content - Grid of Modules */}
+              <div
+                className="flex-1 overflow-y-auto p-8 sm:p-12 custom-scrollbar"
+                style={{
+                  willChange: "scroll-position",
+                  transform: "translateZ(0)",
+                }}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                  {sectors.map((sector, idx) => (
+                    <motion.div
+                      key={sector.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="group p-6 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800 hover:border-primary/40 hover:bg-white dark:hover:bg-slate-900 transition-all duration-300"
+                      style={{
+                        contentVisibility: "auto",
+                        containIntrinsicSize: "0 300px",
+                      }}
+                    >
+                      <div className="flex items-center gap-4 mb-6">
+                        <div
+                          className="size-14 rounded-2xl flex items-center justify-center text-white shadow-lg transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
+                          style={{ backgroundColor: sector.color }}
+                        >
+                          {sector.icon}
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
+                            {sector.title}
+                          </h4>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            {sector.subtitle}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        {sector.menuItems?.map((item, i) => (
+                          <button
+                            key={i}
+                            onClick={() => {
+                              if (item.path !== "#") {
+                                navigate(item.path);
+                                setIsHubOpen(false);
+                              }
+                            }}
+                            className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all ${
+                              item.path === "#"
+                                ? "opacity-30 cursor-not-allowed"
+                                : "hover:bg-primary/5 hover:text-primary dark:text-slate-400 dark:hover:text-primary"
+                            }`}
+                          >
+                            <span className="text-xs font-bold truncate">
+                              {item.label}
+                            </span>
+                            {item.path !== "#" && (
+                              <ArrowUpRight
+                                size={12}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                              />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* 3D Perspective Grid Background */}
       <div className="absolute inset-0 perspective-[1000px] pointer-events-none overflow-hidden">
         <motion.div
@@ -182,18 +320,20 @@ export default function EISDashboard2() {
           animate={{
             rotateX: 60,
             rotateZ: 30,
-            opacity: isDark ? 0.4 : 0.3,
-            backgroundPosition: ["0px 0px", "60px 60px"],
+            opacity: isHubOpen ? 0 : isDark ? 0.4 : 0.3,
+            backgroundPosition: isHubOpen
+              ? "0px 0px"
+              : ["0px 0px", "60px 60px"],
           }}
           transition={{
-            opacity: { duration: 1.5 },
+            opacity: { duration: 0.5 },
             backgroundPosition: {
               duration: 20,
               repeat: Infinity,
               ease: "linear",
             },
           }}
-          className="absolute -inset-full origin-center transition-opacity duration-1000"
+          className={`absolute -inset-full origin-center transition-all duration-700 ${isHubOpen ? "invisible" : "visible"}`}
           style={{
             backgroundImage: `
               linear-gradient(to right, ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"} 1.5px, transparent 1.5px),
@@ -208,271 +348,334 @@ export default function EISDashboard2() {
         />
       </div>
 
-      <div className="relative z-10 flex w-[min(96vw,1240px)] max-w-full shrink-0 flex-col items-center px-2 py-0">
-        <div
-          className="relative aspect-1200/800 w-full max-w-[1200px] overflow-visible"
-          style={{ minHeight: "min(70vh, 800px)" }}
-        >
-          <div
-            className="absolute inset-0 scale-[0.58] sm:scale-[0.72] md:scale-[0.88] lg:scale-100"
-            style={{ transformOrigin: "center center" }}
-          >
-            <div className="relative h-[800px] w-[1200px]">
-              {/* Corner cards mapping dynamically moved to Nodes */}
-
-              <svg
-                viewBox={`0 0 ${SCENE_W} ${SCENE_H}`}
-                className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
-                aria-hidden
+      {/* Floating View Switcher - Positioned on the header's bottom border */}
+      <div className="fixed top-16 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+        <div className="p-1.5 rounded-full bg-white/80 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 backdrop-blur-xl shadow-2xl flex items-center gap-1 transition-all duration-500">
+          {[
+            { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+            { id: "stats", label: "Statistik", icon: BarChart3 },
+          ].map((tab) => {
+            const isActive = activeView === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveView(tab.id as any)}
+                className={`relative px-6 py-2.5 rounded-full flex items-center gap-2 transition-all duration-300 ${
+                  isActive
+                    ? "text-white dark:text-slate-900"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                }`}
               >
-                <defs>
-                  <filter
-                    id="line-glow"
-                    x="-50%"
-                    y="-50%"
-                    width="200%"
-                    height="200%"
-                  >
-                    <feGaussianBlur stdDeviation="1.2" result="b" />
-                    <feMerge>
-                      <feMergeNode in="b" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
-                  <linearGradient
-                    id="iot-grad-blue"
-                    x1="0%"
-                    y1="0%"
-                    x2="100%"
-                    y2="100%"
-                  >
-                    <stop offset="0%" stopColor="#3b82f6" />
-                    <stop offset="100%" stopColor="#ff8c42" />
-                  </linearGradient>
-                  <linearGradient
-                    id="iot-grad-orange"
-                    x1="0%"
-                    y1="100%"
-                    x2="100%"
-                    y2="0%"
-                  >
-                    <stop offset="0%" stopColor="#f97316" />
-                    <stop offset="100%" stopColor="#ff8c42" />
-                  </linearGradient>
-                  <linearGradient
-                    id="iot-grad-green"
-                    x1="0%"
-                    y1="100%"
-                    x2="100%"
-                    y2="0%"
-                  >
-                    <stop offset="0%" stopColor="#10b981" />
-                    <stop offset="100%" stopColor="#ff8c42" />
-                  </linearGradient>
-                  <linearGradient
-                    id="iot-grad-gray"
-                    x1="100%"
-                    y1="100%"
-                    x2="0%"
-                    y2="0%"
-                  >
-                    <stop offset="0%" stopColor="#64748b" />
-                    <stop offset="100%" stopColor="#ff8c42" />
-                  </linearGradient>
-                  <linearGradient
-                    id="iot-grad-purple"
-                    x1="100%"
-                    y1="100%"
-                    x2="0%"
-                    y2="0%"
-                  >
-                    <stop offset="0%" stopColor="#a855f7" />
-                    <stop offset="100%" stopColor="#ff8c42" />
-                  </linearGradient>
-                  <linearGradient
-                    id="iot-grad-yellow"
-                    x1="100%"
-                    y1="0%"
-                    x2="0%"
-                    y2="100%"
-                  >
-                    <stop offset="0%" stopColor="#eab308" />
-                    <stop offset="100%" stopColor="#ff8c42" />
-                  </linearGradient>
-                </defs>
-
-                {/* Ground ring under hub */}
-                <ellipse
-                  cx={600}
-                  cy={465}
-                  rx={98}
-                  ry={40}
-                  fill="none"
-                  stroke="#ff8c42"
-                  strokeWidth="2"
-                  opacity={0.55}
-                  filter="url(#line-glow)"
+                {isActive && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className="absolute inset-0 bg-primary dark:bg-white rounded-full shadow-[0_0_20px_rgba(59,130,246,0.3)] dark:shadow-[0_0_20px_rgba(255,255,255,0.15)]"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+                <tab.icon
+                  size={16}
+                  className={`relative z-10 ${isActive ? "text-white dark:text-slate-900" : ""}`}
                 />
+                <span className="relative z-10 text-xs font-black uppercase tracking-widest">
+                  {tab.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-                {paths.map((p, i) => (
-                  <motion.path
-                    key={p.d}
-                    d={p.d}
-                    fill="none"
-                    stroke={p.stroke}
-                    strokeWidth={3}
-                    filter="url(#line-glow)"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 0.88 }}
-                    transition={{
-                      duration: 1.8,
-                      delay: i * 0.12,
-                      ease: "easeOut",
-                    }}
-                  />
-                ))}
+      <div className="relative z-10 flex w-full flex-col items-center justify-center p-8 pt-24">
+        <AnimatePresence mode="wait">
+          {activeView === "dashboard" ? (
+            <motion.div
+              key="dashboard"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              transition={{ duration: 0.5, ease: "circOut" }}
+              className={`relative aspect-1200/800 w-full max-w-[1200px] overflow-visible transition-all duration-700 ${isHubOpen ? "opacity-0 scale-95 blur-xl pointer-events-none" : "opacity-100 scale-100 blur-0"}`}
+              style={{
+                minHeight: "min(70vh, 800px)",
+                willChange: "transform, opacity",
+              }}
+            >
+              <div
+                className="absolute inset-0 scale-[0.58] sm:scale-[0.72] md:scale-[0.88] lg:scale-100"
+                style={{ transformOrigin: "center center" }}
+              >
+                <div className="relative h-[800px] w-[1200px]">
+                  {/* Corner cards mapping dynamically moved to Nodes */}
 
-                {paths.map((p, i) => (
-                  <motion.circle
-                    key={`pkt-${i}`}
-                    r={3}
-                    fill={isDark ? "#f8fafc" : "#334155"}
-                    className={isDark ? "" : "drop-shadow-none"}
-                    opacity={isDark ? 0.85 : 0.6}
-                    animate={{
-                      offsetDistance: ["0%", "100%"],
-                      opacity: [0, isDark ? 1 : 0.8, 0],
-                    }}
-                    transition={{
-                      duration: 3.2 + (i % 3) * 0.4,
-                      repeat: Infinity,
-                      ease: "linear",
-                      delay: i * 0.35,
-                    }}
-                    style={{ offsetPath: `path('${p.d}')` }}
-                  />
-                ))}
-              </svg>
+                  <svg
+                    viewBox={`0 0 ${SCENE_W} ${SCENE_H}`}
+                    className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+                    aria-hidden
+                  >
+                    <defs>
+                      <filter
+                        id="line-glow"
+                        x="-50%"
+                        y="-50%"
+                        width="200%"
+                        height="200%"
+                      >
+                        <feGaussianBlur stdDeviation="1.2" result="b" />
+                        <feMerge>
+                          <feMergeNode in="b" />
+                          <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                      </filter>
+                      <linearGradient
+                        id="iot-grad-blue"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="100%"
+                      >
+                        <stop offset="0%" stopColor="#3b82f6" />
+                        <stop offset="100%" stopColor="#ff8c42" />
+                      </linearGradient>
+                      <linearGradient
+                        id="iot-grad-orange"
+                        x1="0%"
+                        y1="100%"
+                        x2="100%"
+                        y2="0%"
+                      >
+                        <stop offset="0%" stopColor="#f97316" />
+                        <stop offset="100%" stopColor="#ff8c42" />
+                      </linearGradient>
+                      <linearGradient
+                        id="iot-grad-green"
+                        x1="0%"
+                        y1="100%"
+                        x2="100%"
+                        y2="0%"
+                      >
+                        <stop offset="0%" stopColor="#10b981" />
+                        <stop offset="100%" stopColor="#ff8c42" />
+                      </linearGradient>
+                      <linearGradient
+                        id="iot-grad-gray"
+                        x1="100%"
+                        y1="100%"
+                        x2="0%"
+                        y2="0%"
+                      >
+                        <stop offset="0%" stopColor="#64748b" />
+                        <stop offset="100%" stopColor="#ff8c42" />
+                      </linearGradient>
+                      <linearGradient
+                        id="iot-grad-purple"
+                        x1="100%"
+                        y1="100%"
+                        x2="0%"
+                        y2="0%"
+                      >
+                        <stop offset="0%" stopColor="#a855f7" />
+                        <stop offset="100%" stopColor="#ff8c42" />
+                      </linearGradient>
+                      <linearGradient
+                        id="iot-grad-yellow"
+                        x1="100%"
+                        y1="0%"
+                        x2="0%"
+                        y2="100%"
+                      >
+                        <stop offset="0%" stopColor="#eab308" />
+                        <stop offset="100%" stopColor="#ff8c42" />
+                      </linearGradient>
+                    </defs>
 
-              {nodes.map((node) => {
-                const leftPct = (node.x / SCENE_W) * 100;
-                const topPct = (node.y / SCENE_H) * 100;
+                    {/* Ground ring under hub */}
+                    <ellipse
+                      cx={600}
+                      cy={465}
+                      rx={98}
+                      ry={40}
+                      fill="none"
+                      stroke="#ff8c42"
+                      strokeWidth="2"
+                      opacity={0.55}
+                      filter="url(#line-glow)"
+                    />
 
-                if (node.kind === "hub") {
-                  return (
-                    <div
-                      key={node.id}
-                      className="absolute z-20 -translate-x-1/2 -translate-y-1/2"
-                      style={{ left: `${leftPct}%`, top: `${topPct}%` }}
-                    >
-                      <div
-                        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-45 blur-[14px]"
-                        style={{
-                          width: 120,
-                          height: 56,
-                          backgroundColor: node.color,
-                          transform: "translate(-50%, -40%) rotateX(58deg)",
+                    {paths.map((p, i) => (
+                      <motion.path
+                        key={p.d}
+                        d={p.d}
+                        fill="none"
+                        stroke={p.stroke}
+                        strokeWidth={3}
+                        filter="url(#line-glow)"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 0.88 }}
+                        transition={{
+                          duration: 1.8,
+                          delay: i * 0.12,
+                          ease: "easeOut",
                         }}
                       />
-                      <div className="relative drop-shadow-[0_18px_24px_rgba(255,140,66,0.35)]">
-                        <div className="absolute -top-16 left-1/2 -translate-x-1/2 mb-4">
+                    ))}
+
+                    {paths.map((p, i) => (
+                      <motion.circle
+                        key={`pkt-${i}`}
+                        r={3}
+                        fill={isDark ? "#f8fafc" : "#334155"}
+                        className={isDark ? "" : "drop-shadow-none"}
+                        opacity={isDark ? 0.85 : 0.6}
+                        animate={{
+                          offsetDistance: ["0%", "100%"],
+                          opacity: [0, isDark ? 1 : 0.8, 0],
+                        }}
+                        transition={{
+                          duration: 3.2 + (i % 3) * 0.4,
+                          repeat: Infinity,
+                          ease: "linear",
+                          delay: i * 0.35,
+                        }}
+                        style={{ offsetPath: `path('${p.d}')` }}
+                      />
+                    ))}
+                  </svg>
+
+                  {nodes.map((node) => {
+                    const leftPct = (node.x / SCENE_W) * 100;
+                    const topPct = (node.y / SCENE_H) * 100;
+
+                    if (node.kind === "hub") {
+                      return (
+                        <div
+                          key={node.id}
+                          className="absolute z-20 -translate-x-1/2 -translate-y-1/2 group cursor-pointer hover:scale-105 transition-all duration-500"
+                          style={{ left: `${leftPct}%`, top: `${topPct}%` }}
+                          onClick={() => setIsHubOpen(true)}
+                        >
                           <div
-                            className={`w-14 h-14 rounded-full flex items-center justify-center relative shadow-[0_0_20px_rgba(255,140,66,0.6)] ${isDark ? "bg-[#ff8c42]" : "bg-[#e66c1f]"}`}
-                          >
-                            <Activity
-                              size={28}
-                              className={
-                                isDark ? "text-[#0a0a0c]" : "text-white"
-                              }
+                            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-45 blur-[14px] group-hover:opacity-70 group-hover:blur-[20px] transition-all duration-500"
+                            style={{
+                              width: 120,
+                              height: 56,
+                              backgroundColor: node.color,
+                              transform: "translate(-50%, -40%) rotateX(58deg)",
+                            }}
+                          />
+                          <div className="relative drop-shadow-[0_18px_24px_rgba(255,140,66,0.35)]">
+                            <div className="absolute -top-16 left-1/2 -translate-x-1/2 mb-4 group-hover:-translate-y-2 transition-transform duration-500">
+                              <div
+                                className={`w-14 h-14 rounded-full flex items-center justify-center relative shadow-[0_0_20px_rgba(255,140,66,0.6)] ${isDark ? "bg-[#ff8c42]" : "bg-[#e66c1f]"}`}
+                              >
+                                <Activity
+                                  size={28}
+                                  className={
+                                    isDark ? "text-[#0a0a0c]" : "text-white"
+                                  }
+                                />
+                                <div
+                                  className={`absolute inset-0 rounded-full border-2 animate-ping opacity-60 ${isDark ? "border-[#ff8c42]" : "border-[#e66c1f]"}`}
+                                ></div>
+                              </div>
+                            </div>
+                            <IsoCube
+                              w={84}
+                              h={42}
+                              z={62}
+                              color={node.color}
+                              leftColor={node.left}
+                              rightColor={node.right}
                             />
-                            <div
-                              className={`absolute inset-0 rounded-full border-2 animate-ping opacity-60 ${isDark ? "border-[#ff8c42]" : "border-[#e66c1f]"}`}
-                            ></div>
+                            <div className="absolute bottom-0 right-[-8px]">
+                              <IsoCube
+                                w={42}
+                                h={22}
+                                z={34}
+                                color={node.color}
+                                leftColor={node.left}
+                                rightColor={node.right}
+                              />
+                            </div>
+                          </div>
+                          <div className="absolute left-1/2 top-full z-10 mt-5 w-max -translate-x-1/2 rounded-full border border-slate-300 dark:border-[#2e303a] bg-white/90 dark:bg-[#1c1d22]/90 px-4 py-1.5 text-sm font-black uppercase tracking-widest text-slate-800 dark:text-[#f3f4f6] shadow-lg backdrop-blur-md transition-all duration-500 group-hover:bg-primary group-hover:text-white group-hover:border-primary">
+                            {node.label}
                           </div>
                         </div>
-                        <IsoCube
-                          w={84}
-                          h={42}
-                          z={62}
-                          color={node.color}
-                          leftColor={node.left}
-                          rightColor={node.right}
-                        />
-                        <div className="absolute bottom-0 right-[-8px]">
-                          <IsoCube
-                            w={42}
-                            h={22}
-                            z={34}
-                            color={node.color}
-                            leftColor={node.left}
-                            rightColor={node.right}
-                          />
-                        </div>
-                      </div>
-                      <div className="absolute left-1/2 top-full z-10 mt-5 w-max -translate-x-1/2 rounded-full border border-slate-300 dark:border-[#2e303a] bg-white/90 dark:bg-[#1c1d22]/90 px-4 py-1.5 text-sm font-medium text-slate-800 dark:text-[#f3f4f6] shadow-lg backdrop-blur-md transition-colors duration-500">
-                        {node.label}
-                      </div>
-                    </div>
-                  );
-                }
+                      );
+                    }
 
-                if (node.kind === "sector") {
-                  // Position all cards consistently above the node to prevent screen overflow
-                  const cardPosClass =
-                    "absolute bottom-[110%] left-1/2 -translate-x-1/2 mb-4";
+                    if (node.kind === "sector") {
+                      // Position all cards consistently above the node to prevent screen overflow
+                      const cardPosClass =
+                        "absolute bottom-[110%] left-1/2 -translate-x-1/2 mb-4";
 
-                  return (
-                    <div
-                      key={node.id}
-                      className="absolute z-20 -translate-x-1/2 -translate-y-1/2 group cursor-pointer hover:scale-105 transition-transform duration-300"
-                      style={{ left: `${leftPct}%`, top: `${topPct}%` }}
-                      onClick={() => setSelectedNode(node as any)}
-                    >
-                      <div className="relative drop-shadow-xl">
-                        {/* Glow Behind */}
+                      return (
                         <div
-                          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-30 blur-[10px]"
-                          style={{
-                            width: 60,
-                            height: 30,
-                            backgroundColor: node.color,
-                            transform: "translate(-50%, -40%) rotateX(60deg)",
-                          }}
-                        />
-                        <IsoCube
-                          w={48}
-                          h={24}
-                          z={28}
-                          color={node.color}
-                          leftColor={node.left}
-                          rightColor={node.right}
-                        />
-
-                        {/* Attached Floating Card */}
-                        <div
-                          className={`pointer-events-none z-30 transition-all duration-300 ${cardPosClass}`}
+                          key={node.id}
+                          className="absolute z-20 -translate-x-1/2 -translate-y-1/2 group cursor-pointer hover:scale-105 transition-transform duration-300"
+                          style={{ left: `${leftPct}%`, top: `${topPct}%` }}
+                          onClick={() => setSelectedNode(node as any)}
                         >
-                          <FloatingCard
-                            title={node.title}
-                            subtitle={node.subtitle}
-                            className="w-max min-w-[200px]"
-                          >
-                            <CircularIcon
-                              strokeColor={node.color}
-                              icon={node.icon}
+                          <div className="relative drop-shadow-xl">
+                            {/* Glow Behind */}
+                            <div
+                              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-30 blur-[10px]"
+                              style={{
+                                width: 60,
+                                height: 30,
+                                backgroundColor: node.color,
+                                transform:
+                                  "translate(-50%, -40%) rotateX(60deg)",
+                              }}
                             />
-                          </FloatingCard>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
+                            <IsoCube
+                              w={48}
+                              h={24}
+                              z={28}
+                              color={node.color}
+                              leftColor={node.left}
+                              rightColor={node.right}
+                            />
 
-                return null;
-              })}
-            </div>
-          </div>
-        </div>
+                            {/* Attached Floating Card */}
+                            <div
+                              className={`pointer-events-none z-30 transition-all duration-300 ${cardPosClass}`}
+                            >
+                              <FloatingCard
+                                title={node.title}
+                                subtitle={node.subtitle}
+                                className="w-max min-w-[200px]"
+                              >
+                                <CircularIcon
+                                  strokeColor={node.color}
+                                  icon={node.icon}
+                                />
+                              </FloatingCard>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    return null;
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="stats"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: "circOut" }}
+              className="w-full"
+            >
+              <StatsView />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Identical Side Panel logic ported over for feature-parity */}
