@@ -362,7 +362,7 @@ export default function EISDashboard2() {
                 onClick={() => setActiveView(tab.id as any)}
                 className={`relative px-6 py-2.5 rounded-full flex items-center gap-2 transition-all duration-300 ${
                   isActive
-                    ? "text-white dark:text-slate-900"
+                    ? "text-white dark:text-slate-950 font-black"
                     : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
@@ -428,43 +428,43 @@ export default function EISDashboard2() {
                         </feMerge>
                       </filter>
                       <linearGradient
-                        id="iot-grad-blue"
+                        id="iot-grad-sky"
                         x1="0%"
                         y1="0%"
                         x2="100%"
                         y2="100%"
                       >
-                        <stop offset="0%" stopColor="#3b82f6" />
+                        <stop offset="0%" stopColor="#0ea5e9" />
                         <stop offset="100%" stopColor="#ff8c42" />
                       </linearGradient>
                       <linearGradient
-                        id="iot-grad-orange"
+                        id="iot-grad-pink"
                         x1="0%"
                         y1="100%"
                         x2="100%"
                         y2="0%"
                       >
-                        <stop offset="0%" stopColor="#f97316" />
+                        <stop offset="0%" stopColor="#f472b6" />
                         <stop offset="100%" stopColor="#ff8c42" />
                       </linearGradient>
                       <linearGradient
-                        id="iot-grad-green"
+                        id="iot-grad-lime"
                         x1="0%"
                         y1="100%"
                         x2="100%"
                         y2="0%"
                       >
-                        <stop offset="0%" stopColor="#10b981" />
+                        <stop offset="0%" stopColor="#a3e635" />
                         <stop offset="100%" stopColor="#ff8c42" />
                       </linearGradient>
                       <linearGradient
-                        id="iot-grad-gray"
+                        id="iot-grad-rose"
                         x1="100%"
                         y1="100%"
                         x2="0%"
                         y2="0%"
                       >
-                        <stop offset="0%" stopColor="#64748b" />
+                        <stop offset="0%" stopColor="#fb7185" />
                         <stop offset="100%" stopColor="#ff8c42" />
                       </linearGradient>
                       <linearGradient
@@ -474,17 +474,17 @@ export default function EISDashboard2() {
                         x2="0%"
                         y2="0%"
                       >
-                        <stop offset="0%" stopColor="#a855f7" />
+                        <stop offset="0%" stopColor="#c084fc" />
                         <stop offset="100%" stopColor="#ff8c42" />
                       </linearGradient>
                       <linearGradient
-                        id="iot-grad-yellow"
+                        id="iot-grad-teal"
                         x1="100%"
                         y1="0%"
                         x2="0%"
                         y2="100%"
                       >
-                        <stop offset="0%" stopColor="#eab308" />
+                        <stop offset="0%" stopColor="#2dd4bf" />
                         <stop offset="100%" stopColor="#ff8c42" />
                       </linearGradient>
                     </defs>

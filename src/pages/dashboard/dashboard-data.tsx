@@ -13,19 +13,19 @@ export const SCENE_H = 800;
 export const paths = [
   {
     d: "M 300 250 L 610 405 Q 650 425 610 445 L 600 450",
-    stroke: "url(#iot-grad-blue)",
+    stroke: "url(#iot-grad-sky)",
   },
   {
     d: "M 200 550 L 260 580 Q 300 600 340 580 L 600 450",
-    stroke: "url(#iot-grad-orange)",
+    stroke: "url(#iot-grad-pink)",
   },
   {
     d: "M 450 750 L 785 582.5 Q 825 562.5 785 542.5 L 600 450",
-    stroke: "url(#iot-grad-green)",
+    stroke: "url(#iot-grad-lime)",
   },
   {
     d: "M 750 750 L 415 582.5 Q 375 562.5 415 542.5 L 600 450",
-    stroke: "url(#iot-grad-gray)",
+    stroke: "url(#iot-grad-rose)",
   },
   {
     d: "M 1000 550 L 940 580 Q 900 600 860 580 L 600 450",
@@ -33,7 +33,7 @@ export const paths = [
   },
   {
     d: "M 900 250 L 590 405 Q 550 425 590 445 L 600 450",
-    stroke: "url(#iot-grad-yellow)",
+    stroke: "url(#iot-grad-teal)",
   },
 ];
 
@@ -55,9 +55,9 @@ export const nodes = [
     kind: "sector" as const,
     title: "Akademik",
     subtitle: "Data Sistem Akademik",
-    color: "#3b82f6",
-    left: "#2563eb",
-    right: "#1d4ed8",
+    color: "#0ea5e9", // Sky 500
+    left: "#0284c7",
+    right: "#0369a1",
     icon: <BookOpen size={20} />,
     progress: 100, // Used for CDC Active visual
     details:
@@ -90,9 +90,9 @@ export const nodes = [
     kind: "sector" as const,
     title: "Kemahasiswaan",
     subtitle: "Kegiatan & Prestasi",
-    color: "#f97316",
-    left: "#ea580c",
-    right: "#c2410c",
+    color: "#f472b6", // Pink 400
+    left: "#db2777",
+    right: "#be185d",
     icon: <Users size={20} />,
     progress: 100,
     details:
@@ -110,9 +110,9 @@ export const nodes = [
     kind: "sector" as const,
     title: "Alumni",
     subtitle: "Tracer Study 2026",
-    color: "#10b981",
-    left: "#059669",
-    right: "#047857",
+    color: "#a3e635", // Lime 400
+    left: "#65a30d",
+    right: "#4d7c0f",
     icon: <GraduationCap size={20} />,
     progress: 100,
     details:
@@ -126,9 +126,9 @@ export const nodes = [
     kind: "sector" as const,
     title: "Umum & Kepegawaian",
     subtitle: "SDM & Aset",
-    color: "#64748b",
-    left: "#475569",
-    right: "#334155",
+    color: "#fb7185", // Rose 400
+    left: "#e11d48",
+    right: "#be123c",
     icon: <Building size={20} />,
     progress: 100,
     details:
@@ -145,7 +145,7 @@ export const nodes = [
     kind: "sector" as const,
     title: "Kinerja",
     subtitle: "IKU & Evaluasi",
-    color: "#a855f7",
+    color: "#c084fc", // Purple 400
     left: "#9333ea",
     right: "#7e22ce",
     icon: <LineChart size={20} />,
@@ -168,9 +168,9 @@ export const nodes = [
     kind: "sector" as const,
     title: "Keuangan",
     subtitle: "Anggaran & Realisasi",
-    color: "#eab308",
-    left: "#ca8a04",
-    right: "#a16207",
+    color: "#2dd4bf", // Teal 400
+    left: "#0d9488",
+    right: "#0f766e",
     icon: <Wallet size={20} />,
     progress: 100,
     details:

@@ -306,13 +306,15 @@ export default function EISMobileDashboard() {
                 key={tab.id}
                 onClick={() => setActiveView(tab.id as any)}
                 className={`relative flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 ${
-                  isActive ? "text-white" : "text-slate-500 active:scale-90"
+                  isActive
+                    ? "text-white dark:text-slate-950"
+                    : "text-slate-500 active:scale-90"
                 }`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="mobileActiveTab"
-                    className="absolute inset-0 bg-primary rounded-full"
+                    className="absolute inset-0 bg-primary dark:bg-white rounded-full"
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
