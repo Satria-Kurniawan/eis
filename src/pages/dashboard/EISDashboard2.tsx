@@ -1,4 +1,3 @@
-import bg1 from "@/assets/bg1.png";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
@@ -175,41 +174,39 @@ export default function EISDashboard2() {
   if (isMobile) return <EISMobileDashboard />;
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-100 dark:bg-[#0a0a0a] transition-colors duration-500 font-sans text-slate-800 dark:text-[#e5e7eb]">
-      {/* Subtle map texture */}
-      <div
-        className={`pointer-events-none absolute inset-0 transition-opacity duration-500 ${isDark ? "opacity-[0.12] grayscale" : "opacity-20 grayscale contrast-125 invert"}`}
-      >
-        <img
-          src={bg1}
-          alt=""
-          className="h-full w-full object-cover grayscale"
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white dark:bg-[#0a0a0a] transition-colors duration-500 font-sans text-slate-800 dark:text-[#e5e7eb]">
+      {/* 3D Perspective Grid Background */}
+      <div className="absolute inset-0 perspective-[1000px] pointer-events-none overflow-hidden">
+        <motion.div
+          initial={{ rotateX: 60, rotateZ: 30, opacity: 0 }}
+          animate={{
+            rotateX: 60,
+            rotateZ: 30,
+            opacity: isDark ? 0.4 : 0.3,
+            backgroundPosition: ["0px 0px", "60px 60px"],
+          }}
+          transition={{
+            opacity: { duration: 1.5 },
+            backgroundPosition: {
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear",
+            },
+          }}
+          className="absolute -inset-full origin-center transition-opacity duration-1000"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"} 1.5px, transparent 1.5px),
+              linear-gradient(to bottom, ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"} 1.5px, transparent 1.5px)
+            `,
+            backgroundSize: "60px 60px",
+            maskImage:
+              "radial-gradient(ellipse at center, black 20%, transparent 75%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse at center, black 20%, transparent 75%)",
+          }}
         />
       </div>
-
-      {/* Isometric grid */}
-      <svg
-        className={`pointer-events-none absolute inset-0 h-full w-full transition-opacity duration-500 ${isDark ? "opacity-[0.18]" : "opacity-[0.08]"}`}
-        aria-hidden
-      >
-        <defs>
-          <pattern
-            id="iso-grid"
-            width="56"
-            height="56"
-            patternUnits="userSpaceOnUse"
-            patternTransform="skewY(26)"
-          >
-            <path
-              d="M0 0 H56 M0 28 H56"
-              className="stroke-slate-400 dark:stroke-[#4b5563]"
-              strokeWidth="0.5"
-              fill="none"
-            />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#iso-grid)" />
-      </svg>
 
       <div className="relative z-10 flex w-[min(96vw,1240px)] max-w-full shrink-0 flex-col items-center px-2 py-0">
         <div

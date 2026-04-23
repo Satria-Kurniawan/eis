@@ -26,6 +26,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      port: 5174,
       proxy: {
         "/api": {
           target: env.VITE_API_BASE_URL || "https://service-eis.dwiproject.xyz",
