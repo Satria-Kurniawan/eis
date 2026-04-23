@@ -258,7 +258,7 @@ export default function StatsView() {
           </p>
         </div>
 
-        <div className="w-full max-w-[calc(100vw-2rem)] overflow-x-auto no-scrollbar p-1.5 rounded-[2rem] sm:rounded-3xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center gap-1 shadow-inner dark:shadow-black/40 transition-colors duration-500">
+        <div className="p-1.5 rounded-3xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center gap-1 shadow-inner dark:shadow-black/40 transition-colors duration-500">
           {[
             { id: "mhs", label: "Mahasiswa", icon: Users },
             { id: "dosen", label: "Dosen", icon: GraduationCap },
@@ -269,7 +269,7 @@ export default function StatsView() {
               <button
                 key={tab.id}
                 onClick={() => setSubTab(tab.id as any)}
-                className={`relative px-5 sm:px-8 py-3 rounded-[1.5rem] sm:rounded-2xl flex items-center gap-3 transition-all duration-500 shrink-0 ${
+                className={`relative px-6 sm:px-8 py-3 rounded-2xl flex items-center justify-center gap-0 sm:gap-3 transition-all duration-500 ${
                   isActive
                     ? "text-white dark:text-slate-900"
                     : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
@@ -278,15 +278,15 @@ export default function StatsView() {
                 {isActive && (
                   <motion.div
                     layoutId="statsSubTab"
-                    className="absolute inset-0 bg-primary dark:bg-white rounded-[1.5rem] sm:rounded-2xl shadow-[0_0_20px_rgba(59,130,246,0.3)] dark:shadow-[0_0_20px_rgba(255,255,255,0.15)]"
+                    className="absolute inset-0 bg-primary dark:bg-white rounded-2xl shadow-[0_0_20px_rgba(59,130,246,0.3)] dark:shadow-[0_0_20px_rgba(255,255,255,0.15)]"
                     transition={{ type: "spring", bounce: 0.15, duration: 0.6 }}
                   />
                 )}
                 <tab.icon
-                  size={16}
+                  size={18}
                   className={`relative z-10 ${isActive ? "text-white dark:text-slate-900" : ""}`}
                 />
-                <span className="relative z-10 text-[10px] sm:text-xs font-black uppercase tracking-widest whitespace-nowrap">
+                <span className="relative z-10 text-xs font-black uppercase tracking-widest hidden sm:block">
                   {tab.label}
                 </span>
               </button>
