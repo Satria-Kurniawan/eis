@@ -107,14 +107,20 @@ export function MhsStatsTab() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {isMhsLoading
-          ? [...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-40 w-full rounded-[2rem]" />
-            ))
-          : mhsData?.datas.map((stat, idx) => (
+      {isMhsLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-40 w-full rounded-[2rem]" />
+          ))}
+        </div>
+      ) : (
+        <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-2 px-2">
+          {mhsData?.datas.map((stat, idx) => (
+            <div
+              key={idx}
+              className="min-w-[280px] flex-1 lg:flex-none lg:w-[calc(25%-12px)]"
+            >
               <StatCard
-                key={idx}
                 title={`Mahasiswa ${stat.title}`}
                 value={new Intl.NumberFormat("id-ID").format(stat.value)}
                 change={stat.title === "Aktif" ? "+1.2%" : "Stable"}
@@ -137,8 +143,10 @@ export function MhsStatsTab() {
                         : "#ef4444"
                 }
               />
-            ))}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <DrilldownChart
         title={`Sebaran Mahasiswa per ${currentLevel === "fakultas" ? "Fakultas" : currentLevel === "jurusan" ? "Jurusan" : "Prodi"}`}
