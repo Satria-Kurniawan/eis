@@ -1,4 +1,5 @@
 import logoUndiksha from "@/assets/logo-undiksha.png";
+import { FloatingSidebar } from "@/components/dashboard/FloatingSidebar";
 import { GlobalHubPortal } from "@/components/dashboard/GlobalHubPortal";
 import { HubFloatingButton } from "@/components/dashboard/HubFloatingButton";
 import { GlobalUnitFilter } from "@/components/GlobalUnitFilter";
@@ -636,6 +637,7 @@ export default function AdminLayout() {
           <Outlet />
           <GlobalHubPortal />
           <HubFloatingButton />
+          <FloatingSidebar />
 
           {/* Premium Floating Dashboard Button */}
           <AnimatePresence>
