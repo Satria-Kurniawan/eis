@@ -21,6 +21,7 @@ import EISMobileDashboard from "./EISMobileDashboard";
 import StatsView from "./StatsView";
 import { nodes, paths, SCENE_H, SCENE_W } from "./dashboard-data";
 import { useHubPortal } from "@/contexts/HubPortalContext";
+import { FloatingSidebar } from "@/components/dashboard/FloatingSidebar";
 
 /** Isometric cube (SVG) */
 function IsoCube({
@@ -197,6 +198,8 @@ export default function EISDashboard2() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white dark:bg-[#0a0a0a] transition-colors duration-500 font-sans text-slate-800 dark:text-[#e5e7eb]">
+      <FloatingSidebar />
+      
       {/* 3D Perspective Grid Background */}
       <div className="absolute inset-0 perspective-[1000px] pointer-events-none overflow-hidden">
         <motion.div
@@ -204,7 +207,7 @@ export default function EISDashboard2() {
           animate={{
             rotateX: 60,
             rotateZ: 30,
-            opacity: isHubOpen ? 0 : isDark ? 0.4 : 0.3,
+            opacity: isHubOpen ? 0 : isDark ? 0.4 : 0.4,
             backgroundPosition: isHubOpen
               ? "0px 0px"
               : ["0px 0px", "60px 60px"],

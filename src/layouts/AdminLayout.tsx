@@ -34,7 +34,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { cn } from "@/lib/utils";
@@ -46,6 +45,7 @@ import {
   ChevronDown,
   GraduationCap,
   Home,
+  LayoutDashboard,
   LineChart,
   Moon,
   Sparkles,
@@ -528,7 +528,7 @@ export default function AdminLayout() {
       <SidebarInset>
         <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur-md px-4 justify-between">
           <div className="flex items-center gap-2 sm:gap-4">
-            <SidebarTrigger />
+            {/* <SidebarTrigger /> */}
             <Link
               to="/"
               className="p-2 rounded-xl hover:bg-muted transition-all text-slate-500 hover:text-primary group active:scale-90 shrink-0"
@@ -536,6 +536,16 @@ export default function AdminLayout() {
             >
               <Home className="size-5 group-hover:scale-110 transition-transform" />
             </Link>
+
+            {location.pathname !== "/dashboard" && (
+              <Link
+                to="/dashboard"
+                className="p-2 rounded-xl hover:bg-muted transition-all text-slate-500 hover:text-primary group active:scale-90 shrink-0"
+                title="Ke Dashboard"
+              >
+                <LayoutDashboard className="size-5 group-hover:scale-110 transition-transform" />
+              </Link>
+            )}
 
             <div className="h-6 w-px bg-border hidden md:block mx-1" />
 
