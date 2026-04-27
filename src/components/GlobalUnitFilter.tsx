@@ -84,7 +84,7 @@ export function GlobalUnitFilter() {
           )}
         </button>
       </SheetTrigger>
-      <SheetContent className="w-[400px] sm:w-[540px] rounded-l-[2.5rem] border-l border-primary/20 bg-background/95 backdrop-blur-3xl shadow-2xl p-8 flex flex-col">
+      <SheetContent className="z-999 w-[400px] sm:w-[540px] rounded-l-[2.5rem] border-l border-primary/20 bg-background/95 backdrop-blur-3xl shadow-2xl p-8 flex flex-col">
         <SheetHeader className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-3 bg-primary/10 rounded-2xl text-primary">
