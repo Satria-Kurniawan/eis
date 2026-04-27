@@ -1,17 +1,29 @@
+import { Skeleton } from "@/components/ui/skeleton";
+import { useUnitFilter } from "@/contexts/UnitFilterContext";
+import { useMhsDrilldown } from "@/hooks/dashboard/use-mhs-drilldown";
+import { useMhsOverview } from "@/hooks/dashboard/use-mhs-overview";
 import {
   Activity,
   ArrowUpRight,
-  ChevronDown,
-  Filter,
+  ChevronLeft,
   Globe,
   GraduationCap,
-  TrendingUp,
   Users,
   Users2,
   Zap,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 
 function StatCard({
   title,
@@ -61,25 +73,6 @@ function StatCard({
   );
 }
 
-function FilterDropdown({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-1.5 flex-1 min-w-[160px]">
-      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">
-        {label}
-      </label>
-      <div className="group relative">
-        <button className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-200 transition-all hover:border-primary/50">
-          <span className="truncate">{value}</span>
-          <ChevronDown
-            size={14}
-            className="text-slate-400 group-hover:text-primary transition-colors"
-          />
-        </button>
-      </div>
-    </div>
-  );
-}
-
 function MockChart({ color }: { color: string }) {
   return (
     <div className="flex items-end gap-1.5 h-48 w-full pt-4">
@@ -99,102 +92,333 @@ function MockChart({ color }: { color: string }) {
 
 export default function StatsView() {
   const [subTab, setSubTab] = useState<"mhs" | "dosen" | "pegawai">("mhs");
+  const { data: mhsData, isLoading: isMhsLoading } = useMhsOverview();
+  const {
+    data: drilldownData,
+    isLoading: isDrilldownLoading,
+    currentLevel,
+  } = useMhsDrilldown();
+  const {
+    setKodeFakultas,
+    setKodeJurusan,
+    setKodeProdi,
+    kodeFakultas,
+    kodeJurusan,
+  } = useUnitFilter();
+
+  const handleDrilldownClick = (item: any) => {
+    if (currentLevel === "fakultas") {
+      setKodeFakultas(item.id);
+    } else if (currentLevel === "jurusan") {
+      setKodeJurusan(item.id);
+    } else {
+      setKodeProdi(item.id);
+    }
+  };
+
+  const handleGoBack = () => {
+    if (currentLevel === "prodi") {
+      setKodeProdi("");
+      setKodeJurusan("");
+    } else if (currentLevel === "jurusan") {
+      setKodeJurusan("");
+      setKodeFakultas("");
+    }
+  };
+
+  const getAbbreviation = (name: string) => {
+    if (!name) return "";
+    const map: Record<string, string> = {
+      "Fakultas Ilmu Pendidikan": "FIP",
+      "Fakultas Bahasa dan Seni": "FBS",
+      "Fakultas Hukum dan Ilmu Sosial": "FHIS",
+      "Fakultas Matematika dan Ilmu Pengetahuan Alam": "FMIPA",
+      "Fakultas Teknik dan Kejuruan": "FTK",
+      "Fakultas Olahraga dan Kesehatan": "FOK",
+      "Fakultas Ekonomi": "FE",
+      "Fakultas Kedokteran": "FK",
+      "Program Pascasarjana": "PP",
+    };
+    return map[name] || name.replace("Fakultas ", "").replace("Jurusan ", "");
+  };
 
   const renderMhsContent = () => (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Filters Bar */}
-      <div className="p-6 rounded-[2.5rem] bg-white dark:bg-[#14151a] border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/20 dark:shadow-black/20">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2.5 bg-primary/10 text-primary rounded-xl">
-            <Filter size={18} />
-          </div>
-          <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">
-            Filter Data Akademik
-          </h3>
-        </div>
-        <div className="flex flex-wrap gap-4">
-          <FilterDropdown label="Fakultas" value="Semua Fakultas" />
-          <FilterDropdown label="Jurusan" value="Semua Jurusan" />
-          <FilterDropdown label="Program Studi" value="Semua Prodi" />
-          <div className="flex items-end">
-            <button className="px-8 py-3 bg-primary dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-primary/20 dark:shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:scale-[1.02] active:scale-[0.98] transition-all">
-              Terapkan
-            </button>
-          </div>
-        </div>
-      </div>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Mahasiswa Aktif"
-          value="24.892"
-          change="+12%"
-          icon={Users}
-          color="#3b82f6"
-        />
-        <StatCard
-          title="Mahasiswa Baru"
-          value="4.102"
-          change="+8.2%"
-          icon={TrendingUp}
-          color="#10b981"
-        />
-        <StatCard
-          title="Lulusan 2026"
-          value="3.840"
-          change="+5.1%"
-          icon={GraduationCap}
-          color="#a855f7"
-        />
-        <StatCard
-          title="Rerata IPK"
-          value="3.42"
-          change="+0.12"
-          icon={Activity}
-          color="#f59e0b"
-        />
+        {isMhsLoading
+          ? [...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="h-40 w-full rounded-[2rem]" />
+            ))
+          : mhsData?.datas.map((stat, idx) => (
+              <StatCard
+                key={idx}
+                title={`Mahasiswa ${stat.title}`}
+                value={new Intl.NumberFormat("id-ID").format(stat.value)}
+                change={stat.title === "Aktif" ? "+1.2%" : "Stable"}
+                icon={
+                  stat.title === "Aktif"
+                    ? Users
+                    : stat.title === "Lulus"
+                      ? GraduationCap
+                      : stat.title === "Cuti"
+                        ? Activity
+                        : Users2
+                }
+                color={
+                  stat.title === "Aktif"
+                    ? "#3b82f6"
+                    : stat.title === "Lulus"
+                      ? "#a855f7"
+                      : stat.title === "Cuti"
+                        ? "#f59e0b"
+                        : "#ef4444"
+                }
+              />
+            ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 p-8 rounded-[2.5rem] bg-white dark:bg-[#14151a] border border-slate-200 dark:border-slate-800 shadow-xl">
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white uppercase">
-              Pertumbuhan Mahasiswa
-            </h3>
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-              Last 12 Months
-            </span>
+            <div className="space-y-1">
+              <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white uppercase leading-none">
+                Sebaran Mahasiswa per{" "}
+                {currentLevel === "fakultas"
+                  ? "Fakultas"
+                  : currentLevel === "jurusan"
+                    ? "Jurusan"
+                    : "Prodi"}
+              </h3>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                Institutional Capacity Analytics
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              {(kodeFakultas || kodeJurusan) && (
+                <button
+                  onClick={handleGoBack}
+                  className="p-2 rounded-xl bg-muted hover:bg-primary/10 hover:text-primary transition-all group"
+                >
+                  <ChevronLeft className="size-4 group-hover:-translate-x-0.5 transition-transform" />
+                </button>
+              )}
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-slate-900/50 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-slate-800/50">
+                Level: {currentLevel}
+              </span>
+            </div>
           </div>
-          <MockChart color="#3b82f6" />
-        </div>
-        <div className="p-8 rounded-[2.5rem] bg-white dark:bg-[#14151a] border border-slate-200 dark:border-slate-800 shadow-xl">
-          <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white uppercase mb-8">
-            Sebaran Fakultas
-          </h3>
-          <div className="space-y-4">
-            {[
-              { label: "FTK", value: 35, color: "#3b82f6" },
-              { label: "FIP", value: 25, color: "#10b981" },
-              { label: "FE", value: 20, color: "#a855f7" },
-              { label: "Lainnya", value: 20, color: "#eab308" },
-            ].map((item) => (
-              <div key={item.label} className="space-y-1.5">
-                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                  <span className="text-slate-500">{item.label}</span>
-                  <span className="text-slate-900 dark:text-white">
-                    {item.value}%
-                  </span>
-                </div>
-                <div className="h-1.5 w-full bg-slate-50 dark:bg-slate-900 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${item.value}%` }}
-                    className="h-full rounded-full"
-                    style={{ backgroundColor: item.color }}
+
+          <div className="h-80 w-full mt-4">
+            {isDrilldownLoading ? (
+              <div className="flex items-end gap-4 h-full w-full">
+                {[...Array(8)].map((_, i) => (
+                  <Skeleton
+                    key={i}
+                    className="flex-1 rounded-t-2xl"
+                    style={{ height: `${20 + Math.random() * 60}%` }}
                   />
-                </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={drilldownData?.datas?.filter((f) => f.name) || []}
+                  margin={{ top: 20, right: 0, left: -20, bottom: 60 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="rgba(203, 213, 225, 0.2)"
+                  />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={(props) => {
+                      const { x, y, payload } = props;
+                      const name = getAbbreviation(payload.value);
+                      return (
+                        <g transform={`translate(${x},${y})`}>
+                          <text
+                            x={0}
+                            y={0}
+                            dy={16}
+                            textAnchor="middle"
+                            fill="#64748b"
+                            fontSize={10}
+                            fontWeight={900}
+                            className="uppercase tracking-tighter"
+                          >
+                            {name}
+                          </text>
+                        </g>
+                      );
+                    }}
+                    interval={0}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#94a3b8", fontSize: 10, fontWeight: 700 }}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "rgba(59, 130, 246, 0.05)" }}
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        return (
+                          <div className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 p-3 rounded-2xl shadow-xl border border-white/10 dark:border-slate-200">
+                            <p className="text-[10px] font-black uppercase tracking-widest mb-1 opacity-60">
+                              {currentLevel}
+                            </p>
+                            <p className="text-xs font-bold mb-2">
+                              {data.name}
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="size-2 rounded-full"
+                                style={{
+                                  backgroundColor:
+                                    currentLevel === "fakultas"
+                                      ? "#3b82f6"
+                                      : currentLevel === "jurusan"
+                                        ? "#a855f7"
+                                        : "#10b981",
+                                }}
+                              />
+                              <p className="text-sm font-black tabular-nums">
+                                {new Intl.NumberFormat("id-ID").format(
+                                  data.value,
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Bar
+                    dataKey="value"
+                    radius={[8, 8, 0, 0]}
+                    barSize={40}
+                    animationDuration={1500}
+                    onClick={(data) => handleDrilldownClick(data)}
+                  >
+                    {drilldownData?.datas?.map((_entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={
+                          currentLevel === "fakultas"
+                            ? "#3b82f6"
+                            : currentLevel === "jurusan"
+                              ? "#a855f7"
+                              : "#10b981"
+                        }
+                        fillOpacity={0.8}
+                        className="cursor-pointer hover:fill-opacity-100 transition-all duration-300"
+                        style={{
+                          filter: `drop-shadow(0 4px 6px ${currentLevel === "fakultas" ? "rgba(59,130,246,0.2)" : currentLevel === "jurusan" ? "rgba(168,85,247,0.2)" : "rgba(16,185,129,0.2)"})`,
+                        }}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+
+        <div className="p-8 rounded-[2.5rem] bg-white dark:bg-[#14151a] border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col">
+          <div className="flex items-center justify-between mb-8">
+            <div className="space-y-1">
+              <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white uppercase leading-none">
+                Sebaran{" "}
+                {currentLevel === "fakultas"
+                  ? "Fakultas"
+                  : currentLevel === "jurusan"
+                    ? "Jurusan"
+                    : "Prodi"}
+              </h3>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                Intelligence Distribution
+              </p>
+            </div>
+            {(kodeFakultas || kodeJurusan) && (
+              <button
+                onClick={handleGoBack}
+                className="p-2 rounded-xl bg-muted hover:bg-primary/10 hover:text-primary transition-all group"
+              >
+                <ChevronLeft className="size-4 group-hover:-translate-x-0.5 transition-transform" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex-1 space-y-5">
+            {isDrilldownLoading ? (
+              <div className="space-y-4">
+                {[...Array(6)].map((_, i) => (
+                  <Skeleton key={i} className="h-6 w-full rounded-full" />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {drilldownData?.datas
+                  ?.filter((item) => item.name)
+                  .map((item, idx) => (
+                    <motion.div
+                      key={item.id || idx}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      onClick={() => handleDrilldownClick(item)}
+                      className="group cursor-pointer space-y-2"
+                    >
+                      <div className="flex justify-between items-end">
+                        <div className="space-y-0.5">
+                          <span className="text-[10px] font-black uppercase tracking-tight text-slate-500 group-hover:text-primary transition-colors">
+                            {item.name}
+                          </span>
+                        </div>
+                        <span className="text-xs font-black text-slate-900 dark:text-white tabular-nums">
+                          {new Intl.NumberFormat("id-ID").format(item.value)}
+                        </span>
+                      </div>
+                      <div className="h-2 w-full bg-slate-50 dark:bg-slate-900/50 rounded-full overflow-hidden border border-slate-100 dark:border-slate-800/50">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{
+                            width: `${drilldownData?.total ? (item.value / drilldownData.total) * 100 : 0}%`,
+                          }}
+                          className="h-full rounded-full relative"
+                          style={{
+                            backgroundColor:
+                              currentLevel === "fakultas"
+                                ? "#3b82f6"
+                                : currentLevel === "jurusan"
+                                  ? "#a855f7"
+                                  : "#10b981",
+                            boxShadow: `0 0 10px ${currentLevel === "fakultas" ? "rgba(59,130,246,0.3)" : currentLevel === "jurusan" ? "rgba(168,85,247,0.3)" : "rgba(16,185,129,0.3)"}`,
+                          }}
+                        >
+                          <div className="absolute inset-0 bg-linear-to-r from-white/20 to-transparent" />
+                        </motion.div>
+                      </div>
+                    </motion.div>
+                  ))}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800/50">
+            <div className="flex items-center justify-between text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+              <span>Total Data</span>
+              <span className="text-slate-900 dark:text-white">
+                {new Intl.NumberFormat("id-ID").format(
+                  drilldownData?.total || 0,
+                )}
+              </span>
+            </div>
           </div>
         </div>
       </div>
