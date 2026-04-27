@@ -386,7 +386,9 @@ export default function EISDashboard2() {
         </div>
       </div>
 
-      <div className="relative z-10 flex w-full flex-col items-center justify-center p-8 pt-24">
+      <div
+        className={`relative z-10 flex w-full flex-col items-center justify-center p-8 ${activeView === "dashboard" ? "-mt-20" : "pt-10"}`}
+      >
         <AnimatePresence mode="wait">
           {activeView === "dashboard" ? (
             <motion.div

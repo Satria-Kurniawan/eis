@@ -25,6 +25,8 @@ import JurnalPage from "@/pages/kinerja/JurnalPage";
 import PenelitianPage from "@/pages/kinerja/PenelitianPage";
 import PengabdianPage from "@/pages/kinerja/PengabdianPage";
 import ProsidingPage from "@/pages/kinerja/ProsidingPage";
+import RealisasiBulanPage from "@/pages/keuangan/RealisasiBulanPage";
+import RealisasiUnitPage from "@/pages/keuangan/RealisasiUnitPage";
 import { createBrowserRouter } from "react-router-dom";
 
 export const router = createBrowserRouter([
@@ -135,6 +137,14 @@ export const router = createBrowserRouter([
       {
         path: "kinerja/penelitian",
         Component: PenelitianPage,
+      },
+      {
+        path: "keuangan/realisasi-unit",
+        Component: RealisasiUnitPage,
+      },
+      {
+        path: "keuangan/realisasi-bulan",
+        Component: RealisasiBulanPage,
       },
     ],
   },

@@ -491,14 +491,45 @@ export default function AdminLayout() {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#">
-                    <Wallet />
-                    <span>Keuangan</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              <Collapsible asChild className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip="Keuangan">
+                      <Wallet />
+                      <span>Keuangan</span>
+                      <ChevronDown className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={
+                            location.pathname === "/keuangan/realisasi-unit"
+                          }
+                        >
+                          <Link to="/keuangan/realisasi-unit">
+                            <span>Realisasi Unit</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={
+                            location.pathname === "/keuangan/realisasi-bulan"
+                          }
+                        >
+                          <Link to="/keuangan/realisasi-bulan">
+                            <span>Realisasi Bulan</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
