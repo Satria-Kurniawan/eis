@@ -161,7 +161,8 @@ export default function EISDashboard2() {
 
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeView = (searchParams.get("view") as "dashboard" | "stats") || "dashboard";
+  const activeView =
+    (searchParams.get("view") as "dashboard" | "stats") || "dashboard";
 
   const setActiveView = (view: "dashboard" | "stats") => {
     setSearchParams((prev) => {
@@ -192,11 +193,10 @@ export default function EISDashboard2() {
 
   if (isMobile) return <EISMobileDashboard />;
 
-  const sectors = nodes.filter((n) => n.kind === "sector");
+  // const sectors = nodes.filter((n) => n.kind === "sector");
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white dark:bg-[#0a0a0a] transition-colors duration-500 font-sans text-slate-800 dark:text-[#e5e7eb]">
-
       {/* 3D Perspective Grid Background */}
       <div className="absolute inset-0 perspective-[1000px] pointer-events-none overflow-hidden">
         <motion.div
