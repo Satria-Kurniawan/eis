@@ -1,4 +1,5 @@
 import logoUndiksha from "@/assets/logo-undiksha.png";
+import eGanesha from "@/assets/e-ganesha.png";
 import { FloatingSidebar } from "@/components/dashboard/FloatingSidebar";
 import { GlobalHubPortal } from "@/components/dashboard/GlobalHubPortal";
 import { HubFloatingButton } from "@/components/dashboard/HubFloatingButton";
@@ -555,6 +556,11 @@ export default function AdminLayout() {
                 src={logoUndiksha}
                 alt="Logo Undiksha"
                 className="h-7 w-7 object-contain hidden sm:block drop-shadow-sm"
+              />
+              <img
+                src={eGanesha}
+                alt="Logo E-Ganesha"
+                className="h-7 object-contain hidden sm:block drop-shadow-sm"
               />
               <h1 className="font-bold text-xs sm:text-sm tracking-tight text-slate-900 dark:text-white hidden lg:block">
                 EIS <span className="text-primary">Undiksha</span>

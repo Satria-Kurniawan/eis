@@ -1,4 +1,5 @@
 import logoUndiksha from "@/assets/logo-undiksha.png";
+import eGanesha from "@/assets/e-ganesha.png";
 import Antigravity from "@/components/Antigravity";
 import {
   ArrowRight,
@@ -87,11 +88,17 @@ export default function LandingPage() {
       {/* FIXED TOP NAVIGATION - Minimalist */}
       <div className="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-center px-8 lg:px-16 backdrop-blur-md bg-white/20 dark:bg-[#050505]/40 border-b border-slate-200/50 dark:border-white/5 transition-colors">
         <div className="flex items-center gap-4">
-          <div className="flex items-center justify-center p-1.5 rounded-xl bg-white dark:bg-black/50 border border-slate-200 dark:border-white/10 shadow-sm">
+          <div className="flex items-center justify-center p-1.5 rounded-xl bg-white dark:bg-black/50 border border-slate-200 dark:border-white/10 shadow-sm gap-3">
             <img
               src={logoUndiksha}
               alt="Logo Undiksha"
               className="h-9 w-9 object-contain"
+            />
+            <div className="h-8 w-px bg-slate-200 dark:bg-white/10" />
+            <img
+              src={eGanesha}
+              alt="Logo E-Ganesha"
+              className="h-9 object-contain"
             />
           </div>
           <div className="flex flex-col">
