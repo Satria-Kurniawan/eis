@@ -42,17 +42,31 @@ export interface MhsDrilldownResponse {
     total: number;
 }
 
-export const fetchMhsFakultas = async (tahun: string, semester: string) => {
-    const params = new URLSearchParams({ tahun, semester, status: "1" });
+export interface MhsStatusItem {
+    id_status: number;
+    status: string;
+}
+
+export interface MhsStatusResponse {
+    datas: MhsStatusItem[];
+    message: string;
+}
+
+export const fetchMhsStatus = async () => {
+    return apiClient<MhsStatusResponse>(`/api/v1/status-mhs`);
+};
+
+export const fetchMhsFakultas = async (tahun: string, semester: string, status: string = "1") => {
+    const params = new URLSearchParams({ tahun, semester, status });
     return apiClient<MhsDrilldownResponse>(`/api/v1/dashboard-mhs/fakultas?${params.toString()}`);
 };
 
-export const fetchMhsJurusan = async (tahun: string, semester: string, kodeFakultas: string) => {
-    const params = new URLSearchParams({ tahun, semester, kodeFakultas, status: "1" });
+export const fetchMhsJurusan = async (tahun: string, semester: string, kodeFakultas: string, status: string = "1") => {
+    const params = new URLSearchParams({ tahun, semester, kodeFakultas, status });
     return apiClient<MhsDrilldownResponse>(`/api/v1/dashboard-mhs/jurusan?${params.toString()}`);
 };
 
-export const fetchMhsProdi = async (tahun: string, semester: string, kodeFakultas: string, kodeJurusan: string) => {
-    const params = new URLSearchParams({ tahun, semester, kodeFakultas, kodeJurusan, status: "1" });
+export const fetchMhsProdi = async (tahun: string, semester: string, kodeFakultas: string, kodeJurusan: string, status: string = "1") => {
+    const params = new URLSearchParams({ tahun, semester, kodeFakultas, kodeJurusan, status });
     return apiClient<MhsDrilldownResponse>(`/api/v1/dashboard-mhs/prodi?${params.toString()}`);
 };

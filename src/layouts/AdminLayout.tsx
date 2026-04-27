@@ -1,4 +1,6 @@
 import logoUndiksha from "@/assets/logo-undiksha.png";
+import { GlobalHubPortal } from "@/components/dashboard/GlobalHubPortal";
+import { HubFloatingButton } from "@/components/dashboard/HubFloatingButton";
 import { GlobalUnitFilter } from "@/components/GlobalUnitFilter";
 import {
   Collapsible,
@@ -56,10 +58,10 @@ import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 
 export default function AdminLayout() {
+  const navigate = useNavigate();
   const [isDark, setIsDark] = useState(false);
   const [isPeriodOpen, setIsPeriodOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
   const period = usePeriod();
 
   useEffect(() => {
@@ -121,17 +123,6 @@ export default function AdminLayout() {
           <SidebarGroup>
             <SidebarGroupLabel>Dashboards</SidebarGroupLabel>
             <SidebarMenu>
-              {/* <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={location.pathname === "/dashboard"}
-                >
-                  <Link to="/dashboard">
-                    <LayoutDashboard />
-                    <span>Dashboard</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem> */}
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
@@ -633,6 +624,8 @@ export default function AdminLayout() {
         </header>
         <main className="flex-1 overflow-y-auto relative">
           <Outlet />
+          <GlobalHubPortal />
+          <HubFloatingButton />
 
           {/* Premium Floating Dashboard Button */}
           <AnimatePresence>

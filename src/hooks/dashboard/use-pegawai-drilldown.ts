@@ -1,19 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import {
-  fetchMhsFakultas,
-  fetchMhsJurusan,
-  fetchMhsProdi,
-} from "@/services/dashboard/mahasiswa";
+  fetchPegawaiFakultas,
+  fetchPegawaiJurusan,
+  fetchPegawaiProdi,
+} from "@/services/dashboard/pegawai";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { useUnitFilter } from "@/contexts/UnitFilterContext";
-
 import { useSearchParams } from "react-router-dom";
 
-export const useMhsDrilldown = () => {
+export const usePegawaiDrilldown = () => {
   const { tahun, semester } = usePeriod();
   const { kodeFakultas, kodeJurusan } = useUnitFilter();
   const [searchParams] = useSearchParams();
-  const status = searchParams.get("mhsStatus") || "1";
+
+  const statusPegawai = searchParams.get("statusPegawai") || "";
+  const statusKeaktifan = searchParams.get("statusKeaktifan") || "";
 
   const currentLevel = !kodeFakultas
     ? "fakultas"
@@ -23,19 +24,27 @@ export const useMhsDrilldown = () => {
 
   const query = useQuery({
     queryKey: [
-      "mhs-drilldown",
+      "pegawai-drilldown",
       tahun,
       semester,
       kodeFakultas,
       kodeJurusan,
-      status,
+      statusPegawai,
+      statusKeaktifan,
     ],
     queryFn: () => {
+      const filters = { statusPegawai, statusKeaktifan };
       if (currentLevel === "fakultas")
-        return fetchMhsFakultas(tahun, semester, status);
+        return fetchPegawaiFakultas(tahun, semester, filters);
       if (currentLevel === "jurusan")
-        return fetchMhsJurusan(tahun, semester, kodeFakultas, status);
-      return fetchMhsProdi(tahun, semester, kodeFakultas, kodeJurusan, status);
+        return fetchPegawaiJurusan(tahun, semester, kodeFakultas, filters);
+      return fetchPegawaiProdi(
+        tahun,
+        semester,
+        kodeFakultas,
+        kodeJurusan,
+        filters,
+      );
     },
     staleTime: 1000 * 60 * 5,
   });

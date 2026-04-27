@@ -176,9 +176,8 @@ export const nodes = [
     details:
       "Trafik transaksi UKT dimonitor via CDC Debezium stream. Konektivitas Kafka sink dengan aplikasi keuangan nasional dipastikan aman dan tereplikasi secara instan ke Kafka clusters untuk pelaporan pimpinan.",
     menuItems: [
-      { label: "Dashboard Keuangan", path: "#" },
-      { label: "Realisasi Anggaran", path: "#" },
-      { label: "PNBP & UKT", path: "#" },
+      { label: "Realisasi Unit", path: "/keuangan/realisasi-unit" },
+      { label: "Realisasi Bulan", path: "/keuangan/realisasi-bulan" },
     ],
   },
 ];
