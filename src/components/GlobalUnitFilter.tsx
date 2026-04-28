@@ -122,7 +122,7 @@ export function GlobalUnitFilter() {
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[360px] p-0 rounded-2xl border-primary/10 backdrop-blur-2xl">
+              <PopoverContent className="w-[360px] p-0 rounded-2xl border-primary/10 backdrop-blur-2xl z-[1001]">
                 <Command className="rounded-2xl">
                   <CommandInput
                     placeholder="Cari Fakultas..."
@@ -182,7 +182,7 @@ export function GlobalUnitFilter() {
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[360px] p-0 rounded-2xl border-primary/10 backdrop-blur-2xl">
+              <PopoverContent className="w-[360px] p-0 rounded-2xl border-primary/10 backdrop-blur-2xl z-[1001]">
                 <Command className="rounded-2xl">
                   <CommandInput
                     placeholder="Cari Jurusan..."
@@ -242,7 +242,7 @@ export function GlobalUnitFilter() {
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[360px] p-0 rounded-2xl border-primary/10 backdrop-blur-2xl">
+              <PopoverContent className="w-[360px] p-0 rounded-2xl border-primary/10 backdrop-blur-2xl z-[1001]">
                 <Command className="rounded-2xl">
                   <CommandInput
                     placeholder="Cari Prodi..."
