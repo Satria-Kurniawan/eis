@@ -27,12 +27,18 @@ import PengabdianPage from "@/pages/kinerja/PengabdianPage";
 import ProsidingPage from "@/pages/kinerja/ProsidingPage";
 import RealisasiBulanPage from "@/pages/keuangan/RealisasiBulanPage";
 import RealisasiUnitPage from "@/pages/keuangan/RealisasiUnitPage";
+import SsoCallbackPage from "@/pages/auth/SsoCallbackPage";
+import NotFoundPage from "@/pages/error/NotFoundPage";
 import { createBrowserRouter } from "react-router-dom";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     Component: LandingPage,
+  },
+  {
+    path: "/sso/callback",
+    Component: SsoCallbackPage,
   },
   {
     path: "/",
@@ -147,5 +153,9 @@ export const router = createBrowserRouter([
         Component: RealisasiBulanPage,
       },
     ],
+  },
+  {
+    path: "*",
+    Component: NotFoundPage,
   },
 ]);

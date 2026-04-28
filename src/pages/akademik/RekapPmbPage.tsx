@@ -1,35 +1,29 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { useRekapPmb } from "@/hooks/akademik/use-rekap-pmb";
 import { useDebounce } from "@/hooks/use-debounce";
-import { Input } from "@/components/ui/input";
-import { BarChart3, GraduationCap, Info, Search, TrendingUp } from "lucide-react";
+import {
+  BarChart3,
+  GraduationCap,
+  Info,
+  Search,
+  TrendingUp,
+} from "lucide-react";
 import { motion } from "motion/react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { columns as columnDefs } from "./RekapPmb/columns";
 import { PmbTable } from "./RekapPmb/pmb-table";
+import { PmbDashboard } from "./RekapPmb/pmb-dashboard";
 
 export default function RekapPmbPage() {
   const { tahun, semester } = usePeriod();
   const [searchValue, setSearchValue] = useState("");
   const debouncedSearch = useDebounce(searchValue, 500);
 
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    page,
-    setPage,
-    limit,
-    setLimit,
-  } = useRekapPmb(debouncedSearch);
-
-  // Reset to page 1 when search changes
-  useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch, setPage]);
+  const { data, isLoading, isError, error, page, setPage, limit, setLimit } =
+    useRekapPmb(debouncedSearch);
 
   // Memoize columns and source data for RevoGrid performance
   const columns = useMemo(() => columnDefs, []);
@@ -62,6 +56,76 @@ export default function RekapPmbPage() {
       });
       return flattened;
     });
+  }, [source]);
+
+  // Dashboard Data Aggregation
+  const dashboardData = useMemo(() => {
+    if (!source || source.length === 0) {
+      return {
+        totals: { peminat: 0, lulus: 0, daftar: 0 },
+        distribution: [],
+        topProdis: [],
+      };
+    }
+
+    const categories = [
+      { id: "snbp", label: "SNBP" },
+      { id: "snbt", label: "SNBT" },
+      { id: "smbjm_cbt", label: "CBT" },
+      { id: "smbjm_raport", label: "Raport" },
+      { id: "smbjm_talent", label: "Talent" },
+      { id: "smbjm_utbk", label: "UTBK" },
+      { id: "profesi", label: "Profesi" },
+      { id: "internasional", label: "Intl" },
+      { id: "pasca", label: "Pasca" },
+      { id: "adikpapua", label: "ADIK" },
+    ];
+
+    const distMap: Record<string, any> = {};
+    categories.forEach((cat) => {
+      distMap[cat.id] = { name: cat.label, peminat: 0, lulus: 0, daftar: 0 };
+    });
+
+    let totalPeminat = 0;
+    let totalLulus = 0;
+    let totalDaftar = 0;
+
+    source.forEach((item) => {
+      const global = item.jumlah;
+      totalPeminat += parseInt(global.peminat || "0");
+      totalLulus += parseInt(global.lulus || "0");
+      totalDaftar += parseInt(global.daftar || "0");
+
+      categories.forEach((cat) => {
+        const stats = item[cat.id as keyof typeof item] as any;
+        if (stats) {
+          distMap[cat.id].peminat += parseInt(stats.peminat || "0");
+          distMap[cat.id].lulus += parseInt(stats.lulus || "0");
+          distMap[cat.id].daftar += parseInt(stats.daftar || "0");
+        }
+      });
+    });
+
+    const topProdis = [...source]
+      .sort(
+        (a, b) =>
+          parseInt(b.jumlah.peminat || "0") - parseInt(a.jumlah.peminat || "0"),
+      )
+      .slice(0, 5)
+      .map((item) => ({
+        name: item.nama_prodi.split("(")[0].trim(),
+        peminat: parseInt(item.jumlah.peminat || "0"),
+      }));
+
+    return {
+      totals: {
+        peminat: totalPeminat,
+        lulus: totalLulus,
+        daftar: totalDaftar,
+      },
+      distribution: Object.values(distMap),
+      topProdis,
+    };
   }, [source]);
 
   return (
@@ -123,6 +187,17 @@ export default function RekapPmbPage() {
             </div>
           </div>
         </Alert>
+      )}
+
+      {/* Visual Dashboard Section */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Skeleton className="h-40 rounded-[2.5rem]" />
+          <Skeleton className="h-40 rounded-[2.5rem]" />
+          <Skeleton className="h-40 rounded-[2.5rem]" />
+        </div>
+      ) : (
+        <PmbDashboard data={dashboardData} />
       )}
 
       {/* Modern Filter Toolbar */}

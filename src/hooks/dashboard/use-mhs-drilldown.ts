@@ -9,7 +9,7 @@ import { useUnitFilter } from "@/contexts/UnitFilterContext";
 
 import { useSearchParams } from "react-router-dom";
 
-export const useMhsDrilldown = () => {
+export const useMhsDrilldown = (enabled: boolean = true) => {
   const { tahun, semester } = usePeriod();
   const { kodeFakultas, kodeJurusan } = useUnitFilter();
   const [searchParams] = useSearchParams();
@@ -38,6 +38,7 @@ export const useMhsDrilldown = () => {
       return fetchMhsProdi(tahun, semester, kodeFakultas, kodeJurusan, status);
     },
     staleTime: 1000 * 60 * 5,
+    enabled,
   });
 
   return {

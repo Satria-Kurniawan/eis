@@ -4,7 +4,7 @@ import { usePeriod } from "@/contexts/PeriodContext";
 
 import { useSearchParams } from "react-router-dom";
 
-export const useDosenOverview = () => {
+export const useDosenOverview = (enabled: boolean = true) => {
   const { tahun, semester } = usePeriod();
   const [searchParams] = useSearchParams();
 
@@ -25,5 +25,6 @@ export const useDosenOverview = () => {
         id_status_keaktifan,
       }),
     staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled,
   });
 };

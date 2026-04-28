@@ -19,18 +19,23 @@ import { DrilldownChart } from "./DrilldownChart";
 export function MhsStatsTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const mhsStatus = searchParams.get("mhsStatus") || "1";
+  
+  const isStatsView = searchParams.get("view") === "stats";
+  const isMhsTab = searchParams.get("tab") === "mhs" || !searchParams.get("tab");
+  const isEnabled = isStatsView && isMhsTab;
 
   const { data: statusList } = useQuery({
     queryKey: ["mhs-status-list"],
     queryFn: fetchMhsStatus,
+    enabled: isEnabled,
   });
 
-  const { data: mhsData, isLoading: isMhsLoading } = useMhsOverview();
+  const { data: mhsData, isLoading: isMhsLoading } = useMhsOverview(isEnabled);
   const {
     data: drilldownData,
     isLoading: isDrilldownLoading,
     currentLevel,
-  } = useMhsDrilldown();
+  } = useMhsDrilldown(isEnabled);
 
   const {
     setKodeFakultas,

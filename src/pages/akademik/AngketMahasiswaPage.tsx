@@ -6,7 +6,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { Input } from "@/components/ui/input";
 import { ClipboardCheck, GraduationCap, Info, Search, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { AngketTable } from "./AngketMahasiswa/angket-table";
 import { columns } from "./AngketMahasiswa/columns";
 
@@ -30,13 +30,6 @@ export default function AngketMahasiswaPage() {
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch, setPage]);
-
-  // Calculate stats for overview
-  const totalData = data?.pagination.total || 0;
-  const uniqueProdis = useMemo(() => {
-    if (!data?.datas) return 0;
-    return new Set(data.datas.map((d) => d.unit?.prd_kode)).size;
-  }, [data]);
 
   return (
     <motion.div
@@ -75,76 +68,6 @@ export default function AngketMahasiswaPage() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Statistics Dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          {
-            label: "Total Data Angket",
-            value: totalData.toLocaleString(),
-            icon: ClipboardCheck,
-            color: "text-blue-500",
-            bg: "bg-blue-500/5",
-            border: "border-blue-500/10",
-            desc: "Total partisipasi mahasiswa",
-          },
-          {
-            label: "Sebaran Prodi",
-            value: uniqueProdis,
-            icon: GraduationCap,
-            color: "text-emerald-500",
-            bg: "bg-emerald-500/5",
-            border: "border-emerald-500/10",
-            desc: "Program studi yang terlibat",
-          },
-          {
-            label: "Monitoring Status",
-            value: "Active",
-            icon: TrendingUp,
-            color: "text-amber-500",
-            bg: "bg-amber-500/5",
-            border: "border-amber-500/10",
-            desc: "Sistem berjalan normal",
-          },
-        ].map((stat, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 + 0.2 }}
-            className={`group relative overflow-hidden rounded-[2.5rem] border ${stat.border} ${stat.bg} p-8 backdrop-blur-xl transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1`}
-          >
-            <div className="flex items-start justify-between relative z-10">
-              <div className="space-y-4">
-                <div className="p-3 rounded-2xl bg-background/50 border border-primary/5 w-fit shadow-inner">
-                  <stat.icon className={`size-6 ${stat.color}`} />
-                </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">
-                    {stat.label}
-                  </p>
-                  <div className="flex items-baseline gap-2">
-                    <h3 className="text-4xl font-black tracking-tighter text-foreground">
-                      {stat.value}
-                    </h3>
-                  </div>
-                  <p className="text-xs font-medium text-muted-foreground mt-2 flex items-center gap-1.5">
-                    <span className="size-1 rounded-full bg-primary/30" />
-                    {stat.desc}
-                  </p>
-                </div>
-              </div>
-
-              {/* Decorative accent */}
-              <div
-                className={`absolute -right-4 -top-4 size-32 opacity-[0.03] grayscale transition-all duration-700 group-hover:opacity-[0.08] group-hover:scale-110 group-hover:rotate-12`}
-              >
-                <stat.icon className="size-full" />
-              </div>
-            </div>
-          </motion.div>
-        ))}
       </div>
 
       {isError && (

@@ -1,4 +1,8 @@
-import { RevoGrid, type ColumnRegular, type DataType } from "@revolist/react-datagrid";
+import {
+  RevoGrid,
+  type ColumnRegular,
+  type DataType,
+} from "@revolist/react-datagrid";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -41,8 +45,8 @@ export function PmbTable<TData extends DataType>({
 
   return (
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="relative overflow-hidden rounded-[2.5rem] border border-primary/10 bg-card/60 backdrop-blur-xl shadow-2xl shadow-primary/5 p-4">
-        <div style={{ height: "550px" }} className="revo-grid-container">
+      <div className="relative overflow-hidden rounded-[2.5rem] border border-primary/10 bg-background/40 backdrop-blur-xl shadow-2xl shadow-primary/5 p-4">
+        <div style={{ height: "600px" }} className="revo-grid-container">
           <RevoGrid
             columns={columns}
             source={data}
@@ -75,7 +79,7 @@ export function PmbTable<TData extends DataType>({
                 side="top"
                 className="rounded-2xl border-primary/10 backdrop-blur-xl"
               >
-                {[10, 20, 30, 40, 50].map((size) => (
+                {[10, 20, 30, 40, 50, 100].map((size) => (
                   <SelectItem
                     key={size}
                     value={`${size}`}
@@ -148,8 +152,14 @@ export function PmbTable<TData extends DataType>({
           --revo-row-border-color: rgba(var(--primary-rgb), 0.08);
           --revo-cell-border-color: rgba(var(--primary-rgb), 0.04);
           --revo-active-cell-color: var(--primary);
+          --revo-text-color: var(--foreground);
           --revo-row-odd-background-color: transparent;
           --revo-row-even-background-color: rgba(var(--primary-rgb), 0.02);
+          --revo-cell-selected-color: rgba(var(--primary-rgb), 0.1);
+        }
+        .dark .revo-grid-container {
+          --revo-text-color: #f8fafc;
+          --revo-grid-background-color: transparent;
         }
         revogr-header-view {
           background-color: rgba(var(--primary-rgb), 0.05) !important;
@@ -158,42 +168,63 @@ export function PmbTable<TData extends DataType>({
         revogr-header-view revogr-header-cell {
           font-weight: 900 !important;
           text-transform: uppercase !important;
-          letter-spacing: 0.15em !important;
+          letter-spacing: 0.1em !important;
           font-size: 10px !important;
           color: var(--primary) !important;
-          padding: 0 20px !important;
+          padding: 10px 15px !important;
           transition: background-color 0.2s;
+          white-space: normal !important;
+          line-height: 1.3 !important;
+          text-align: center !important;
         }
         .dark revogr-header-view revogr-header-cell {
-          color: #f8fafc !important; /* Slate 50 for high contrast in dark mode */
+          color: #f8fafc !important;
         }
         revogr-header-view revogr-header-cell:hover {
           background-color: rgba(var(--primary-rgb), 0.1) !important;
         }
         div[slot="content-fixed-left"] {
           border-right: 2px solid rgba(var(--primary-rgb), 0.1) !important;
-          box-shadow: 10px 0 20px -10px rgba(0,0,0,0.1) !important;
-          background: rgba(255, 255, 255, 0.7) !important;
-          backdrop-filter: blur(10px);
+          box-shadow: 10px 0 20px -10px rgba(0,0,0,0.05) !important;
+          background: rgba(var(--background-rgb), 0.5) !important;
+          backdrop-filter: blur(12px);
         }
         .dark div[slot="content-fixed-left"] {
-          background: rgba(15, 16, 20, 0.95) !important;
-          box-shadow: 15px 0 30px -10px rgba(0,0,0,0.4) !important;
+          background: rgba(15, 16, 20, 0.9) !important;
+          box-shadow: 15px 0 30px -10px rgba(0,0,0,0.3) !important;
           border-right: 2px solid rgba(var(--primary-rgb), 0.2) !important;
         }
         revogr-viewport-scroll {
           scrollbar-width: thin;
           scrollbar-color: rgba(var(--primary-rgb), 0.2) transparent;
         }
-        .dark revogr-temp-row:hover {
-          background-color: rgba(var(--primary-rgb), 0.12) !important;
+        /* Custom Scrollbar for RevoGrid */
+        .revo-grid-container ::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        .revo-grid-container ::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .revo-grid-container ::-webkit-scrollbar-thumb {
+          background: rgba(var(--primary-rgb), 0.1);
+          border-radius: 10px;
+        }
+        .revo-grid-container ::-webkit-scrollbar-thumb:hover {
+          background: rgba(var(--primary-rgb), 0.3);
         }
         revogr-temp-row:hover {
           background-color: rgba(var(--primary-rgb), 0.06) !important;
         }
+        .dark revogr-temp-row:hover {
+          background-color: rgba(var(--primary-rgb), 0.12) !important;
+        }
         revogr-data .rgCell {
           padding: 0 !important;
           line-height: normal !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
         }
       `}</style>
     </div>

@@ -22,4 +22,3 @@ export const useAngketMahasiswa = (search: string = "") => {
     setLimit,
   };
 };
-

@@ -386,7 +386,7 @@ export default function EISDashboard2() {
                       stroke="#ff8c42"
                       strokeWidth="2"
                       opacity={0.55}
-                      filter="url(#line-glow)"
+                      filter={isLowSpec ? undefined : "url(#line-glow)"}
                     />
 
                     {paths.map((p, i) => (
@@ -396,7 +396,7 @@ export default function EISDashboard2() {
                         fill="none"
                         stroke={p.stroke}
                         strokeWidth={3}
-                        filter="url(#line-glow)"
+                        filter={isLowSpec ? undefined : "url(#line-glow)"}
                         initial={{ pathLength: 0, opacity: 0 }}
                         animate={{ pathLength: 1, opacity: 0.88 }}
                         transition={{
@@ -438,7 +438,7 @@ export default function EISDashboard2() {
                       return (
                         <div
                           key={node.id}
-                          className="absolute z-20 -translate-x-1/2 -translate-y-1/2 group cursor-pointer hover:scale-105 transition-all duration-500"
+                          className="absolute z-20 -translate-x-1/2 -translate-y-1/2 group cursor-pointer hover:scale-105 transition-all duration-500 will-change-transform"
                           style={{ left: `${leftPct}%`, top: `${topPct}%` }}
                           onClick={() => setIsHubOpen(true)}
                         >
@@ -503,7 +503,7 @@ export default function EISDashboard2() {
                       return (
                         <div
                           key={node.id}
-                          className="absolute z-20 -translate-x-1/2 -translate-y-1/2 group cursor-pointer hover:scale-105 transition-transform duration-300"
+                          className="absolute z-20 -translate-x-1/2 -translate-y-1/2 group cursor-pointer hover:scale-105 transition-transform duration-300 will-change-transform"
                           style={{ left: `${leftPct}%`, top: `${topPct}%` }}
                           onClick={() => setSelectedNode(node as any)}
                         >

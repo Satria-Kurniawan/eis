@@ -3,7 +3,7 @@ import { fetchPegawaiOverview } from "@/services/dashboard/pegawai";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { useSearchParams } from "react-router-dom";
 
-export const usePegawaiOverview = () => {
+export const usePegawaiOverview = (enabled: boolean = true) => {
   const { tahun, semester } = usePeriod();
   const [searchParams] = useSearchParams();
 
@@ -24,5 +24,6 @@ export const usePegawaiOverview = () => {
         statusKeaktifan,
       }),
     staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled,
   });
 };

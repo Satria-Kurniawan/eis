@@ -165,7 +165,9 @@ export default function LandingPage() {
 
             {/* CTA: Login SSO */}
             <button
-              onClick={() => alert("Ke Halaman SSO...")}
+              onClick={() => {
+                alert("Modul sedang dalam pengembangan");
+              }}
               className="group pointer-events-auto relative flex items-center gap-4 px-10 py-5 rounded-full bg-white/80 dark:bg-[#0a0a0a] backdrop-blur-md border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:bg-slate-50 dark:hover:bg-black shadow-[0_10px_30px_rgba(0,0,0,0.02)]"
             >
               <span className="relative z-10 text-slate-800 dark:text-slate-300 font-bold tracking-widest uppercase text-xs transition-colors duration-300">

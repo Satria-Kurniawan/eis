@@ -8,7 +8,7 @@ import { usePeriod } from "@/contexts/PeriodContext";
 import { useUnitFilter } from "@/contexts/UnitFilterContext";
 import { useSearchParams } from "react-router-dom";
 
-export const usePegawaiDrilldown = () => {
+export const usePegawaiDrilldown = (enabled: boolean = true) => {
   const { tahun, semester } = usePeriod();
   const { kodeFakultas, kodeJurusan } = useUnitFilter();
   const [searchParams] = useSearchParams();
@@ -47,6 +47,7 @@ export const usePegawaiDrilldown = () => {
       );
     },
     staleTime: 1000 * 60 * 5,
+    enabled,
   });
 
   return {

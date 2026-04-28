@@ -14,12 +14,18 @@ import { DrilldownChart } from "./DrilldownChart";
 import { StatCard } from "./StatCard";
 
 export function PegawaiStatsTab() {
-  const { data: pegawaiData, isLoading } = usePegawaiOverview();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const isStatsView = searchParams.get("view") === "stats";
+  const isPegawaiTab = searchParams.get("tab") === "pegawai";
+  const isEnabled = isStatsView && isPegawaiTab;
+
+  const { data: pegawaiData, isLoading } = usePegawaiOverview(isEnabled);
   const {
     data: pegawaiDrilldownData,
     isLoading: isDrilldownLoading,
     currentLevel: pegawaiLevel,
-  } = usePegawaiDrilldown();
+  } = usePegawaiDrilldown(isEnabled);
 
   const {
     setKodeFakultas,
@@ -51,8 +57,6 @@ export function PegawaiStatsTab() {
       setKodeFakultas("");
     }
   };
-
-  const [searchParams, setSearchParams] = useSearchParams();
 
   const { data: statusPegawaiList } = useQuery({
     queryKey: ["status-pegawai-list"],

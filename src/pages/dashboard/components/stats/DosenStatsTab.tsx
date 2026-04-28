@@ -16,22 +16,28 @@ import { StatCard } from "./StatCard";
 export function DosenStatsTab() {
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const isStatsView = searchParams.get("view") === "stats";
+  const isDosenTab = searchParams.get("tab") === "dosen";
+  const isEnabled = isStatsView && isDosenTab;
+
   const { data: statusPegawaiList } = useQuery({
     queryKey: ["status-pegawai-list"],
     queryFn: fetchStatusPegawai,
+    enabled: isEnabled,
   });
 
   const { data: statusKeaktifanList } = useQuery({
     queryKey: ["status-keaktifan-list"],
     queryFn: fetchStatusKeaktifan,
+    enabled: isEnabled,
   });
 
-  const { data: dosenData, isLoading: isDosenLoading } = useDosenOverview();
+  const { data: dosenData, isLoading: isDosenLoading } = useDosenOverview(isEnabled);
   const {
     data: dosenDrilldownData,
     isLoading: isDosenDrilldownLoading,
     currentLevel: dosenLevel,
-  } = useDosenDrilldown();
+  } = useDosenDrilldown(isEnabled);
 
   const {
     setKodeFakultas,

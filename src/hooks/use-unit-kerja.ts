@@ -1,11 +1,12 @@
 import { fetchUnitKerja } from "@/services/master";
 import { useQuery } from "@tanstack/react-query";
 
-export const useUnitKerja = () => {
+export const useUnitKerja = (enabled: boolean = true) => {
   const query = useQuery({
     queryKey: ["unit-kerja"],
     queryFn: fetchUnitKerja,
     staleTime: 1000 * 60 * 60, // 1 hour cache
+    enabled,
   });
 
   const getFakultas = () => {
