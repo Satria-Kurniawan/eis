@@ -50,9 +50,7 @@ import {
   Home,
   LayoutDashboard,
   LineChart,
-  Moon,
   Sparkles,
-  Sun,
   Users,
   Wallet,
 } from "lucide-react";
@@ -60,6 +58,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useLowSpec } from "@/contexts/LowSpecContext";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -77,6 +76,17 @@ export default function AdminLayout() {
     } else {
       document.documentElement.classList.remove("dark");
     }
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "class") {
+          setIsDark(document.documentElement.classList.contains("dark"));
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
   }, []);
 
   const academicPeriods = [
@@ -98,18 +108,6 @@ export default function AdminLayout() {
     if (selected) {
       period.setTahun(selected.tahun);
       period.setSemester(selected.semester);
-    }
-  };
-
-  const toggleSidebarTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    if (newTheme) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
     }
   };
 
@@ -624,17 +622,13 @@ export default function AdminLayout() {
             >
               <Gauge className="size-5" />
             </button>
-            <button
-              onClick={toggleSidebarTheme}
-              className="p-2 rounded-xl hover:bg-muted transition-all text-slate-500 hover:text-primary active:scale-90 shrink-0"
+            
+            <AnimatedThemeToggler 
+              variant="circle"
+              duration={600}
+              className="p-2 rounded-xl hover:bg-muted transition-all text-slate-500 hover:text-primary active:scale-90 shrink-0 [&_svg]:size-5"
               title={isDark ? "Mode Terang" : "Mode Gelap"}
-            >
-              {isDark ? (
-                <Sun className="size-5" />
-              ) : (
-                <Moon className="size-5" />
-              )}
-            </button>
+            />
           </div>
         </header>
         <FloatingSidebar />

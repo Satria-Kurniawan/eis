@@ -1,5 +1,5 @@
-import logoUndiksha from "@/assets/logo-undiksha.png";
 import eGanesha from "@/assets/e-ganesha.png";
+import logoUndiksha from "@/assets/logo-undiksha.png";
 import Antigravity from "@/components/Antigravity";
 import {
   ArrowRight,
@@ -8,20 +8,20 @@ import {
   GraduationCap,
   LineChart,
   LogIn,
-  Moon,
   ShieldCheck,
-  Sun,
   Zap,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+
 export default function LandingPage() {
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [isDark, setIsDark] = useState(
+  const [_, setIsDark] = useState(
     document.documentElement.classList.contains("dark"),
   );
 
@@ -55,18 +55,6 @@ export default function LandingPage() {
     observer.observe(document.documentElement, { attributes: true });
     return () => observer.disconnect();
   }, []);
-
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    if (newTheme) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  };
 
   return (
     <div
@@ -110,16 +98,12 @@ export default function LandingPage() {
             </span>
           </div>
         </div>
-        <button
-          onClick={toggleTheme}
-          className="p-3 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors shadow-sm"
-        >
-          {isDark ? (
-            <Sun className="size-4 text-slate-300" />
-          ) : (
-            <Moon className="size-4 text-slate-600" />
-          )}
-        </button>
+
+        <AnimatedThemeToggler
+          variant="circle"
+          duration={800}
+          className="p-3 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors shadow-sm [&_svg]:size-4 [&_svg]:text-slate-600 dark:[&_svg]:text-slate-300"
+        />
       </div>
 
       {/* NORMAL FLOW LAYOUT (z-10 ensures UI clicks don't fall through) */}
