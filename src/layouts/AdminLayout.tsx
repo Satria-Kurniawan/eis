@@ -639,11 +639,14 @@ export default function AdminLayout() {
             </button>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto relative">
-          <Outlet />
+        <FloatingSidebar />
+        <main className="flex-1 overflow-y-auto relative custom-scrollbar">
+          <div className="container mx-auto md:pl-28 transition-all duration-500 min-h-full">
+            <Outlet />
+          </div>
+
           <GlobalHubPortal />
           <HubFloatingButton />
-          <FloatingSidebar />
 
           {/* Premium Floating Dashboard Button */}
           <AnimatePresence>
