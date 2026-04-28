@@ -21,6 +21,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import EISMobileDashboard from "./EISMobileDashboard";
 import StatsView from "./StatsView";
 import { nodes, paths, SCENE_H, SCENE_W } from "./dashboard-data";
+import { useLowSpec } from "@/contexts/LowSpecContext";
 
 /** Isometric cube (SVG) */
 function IsoCube({
@@ -163,6 +164,7 @@ export default function EISDashboard2() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeView =
     (searchParams.get("view") as "dashboard" | "stats") || "dashboard";
+  const { isLowSpec } = useLowSpec();
 
   const setActiveView = (view: "dashboard" | "stats") => {
     setSearchParams((prev) => {
@@ -205,9 +207,8 @@ export default function EISDashboard2() {
             rotateX: 60,
             rotateZ: 30,
             opacity: isHubOpen ? 0 : isDark ? 0.4 : 0.4,
-            backgroundPosition: isHubOpen
-              ? "0px 0px"
-              : ["0px 0px", "60px 60px"],
+            backgroundPosition:
+              isLowSpec || isHubOpen ? "0px 0px" : ["0px 0px", "60px 60px"],
           }}
           transition={{
             opacity: { duration: 0.5 },
@@ -406,26 +407,27 @@ export default function EISDashboard2() {
                       />
                     ))}
 
-                    {paths.map((p, i) => (
-                      <motion.circle
-                        key={`pkt-${i}`}
-                        r={3}
-                        fill={isDark ? "#f8fafc" : "#334155"}
-                        className={isDark ? "" : "drop-shadow-none"}
-                        opacity={isDark ? 0.85 : 0.6}
-                        animate={{
-                          offsetDistance: ["0%", "100%"],
-                          opacity: [0, isDark ? 1 : 0.8, 0],
-                        }}
-                        transition={{
-                          duration: 3.2 + (i % 3) * 0.4,
-                          repeat: Infinity,
-                          ease: "linear",
-                          delay: i * 0.35,
-                        }}
-                        style={{ offsetPath: `path('${p.d}')` }}
-                      />
-                    ))}
+                    {!isLowSpec &&
+                      paths.map((p, i) => (
+                        <motion.circle
+                          key={`pkt-${i}`}
+                          r={3}
+                          fill={isDark ? "#f8fafc" : "#334155"}
+                          className={isDark ? "" : "drop-shadow-none"}
+                          opacity={isDark ? 0.85 : 0.6}
+                          animate={{
+                            offsetDistance: ["0%", "100%"],
+                            opacity: [0, isDark ? 1 : 0.8, 0],
+                          }}
+                          transition={{
+                            duration: 3.2 + (i % 3) * 0.4,
+                            repeat: Infinity,
+                            ease: "linear",
+                            delay: i * 0.35,
+                          }}
+                          style={{ offsetPath: `path('${p.d}')` }}
+                        />
+                      ))}
                   </svg>
 
                   {nodes.map((node) => {
@@ -460,9 +462,11 @@ export default function EISDashboard2() {
                                     isDark ? "text-[#0a0a0c]" : "text-white"
                                   }
                                 />
-                                <div
-                                  className={`absolute inset-0 rounded-full border-2 animate-ping opacity-60 ${isDark ? "border-[#ff8c42]" : "border-[#e66c1f]"}`}
-                                ></div>
+                                {!isLowSpec && (
+                                  <div
+                                    className={`absolute inset-0 rounded-full border-2 animate-ping opacity-60 ${isDark ? "border-[#ff8c42]" : "border-[#e66c1f]"}`}
+                                  ></div>
+                                )}
                               </div>
                             </div>
                             <IsoCube
@@ -601,14 +605,18 @@ export default function EISDashboard2() {
                           CDC Activity Monitor
                         </span>
                         <div className="flex items-center gap-2.5 mt-1.5">
-                          <motion.div
-                            animate={{
-                              opacity: [1, 0.4, 1],
-                              scale: [1, 1.2, 1],
-                            }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                            className="size-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-                          />
+                          {isLowSpec ? (
+                            <div className="size-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                          ) : (
+                            <motion.div
+                              animate={{
+                                opacity: [1, 0.4, 1],
+                                scale: [1, 1.2, 1],
+                              }}
+                              transition={{ duration: 2, repeat: Infinity }}
+                              className="size-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                            />
+                          )}
                           <span className="text-xs font-black text-emerald-500 uppercase tracking-wider">
                             Real-time Streaming
                           </span>
@@ -626,30 +634,42 @@ export default function EISDashboard2() {
 
                     {/* Visual Stream Animation */}
                     <div className="flex items-center gap-1.5 h-12 px-3 bg-white/50 dark:bg-slate-950/50 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 overflow-hidden backdrop-blur-sm">
-                      {[...Array(24)].map((_, i) => (
-                        <motion.div
-                          key={i}
-                          animate={{
-                            height: [
-                              "25%",
-                              `${30 + Math.random() * 60}%`,
-                              `${15 + Math.random() * 50}%`,
-                              "25%",
-                            ],
-                          }}
-                          transition={{
-                            duration: 0.6 + Math.random() * 0.4,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: i * 0.05,
-                          }}
-                          className="w-full min-w-[4px] rounded-full"
-                          style={{
-                            backgroundColor: selectedNode.color,
-                            opacity: 0.2 + (i / 24) * 0.8,
-                          }}
-                        />
-                      ))}
+                      {[...Array(24)].map((_, i) =>
+                        isLowSpec ? (
+                          <div
+                            key={i}
+                            className="w-full min-w-[4px] rounded-full"
+                            style={{
+                              height: `${20 + (i % 5) * 15}%`,
+                              backgroundColor: selectedNode.color,
+                              opacity: 0.2 + (i / 24) * 0.8,
+                            }}
+                          />
+                        ) : (
+                          <motion.div
+                            key={i}
+                            animate={{
+                              height: [
+                                "25%",
+                                `${30 + Math.random() * 60}%`,
+                                `${15 + Math.random() * 50}%`,
+                                "25%",
+                              ],
+                            }}
+                            transition={{
+                              duration: 0.6 + Math.random() * 0.4,
+                              repeat: Infinity,
+                              ease: "easeInOut",
+                              delay: i * 0.05,
+                            }}
+                            className="w-full min-w-[4px] rounded-full"
+                            style={{
+                              backgroundColor: selectedNode.color,
+                              opacity: 0.2 + (i / 24) * 0.8,
+                            }}
+                          />
+                        ),
+                      )}
                     </div>
                     <div className="mt-4 flex justify-between items-center px-1">
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">

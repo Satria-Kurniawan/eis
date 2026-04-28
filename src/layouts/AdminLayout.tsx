@@ -45,6 +45,7 @@ import {
   Building,
   Calendar,
   ChevronDown,
+  Gauge,
   GraduationCap,
   Home,
   LayoutDashboard,
@@ -58,6 +59,7 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useLowSpec } from "@/contexts/LowSpecContext";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -65,6 +67,7 @@ export default function AdminLayout() {
   const [isPeriodOpen, setIsPeriodOpen] = useState(false);
   const location = useLocation();
   const period = usePeriod();
+  const { isLowSpec, setIsLowSpec } = useLowSpec();
 
   useEffect(() => {
     const isDarkGlobal = localStorage.getItem("theme") === "dark";
@@ -626,6 +629,13 @@ export default function AdminLayout() {
               </Popover>
             </div>
 
+            <button
+              onClick={() => setIsLowSpec(!isLowSpec)}
+              className={`p-2 rounded-xl hover:bg-muted transition-all active:scale-90 shrink-0 ${isLowSpec ? 'text-amber-500 bg-amber-500/10 hover:bg-amber-500/20' : 'text-slate-500 hover:text-primary'}`}
+              title={isLowSpec ? "Mode Performa Aktif (Low Spec)" : "Mode Standar"}
+            >
+              <Gauge className="size-5" />
+            </button>
             <button
               onClick={toggleSidebarTheme}
               className="p-2 rounded-xl hover:bg-muted transition-all text-slate-500 hover:text-primary active:scale-90 shrink-0"

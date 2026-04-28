@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useLowSpec } from "@/contexts/LowSpecContext";
 
 interface DrilldownChartProps {
   title: string;
@@ -35,6 +36,8 @@ export function DrilldownChart({
   onGoBack,
   showGoBack,
 }: DrilldownChartProps) {
+  const { isLowSpec } = useLowSpec();
+
   const getAbbreviation = (name: string) => {
     if (!name) return "";
     const map: Record<string, string> = {
@@ -182,7 +185,8 @@ export function DrilldownChart({
                   dataKey="value"
                   radius={[8, 8, 0, 0]}
                   barSize={40}
-                  animationDuration={1500}
+                  isAnimationActive={!isLowSpec}
+                  animationDuration={isLowSpec ? 0 : 1500}
                   onClick={(barData) => onDrilldown(barData, level)}
                 >
                   {data.map((_entry, index) => (
@@ -253,10 +257,11 @@ export function DrilldownChart({
                     </div>
                     <div className="h-2 w-full bg-slate-50 dark:bg-slate-900/50 rounded-full overflow-hidden border border-slate-100 dark:border-slate-800/50">
                       <motion.div
-                        initial={{ width: 0 }}
+                        initial={isLowSpec ? false : { width: 0 }}
                         animate={{
                           width: `${total ? (item.value / total) * 100 : 0}%`,
                         }}
+                        transition={isLowSpec ? { duration: 0 } : { duration: 0.5 }}
                         className="h-full rounded-full relative"
                         style={{
                           backgroundColor: levelColor,

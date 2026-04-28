@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PeriodProvider } from "@/contexts/PeriodContext";
 import { UnitFilterProvider } from "@/contexts/UnitFilterContext";
 import { HubPortalProvider } from "@/contexts/HubPortalContext";
+import { LowSpecProvider } from "@/contexts/LowSpecContext";
 
 const queryClient = new QueryClient();
 
@@ -14,9 +15,11 @@ export default function AppRouterProvider() {
       <PeriodProvider>
         <UnitFilterProvider>
           <HubPortalProvider>
-            <TooltipProvider>
-              <RouterProvider router={router} />
-            </TooltipProvider>
+            <LowSpecProvider>
+              <TooltipProvider>
+                <RouterProvider router={router} />
+              </TooltipProvider>
+            </LowSpecProvider>
           </HubPortalProvider>
         </UnitFilterProvider>
       </PeriodProvider>
