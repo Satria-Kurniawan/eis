@@ -4,14 +4,16 @@ import { type ColumnDef } from "@tanstack/react-table";
 import {
   BookOpen,
   Building2,
-  FileText,
+  ExternalLink,
   Globe,
   Hash,
   School,
   Users,
 } from "lucide-react";
 
-export const columns: ColumnDef<Jurnal>[] = [
+export const createColumns = (
+  onViewDetail: (jurnal: Jurnal) => void,
+): ColumnDef<Jurnal>[] => [
   {
     accessorKey: "judul_artikel",
     header: "Judul Artikel",
@@ -136,33 +138,16 @@ export const columns: ColumnDef<Jurnal>[] = [
     ),
   },
   {
-    accessorKey: "dokumen",
-    header: "Dokumen",
-    cell: ({ row }) => {
-      const url = row.original.file_selesai_dicetak || row.original.url_dokumen;
-
-      return (
-        <div className="flex items-center gap-2">
-          {url ? (
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10 transition-all font-bold text-[10px] uppercase tracking-widest"
-            >
-              <FileText className="size-3" />
-              Detail
-            </a>
-          ) : (
-            <Badge
-              variant="secondary"
-              className="bg-muted/50 text-muted-foreground/50 border-transparent text-[8px] font-black uppercase"
-            >
-              No File
-            </Badge>
-          )}
-        </div>
-      );
-    },
+    accessorKey: "actions",
+    header: "Aksi",
+    cell: ({ row }) => (
+      <button
+        onClick={() => onViewDetail(row.original)}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10 transition-all font-bold text-[10px] uppercase tracking-widest shadow-sm"
+      >
+        <ExternalLink className="size-3" />
+        Detail
+      </button>
+    ),
   },
 ];

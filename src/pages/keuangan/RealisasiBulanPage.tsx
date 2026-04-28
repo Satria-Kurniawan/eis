@@ -2,13 +2,19 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { useRealisasiBulan } from "@/hooks/keuangan/use-realisasi-bulan";
-import { AlertCircle, CalendarDays, RefreshCw, Wallet } from "lucide-react";
+import {
+  AlertCircle,
+  RefreshCw,
+  Search,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { columns } from "./RealisasiBulan/columns";
 import { RealisasiBulanTable } from "./RealisasiBulan/realisasi-bulan-table";
 
 export default function RealisasiBulanPage() {
-  const { tahun } = usePeriod();
+  const { tahun, semester } = usePeriod();
   const {
     data,
     isLoading,
@@ -48,9 +54,15 @@ export default function RealisasiBulanPage() {
         <div className="flex items-center gap-4">
           <div className="flex flex-col items-end gap-1">
             <div className="flex items-center gap-3 px-5 py-2.5 rounded-full bg-primary/5 border border-primary/10 shadow-sm backdrop-blur-md">
-              <CalendarDays className="size-4 text-primary" />
+              <TrendingUp className="size-4 text-primary" />
               <span className="text-sm font-black text-primary">
-                FY {tahun}
+                TA {tahun}
+              </span>
+            </div>
+            <div className="flex items-center gap-3 px-5 py-2.5 rounded-full bg-foreground text-background shadow-2xl">
+              <Search className="size-4" />
+              <span className="text-sm font-black uppercase tracking-tighter">
+                Smtr. {semester === "2" ? "Ganjil" : "Genap"}
               </span>
             </div>
           </div>

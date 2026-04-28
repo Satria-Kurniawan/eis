@@ -100,7 +100,6 @@ export const nodes = [
     menuItems: [
       { label: "Mahasiswa", path: "/kemahasiswaan/mahasiswa" },
       { label: "Beasiswa", path: "/kemahasiswaan/beasiswa" },
-      { label: "Dashboard Mahasiswa", path: "/kemahasiswaan/dashboard" },
     ],
   },
   {

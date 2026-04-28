@@ -1,45 +1,28 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { useMahasiswa } from "@/hooks/kemahasiswaan/use-mahasiswa";
-import { useUnitKerja } from "@/hooks/use-unit-kerja";
-import { cn } from "@/lib/utils";
+import { useDebounce } from "@/hooks/use-debounce";
 import {
-  Briefcase,
-  Check,
-  ChevronsUpDown,
   Eraser,
   Filter,
   GraduationCap,
   RefreshCw,
-  School,
-  Subtitles,
+  Search,
   TrendingUp,
-  UserPlus,
   Users,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { columns } from "./Mahasiswa/columns";
 import { MahasiswaTable } from "./Mahasiswa/mahasiswa-table";
 
 export default function MahasiswaPage() {
   const { tahun, semester } = usePeriod();
+  const [searchValue, setSearchValue] = useState("");
+  const debouncedSearch = useDebounce(searchValue, 500);
+
   const {
     data,
     isLoading,
@@ -49,44 +32,20 @@ export default function MahasiswaPage() {
     setPage,
     limit,
     setLimit,
-    filters,
     refetch,
     isFetching,
-  } = useMahasiswa();
+  } = useMahasiswa(debouncedSearch);
 
   const [showFilters, setShowFilters] = useState(true);
-  const { getFakultas, getJurusan, getProdi } = useUnitKerja();
-
-  const fakultasOptions = useMemo(() => getFakultas(), [getFakultas]);
-  const jurusanOptions = useMemo(
-    () => getJurusan(filters.kodeFakultas),
-    [filters.kodeFakultas, getJurusan],
-  );
-  const prodiOptions = useMemo(
-    () => getProdi(filters.kodeFakultas, filters.kodeJurusan),
-    [filters.kodeFakultas, filters.kodeJurusan, getProdi],
-  );
 
   const handleResetFilters = () => {
-    filters.setAngkatan("");
-    filters.setKodeFakultas("");
-    filters.setKodeJurusan("");
-    filters.setKodeProdi("");
+    setSearchValue("");
     setPage(1);
   };
 
-  const handleFakultasChange = (val: string) => {
-    filters.setKodeFakultas(val);
-    filters.setKodeJurusan(""); // Reset child
-    filters.setKodeProdi(""); // Reset grandchild
+  useEffect(() => {
     setPage(1);
-  };
-
-  const handleJurusanChange = (val: string) => {
-    filters.setKodeJurusan(val);
-    filters.setKodeProdi(""); // Reset child
-    setPage(1);
-  };
+  }, [debouncedSearch, setPage]);
 
   return (
     <motion.div
@@ -188,206 +147,23 @@ export default function MahasiswaPage() {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-6 rounded-[2.5rem] border bg-card/40 backdrop-blur-md shadow-xl border-primary/5">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-2">
-                    Angkatan
-                  </label>
-                  <div className="relative group">
-                    <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
-                    <Input
-                      placeholder="Contoh: 2022"
-                      className="pl-10 h-11 border-primary/10 rounded-2xl bg-background/50 focus-visible:ring-primary/20"
-                      value={filters.angkatan}
-                      onChange={(e) => {
-                        filters.setAngkatan(e.target.value);
-                        setPage(1);
-                      }}
-                    />
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card/40 backdrop-blur-md p-4 rounded-3xl border border-primary/5 shadow-sm mb-4">
+                <div className="relative w-full sm:w-96 group">
+                  <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors">
+                    <Search className="size-4" />
                   </div>
+                  <Input
+                    placeholder="Cari Nama atau NIM..."
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    className="pl-11 h-12 rounded-2xl border-primary/10 bg-background/50 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+                  />
                 </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-2">
-                    Fakultas
-                  </label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className="w-full h-11 justify-between border-primary/10 rounded-2xl bg-background/50 hover:bg-background/80 font-bold italic transition-all group"
-                      >
-                        <div className="flex items-center gap-2 truncate">
-                          <School className="size-4 text-primary/60 group-hover:text-primary transition-colors" />
-                          {filters.kodeFakultas
-                            ? fakultasOptions.find(
-                                (f) => f.uk_kode === filters.kodeFakultas,
-                              )?.uk_nama
-                            : "Pilih Fakultas"}
-                        </div>
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0 rounded-2xl border-primary/10 backdrop-blur-2xl">
-                      <Command className="rounded-2xl">
-                        <CommandInput
-                          placeholder="Cari Fakultas..."
-                          className="h-11 font-bold"
-                        />
-                        <CommandList className="max-h-[300px]">
-                          <CommandEmpty className="py-6 text-center text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                            Fakultas tidak ditemukan.
-                          </CommandEmpty>
-                          <CommandGroup>
-                            {fakultasOptions.map((f) => (
-                              <CommandItem
-                                key={f.uk_id}
-                                value={f.uk_nama}
-                                onSelect={() => handleFakultasChange(f.uk_kode)}
-                                className="rounded-xl font-bold italic py-2.5 my-1"
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4 text-primary",
-                                    filters.kodeFakultas === f.uk_kode
-                                      ? "opacity-100"
-                                      : "opacity-0",
-                                  )}
-                                />
-                                {f.uk_nama}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-2">
-                    Jurusan
-                  </label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        disabled={!filters.kodeFakultas}
-                        className="w-full h-11 justify-between border-primary/10 rounded-2xl bg-background/50 hover:bg-background/80 font-bold italic transition-all group disabled:opacity-30 disabled:grayscale"
-                      >
-                        <div className="flex items-center gap-2 truncate">
-                          <Subtitles className="size-4 text-primary/60 group-hover:text-primary transition-colors" />
-                          {filters.kodeJurusan
-                            ? jurusanOptions.find(
-                                (j) => j.uk_kode === filters.kodeJurusan,
-                              )?.uk_nama
-                            : filters.kodeFakultas
-                              ? "Pilih Jurusan"
-                              : "Pilih Fakultas Dulu"}
-                        </div>
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0 rounded-2xl border-primary/10 backdrop-blur-2xl">
-                      <Command className="rounded-2xl">
-                        <CommandInput
-                          placeholder="Cari Jurusan..."
-                          className="h-11 font-bold"
-                        />
-                        <CommandList className="max-h-[300px]">
-                          <CommandEmpty className="py-6 text-center text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                            Jurusan tidak ditemukan.
-                          </CommandEmpty>
-                          <CommandGroup>
-                            {jurusanOptions.map((j) => (
-                              <CommandItem
-                                key={j.uk_id}
-                                value={j.uk_nama}
-                                onSelect={() => handleJurusanChange(j.uk_kode)}
-                                className="rounded-xl font-bold italic py-2.5 my-1"
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4 text-primary",
-                                    filters.kodeJurusan === j.uk_kode
-                                      ? "opacity-100"
-                                      : "opacity-0",
-                                  )}
-                                />
-                                {j.uk_nama}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-2">
-                    Program Studi
-                  </label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        disabled={!filters.kodeJurusan}
-                        className="w-full h-11 justify-between border-primary/10 rounded-2xl bg-background/50 hover:bg-background/80 font-bold italic transition-all group disabled:opacity-30 disabled:grayscale"
-                      >
-                        <div className="flex items-center gap-2 truncate">
-                          <Briefcase className="size-4 text-primary/60 group-hover:text-primary transition-colors" />
-                          {filters.kodeProdi
-                            ? prodiOptions.find(
-                                (p) => p.uk_kode === filters.kodeProdi,
-                              )?.uk_nama
-                            : filters.kodeJurusan
-                              ? "Pilih Prodi"
-                              : "Pilih Jurusan Dulu"}
-                        </div>
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0 rounded-2xl border-primary/10 backdrop-blur-2xl">
-                      <Command className="rounded-2xl">
-                        <CommandInput
-                          placeholder="Cari Prodi..."
-                          className="h-11 font-bold"
-                        />
-                        <CommandList className="max-h-[300px]">
-                          <CommandEmpty className="py-6 text-center text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                            Prodi tidak ditemukan.
-                          </CommandEmpty>
-                          <CommandGroup>
-                            {prodiOptions.map((p) => (
-                              <CommandItem
-                                key={p.uk_id}
-                                value={p.uk_nama}
-                                onSelect={() => {
-                                  filters.setKodeProdi(p.uk_kode);
-                                  setPage(1);
-                                }}
-                                className="rounded-xl font-bold italic py-2.5 my-1"
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4 text-primary",
-                                    filters.kodeProdi === p.uk_kode
-                                      ? "opacity-100"
-                                      : "opacity-0",
-                                  )}
-                                />
-                                {p.uk_nama}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                <div className="flex items-center gap-3">
+                  <div className="px-4 py-2 rounded-2xl bg-muted/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground border border-transparent hover:border-primary/10 transition-all flex items-center gap-2">
+                    <Filter className="size-3 text-primary" />
+                    Global Filter Active: Unit & Period
+                  </div>
                 </div>
               </div>
             </motion.div>

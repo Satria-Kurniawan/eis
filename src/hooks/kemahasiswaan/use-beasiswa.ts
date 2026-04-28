@@ -4,7 +4,7 @@ import { usePeriod } from "@/contexts/PeriodContext";
 import { useUnitFilter } from "@/contexts/UnitFilterContext";
 import { useState } from "react";
 
-export const useBeasiswa = () => {
+export const useBeasiswa = (search: string = "") => {
   const { tahun, semester } = usePeriod();
   const { kodeFakultas, kodeJurusan, kodeProdi } = useUnitFilter();
   const [page, setPage] = useState(1);
@@ -17,7 +17,8 @@ export const useBeasiswa = () => {
       semester, 
       kodeFakultas, 
       kodeJurusan, 
-      kodeProdi, 
+      kodeProdi,
+      search,
       page, 
       limit
     ],
@@ -27,6 +28,7 @@ export const useBeasiswa = () => {
       kodeFakultas,
       kodeJurusan,
       kodeProdi,
+      search,
       page,
       limit
     }),

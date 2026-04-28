@@ -31,12 +31,14 @@ export const fetchPegawaiHistory = async (
   kodeProdi: string,
   page: number = 1,
   limit: number = 10,
+  search?: string
 ) => {
   const params = new URLSearchParams({
     tahun,
     semester,
     page: page.toString(),
     limit: limit.toString(),
+    ...(search && { search }),
   });
 
   if (kodeFakultas) params.append("kode_fakultas", kodeFakultas);

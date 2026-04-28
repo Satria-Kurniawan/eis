@@ -11,7 +11,9 @@ import {
   Users,
 } from "lucide-react";
 
-export const columns: ColumnDef<Buku>[] = [
+export const createColumns = (
+  onViewDetail: (buku: Buku) => void,
+): ColumnDef<Buku>[] => [
   {
     accessorKey: "judul_buku",
     header: "Judul Buku",
@@ -127,24 +129,16 @@ export const columns: ColumnDef<Buku>[] = [
     ),
   },
   {
-    accessorKey: "file_upload",
-    header: "Dokumen",
-    cell: ({ row }) => {
-      const url = row.original.file_upload;
-      if (!url)
-        return <span className="text-[10px] text-muted-foreground">N/A</span>;
-
-      return (
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10 transition-all font-bold text-[10px] uppercase tracking-widest"
-        >
-          <ExternalLink className="size-3" />
-          Detail
-        </a>
-      );
-    },
+    accessorKey: "actions",
+    header: "Aksi",
+    cell: ({ row }) => (
+      <button
+        onClick={() => onViewDetail(row.original)}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10 transition-all font-bold text-[10px] uppercase tracking-widest shadow-sm"
+      >
+        <ExternalLink className="size-3" />
+        Detail
+      </button>
+    ),
   },
 ];

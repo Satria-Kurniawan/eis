@@ -7,6 +7,7 @@ import {
   AlertCircle,
   Filter,
   RefreshCw,
+  Search,
   TrendingUp,
   Wallet,
 } from "lucide-react";
@@ -15,7 +16,7 @@ import { columns } from "./RealisasiUnit/columns";
 import { RealisasiUnitTable } from "./RealisasiUnit/realisasi-unit-table";
 
 export default function RealisasiUnitPage() {
-  const { tahun } = usePeriod();
+  const { tahun, semester } = usePeriod();
   const { kodeFakultas, kodeJurusan, kodeProdi } = useUnitFilter();
   const {
     data,
@@ -58,7 +59,13 @@ export default function RealisasiUnitPage() {
             <div className="flex items-center gap-3 px-5 py-2.5 rounded-full bg-primary/5 border border-primary/10 shadow-sm backdrop-blur-md">
               <TrendingUp className="size-4 text-primary" />
               <span className="text-sm font-black text-primary">
-                FY {tahun}
+                TA {tahun}
+              </span>
+            </div>
+            <div className="flex items-center gap-3 px-5 py-2.5 rounded-full bg-foreground text-background shadow-2xl">
+              <Search className="size-4" />
+              <span className="text-sm font-black uppercase tracking-tighter">
+                Smtr. {semester === "2" ? "Ganjil" : "Genap"}
               </span>
             </div>
             {(kodeFakultas || kodeJurusan || kodeProdi) && (

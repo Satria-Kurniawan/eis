@@ -334,18 +334,6 @@ export default function AdminLayout() {
                           </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={
-                            location.pathname === "/kemahasiswaan/dashboard"
-                          }
-                        >
-                          <Link to="/kemahasiswaan/dashboard">
-                            <span>Dashboard Mahasiswa</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>

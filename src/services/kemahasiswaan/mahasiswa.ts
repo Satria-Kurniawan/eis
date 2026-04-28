@@ -31,10 +31,10 @@ export const fetchMahasiswaHistory = async (
   params: {
     tahun?: string;
     semester?: string;
-    angkatan?: string;
     kodeFakultas?: string;
     kodeJurusan?: string;
     kodeProdi?: string;
+    search?: string;
     page?: number;
     limit?: number;
   }

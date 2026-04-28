@@ -1,38 +1,34 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchMahasiswaHistory } from "@/services/kemahasiswaan/mahasiswa";
 import { usePeriod } from "@/contexts/PeriodContext";
+import { useUnitFilter } from "@/contexts/UnitFilterContext";
 import { useState } from "react";
 
-export const useMahasiswa = () => {
+export const useMahasiswa = (search: string = "") => {
   const { tahun, semester } = usePeriod();
+  const { kodeFakultas, kodeJurusan, kodeProdi } = useUnitFilter();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   
-  // Filters
-  const [angkatan, setAngkatan] = useState("");
-  const [kodeFakultas, setKodeFakultas] = useState("");
-  const [kodeJurusan, setKodeJurusan] = useState("");
-  const [kodeProdi, setKodeProdi] = useState("");
-
   const query = useQuery({
     queryKey: [
       "mahasiswa-history", 
       tahun, 
       semester, 
-      angkatan, 
       kodeFakultas, 
       kodeJurusan, 
-      kodeProdi, 
+      kodeProdi,
+      search,
       page, 
       limit
     ],
     queryFn: () => fetchMahasiswaHistory({
       tahun,
       semester,
-      angkatan,
       kodeFakultas,
       kodeJurusan,
       kodeProdi,
+      search,
       page,
       limit
     }),
@@ -44,16 +40,6 @@ export const useMahasiswa = () => {
     page,
     setPage,
     limit,
-    setLimit,
-    filters: {
-      angkatan,
-      setAngkatan,
-      kodeFakultas,
-      setKodeFakultas,
-      kodeJurusan,
-      setKodeJurusan,
-      kodeProdi,
-      setKodeProdi
-    }
+    setLimit
   };
 };

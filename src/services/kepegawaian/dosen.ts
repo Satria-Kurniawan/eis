@@ -30,7 +30,8 @@ export const fetchDosenHistory = async (
   kodeJurusan: string,
   kodeProdi: string,
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  search?: string
 ) => {
   const params = new URLSearchParams({
     tahun,
@@ -42,6 +43,7 @@ export const fetchDosenHistory = async (
   if (kodeFakultas) params.append("kode_fakultas", kodeFakultas);
   if (kodeJurusan) params.append("kode_jurusan", kodeJurusan);
   if (kodeProdi) params.append("kode_prodi", kodeProdi);
+  if (search) params.append("search", search);
 
   return apiClient<DosenResponse>(`/api/v1/dosen/history?${params.toString()}`);
 };

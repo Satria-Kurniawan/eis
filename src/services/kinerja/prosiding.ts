@@ -119,13 +119,21 @@ export const fetchProsiding = async (
     tahun: string,
     semester: string,
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
+    search?: string,
+    kodeFakultas?: string,
+    kodeJurusan?: string,
+    kodeProdi?: string
 ) => {
     const params = new URLSearchParams({
         tahun,
         semester,
         page: page.toString(),
         limit: limit.toString(),
+        ...(search && { search }),
+        ...(kodeFakultas && { kodeFakultas }),
+        ...(kodeJurusan && { kodeJurusan }),
+        ...(kodeProdi && { kodeProdi }),
     });
 
     return apiClient<ProsidingResponse>(`/api/v1/prosiding?${params.toString()}`);

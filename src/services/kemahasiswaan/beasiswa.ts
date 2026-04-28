@@ -38,6 +38,7 @@ export interface BeasiswaParams {
   kodeFakultas?: string;
   kodeJurusan?: string;
   kodeProdi?: string;
+  search?: string;
   page?: number;
   limit?: number;
 }
@@ -49,6 +50,7 @@ export const fetchBeasiswa = async (params: BeasiswaParams) => {
     ...(params.kodeFakultas && { kodeFakultas: params.kodeFakultas }),
     ...(params.kodeJurusan && { kodeJurusan: params.kodeJurusan }),
     ...(params.kodeProdi && { kodeProdi: params.kodeProdi }),
+    ...(params.search && { search: params.search }),
     page: (params.page || 1).toString(),
     limit: (params.limit || 10).toString(),
   });

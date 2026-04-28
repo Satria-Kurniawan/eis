@@ -4,7 +4,7 @@ import { usePeriod } from "@/contexts/PeriodContext";
 import { useUnitFilter } from "@/contexts/UnitFilterContext";
 import { useState } from "react";
 
-export const usePegawaiHistory = () => {
+export const usePegawaiHistory = (search: string = "") => {
   const { tahun, semester } = usePeriod();
   const { kodeFakultas, kodeJurusan, kodeProdi } = useUnitFilter();
   const [page, setPage] = useState(1);
@@ -18,6 +18,7 @@ export const usePegawaiHistory = () => {
       kodeFakultas,
       kodeJurusan,
       kodeProdi,
+      search,
       page,
       limit,
     ],
@@ -29,7 +30,8 @@ export const usePegawaiHistory = () => {
         kodeJurusan,
         kodeProdi,
         page,
-        limit
+        limit,
+        search
       ),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });

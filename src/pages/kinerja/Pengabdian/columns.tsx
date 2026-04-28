@@ -4,13 +4,16 @@ import { type ColumnDef } from "@tanstack/react-table";
 import {
   Building2,
   Coins,
+  ExternalLink,
   FileText,
   School,
   TrendingUp,
   Users,
 } from "lucide-react";
 
-export const columns: ColumnDef<Pengabdian>[] = [
+export const createColumns = (
+  onViewDetail: (pengabdian: Pengabdian) => void,
+): ColumnDef<Pengabdian>[] => [
   {
     accessorKey: "nama_kegiatan",
     header: "Nama Kegiatan",
@@ -137,37 +140,16 @@ export const columns: ColumnDef<Pengabdian>[] = [
     ),
   },
   {
-    accessorKey: "file",
-    header: "Laporan",
-    cell: ({ row }) => {
-      // Prioritize final report if available
-      const url =
-        row.original.file_laporan_akhir ||
-        row.original.file_laporan_kemajuan ||
-        row.original.file_proposal;
-
-      return (
-        <div className="flex items-center gap-2">
-          {url ? (
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10 transition-all font-bold text-[10px] uppercase tracking-widest"
-            >
-              <FileText className="size-3" />
-              Laporan
-            </a>
-          ) : (
-            <Badge
-              variant="secondary"
-              className="bg-muted/50 text-muted-foreground/50 border-transparent text-[8px] font-black uppercase"
-            >
-              No Document
-            </Badge>
-          )}
-        </div>
-      );
-    },
+    accessorKey: "actions",
+    header: "Aksi",
+    cell: ({ row }) => (
+      <button
+        onClick={() => onViewDetail(row.original)}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10 transition-all font-bold text-[10px] uppercase tracking-widest shadow-sm"
+      >
+        <ExternalLink className="size-3" />
+        Detail
+      </button>
+    ),
   },
 ];

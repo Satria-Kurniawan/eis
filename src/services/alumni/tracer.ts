@@ -72,9 +72,22 @@ export const fetchTracer = async (
   tahun: string,
   semester: string,
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  search?: string,
+  kodeFakultas?: string,
+  kodeJurusan?: string,
+  kodeProdi?: string
 ) => {
-  return apiClient<TracerResponse>(
-    `/api/v1/tracer?tahun=${tahun}&semester=${semester}&page=${page}&limit=${limit}`
-  );
+  const params = new URLSearchParams({
+    tahun,
+    semester,
+    page: page.toString(),
+    limit: limit.toString(),
+    ...(search && { search }),
+    ...(kodeFakultas && { kodeFakultas }),
+    ...(kodeJurusan && { kodeJurusan }),
+    ...(kodeProdi && { kodeProdi }),
+  });
+  
+  return apiClient<TracerResponse>(`/api/v1/tracer?${params.toString()}`);
 };

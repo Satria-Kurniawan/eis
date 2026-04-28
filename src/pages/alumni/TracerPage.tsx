@@ -2,27 +2,46 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { useTracer } from "@/hooks/alumni/use-tracer";
-import { GraduationCap, Info, TrendingUp, Users, CheckCircle2, PieChart } from "lucide-react";
-import { motion } from "motion/react";
-import { useMemo } from "react";
+import { useDebounce } from "@/hooks/use-debounce";
+import {
+  GraduationCap,
+  Info,
+  TrendingUp,
+  Users,
+  RefreshCw,
+  Search,
+  Filter,
+} from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useState } from "react";
 import { columns } from "./Tracer/columns";
 import { TracerTable } from "./Tracer/tracer-table";
+import { Input } from "@/components/ui/input";
 
 export default function TracerPage() {
-  const { data, isLoading, isError, error, page, setPage, limit, setLimit } =
-    useTracer();
+  const [searchValue, setSearchValue] = useState("");
+  const debouncedSearch = useDebounce(searchValue, 500);
+
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    page,
+    setPage,
+    limit,
+    setLimit,
+    refetch,
+    isFetching,
+  } = useTracer(debouncedSearch);
+
   const { tahun, semester } = usePeriod();
+  const [showFilters, setShowFilters] = useState(true);
 
-  // Calculate statistics for the dashboard
-  const stats = useMemo(() => {
-    if (!data?.datas) return { total: 0, completed: 0, avgProgress: 0 };
-
-    const total = data.pagination.total;
-    const completed = data.datas.filter(d => d.status_pengisian === "1" || d.persentase_pengisian === 100).length;
-    const avgProgress = data.datas.reduce((acc, curr) => acc + curr.persentase_pengisian, 0) / (data.datas.length || 1);
-
-    return { total, completed, avgProgress: Math.round(avgProgress) };
-  }, [data]);
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, setPage]);
 
   return (
     <motion.div
@@ -42,7 +61,8 @@ export default function TracerPage() {
             Data Tracer Alumni
           </h1>
           <p className="text-muted-foreground font-medium max-w-xl text-lg text-pretty">
-            Monitoring data penelusuran alumni untuk evaluasi relevansi kurikulum dan kesiapan kerja.
+            Monitoring data penelusuran alumni untuk evaluasi relevansi
+            kurikulum dan kesiapan kerja.
           </p>
         </div>
 
@@ -62,70 +82,6 @@ export default function TracerPage() {
         </div>
       </div>
 
-      {/* Statistics Dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          {
-            label: "Total Alumni",
-            value: stats.total.toLocaleString(),
-            icon: Users,
-            color: "text-blue-500",
-            bg: "bg-blue-500/5",
-            border: "border-blue-500/10",
-            desc: "Total lulusan di periode ini"
-          },
-          {
-            label: "Respon Selesai",
-            value: `${stats.completed}`,
-            icon: CheckCircle2,
-            color: "text-emerald-500",
-            bg: "bg-emerald-500/5",
-            border: "border-emerald-500/10",
-            desc: "Alumni yang sudah mengisi lengkap"
-          },
-          {
-            label: "Rata-rata Progress",
-            value: `${stats.avgProgress}%`,
-            icon: PieChart,
-            color: "text-amber-500",
-            bg: "bg-amber-500/5",
-            border: "border-amber-500/10",
-            desc: "Persentase pengisian keseluruhan"
-          }
-        ].map((stat, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 + 0.2 }}
-            className={`group relative overflow-hidden rounded-[2.5rem] border ${stat.border} ${stat.bg} p-8 backdrop-blur-xl transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1`}
-          >
-            <div className="flex items-start justify-between relative z-10">
-              <div className="space-y-4">
-                <div className="p-3 rounded-2xl bg-background/50 border border-primary/5 w-fit shadow-inner">
-                  <stat.icon className={`size-6 ${stat.color}`} />
-                </div>
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">
-                    {stat.label}
-                  </p>
-                  <h3 className="text-4xl font-black tracking-tighter text-foreground">
-                    {stat.value}
-                  </h3>
-                  <p className="text-xs font-medium text-muted-foreground mt-2 flex items-center gap-1.5">
-                    <span className="size-1 rounded-full bg-primary/30" />
-                    {stat.desc}
-                  </p>
-                </div>
-              </div>
-              <div className="absolute -right-4 -top-4 size-32 opacity-[0.03] grayscale transition-all duration-700 group-hover:opacity-[0.08] group-hover:scale-110 group-hover:rotate-12">
-                <stat.icon className="size-full" />
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
       {isError && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -140,11 +96,72 @@ export default function TracerPage() {
               Data Synchronization Failure
             </AlertTitle>
             <AlertDescription className="font-medium opacity-90">
-              {(error as Error).message || "Gagal menyelaraskan data tracer alumni."}
+              {(error as Error).message ||
+                "Gagal menyelaraskan data tracer alumni."}
             </AlertDescription>
           </Alert>
         </motion.div>
       )}
+
+      {/* Modern Filter Toolbar */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold tracking-tight text-foreground/80">
+              Daftar Alumni
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="px-4 py-2 rounded-xl bg-muted/50 hover:bg-muted text-xs font-bold transition-all border border-primary/5"
+            >
+              {showFilters ? "Sembunyikan Pencarian" : "Tampilkan Pencarian"}
+            </button>
+            <button
+              onClick={() => refetch()}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border border-primary/10 shadow-sm ${isFetching ? "bg-primary/20 text-primary animate-pulse" : "bg-card hover:bg-muted text-muted-foreground"}`}
+            >
+              <RefreshCw
+                className={`size-3 ${isFetching ? "animate-spin" : ""}`}
+              />
+              {isFetching ? "Syncing..." : "Refresh"}
+            </button>
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card/40 backdrop-blur-md p-4 rounded-3xl border border-primary/5 shadow-sm mb-4">
+                <div className="relative w-full sm:w-96 group">
+                  <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors">
+                    <Search className="size-4" />
+                  </div>
+                  <Input
+                    placeholder="Cari Nama atau NIM..."
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    className="pl-11 h-12 rounded-2xl border-primary/10 bg-background/50 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+                  />
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="px-4 py-2 rounded-2xl bg-muted/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground border border-transparent hover:border-primary/10 transition-all flex items-center gap-2">
+                    <Filter className="size-3 text-primary" />
+                    Global Filter Active: Unit & Period
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Main Table Area */}
       <div className="space-y-4">
@@ -175,7 +192,7 @@ export default function TracerPage() {
           <div className="size-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
           Data Integrity Monitoring:{" "}
           <span className="text-foreground group-hover:text-primary transition-colors">
-             Live {new Date().toLocaleTimeString("id-ID")}
+            Live {new Date().toLocaleTimeString("id-ID")}
           </span>
         </div>
       </div>

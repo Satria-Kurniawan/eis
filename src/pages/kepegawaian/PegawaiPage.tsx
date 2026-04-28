@@ -1,14 +1,20 @@
 import { usePeriod } from "@/contexts/PeriodContext";
 import { usePegawaiHistory } from "@/hooks/kepegawaian/use-pegawai";
+import { useDebounce } from "@/hooks/use-debounce";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RefreshCw, Users, BookOpen, AlertCircle, ShieldCheck } from "lucide-react";
-import { motion } from "motion/react";
+import { RefreshCw, Users, BookOpen, AlertCircle, ShieldCheck, Search, Filter } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useState } from "react";
 import { columns } from "./Pegawai/columns";
 import { PegawaiTable } from "./Pegawai/pegawai-table";
+import { Input } from "@/components/ui/input";
 
 export default function PegawaiPage() {
   const { tahun, semester } = usePeriod();
+  const [searchValue, setSearchValue] = useState("");
+  const debouncedSearch = useDebounce(searchValue, 500);
+
   const {
     data,
     isLoading,
@@ -20,7 +26,14 @@ export default function PegawaiPage() {
     setLimit,
     refetch,
     isFetching,
-  } = usePegawaiHistory();
+  } = usePegawaiHistory(debouncedSearch);
+
+  const [showFilters, setShowFilters] = useState(true);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, setPage]);
 
   return (
     <motion.div
@@ -77,18 +90,64 @@ export default function PegawaiPage() {
         </Alert>
       )}
 
-      {/* Filter Toolbar Section */}
-      <div className="flex items-center justify-between pb-2">
-        <h2 className="text-xl font-bold tracking-tight text-foreground/80">
-          History Pegawai
-        </h2>
-        <button
-          onClick={() => refetch()}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${isFetching ? "bg-emerald-500/20 text-emerald-600 animate-pulse border border-emerald-500/20" : "bg-muted border border-transparent hover:border-emerald-500/20 text-muted-foreground hover:bg-muted/80 hover:text-foreground"}`}
-        >
-          <RefreshCw className={`size-3 ${isFetching ? "animate-spin" : ""}`} />
-          {isFetching ? "Syncing..." : "Refresh Data"}
-        </button>
+      {/* Modern Filter Toolbar */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+             <h2 className="text-xl font-bold tracking-tight text-foreground/80">
+              History Pegawai
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="px-4 py-2 rounded-xl bg-muted/50 hover:bg-muted text-xs font-bold transition-all border border-primary/5"
+            >
+              {showFilters ? "Sembunyikan Pencarian" : "Tampilkan Pencarian"}
+            </button>
+            <button
+              onClick={() => refetch()}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border border-primary/10 shadow-sm ${isFetching ? "bg-emerald-500/20 text-emerald-600 animate-pulse border border-emerald-500/20" : "bg-card hover:bg-muted text-muted-foreground"}`}
+            >
+              <RefreshCw
+                className={`size-3 ${isFetching ? "animate-spin" : ""}`}
+              />
+              {isFetching ? "Syncing..." : "Refresh"}
+            </button>
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card/40 backdrop-blur-md p-4 rounded-3xl border border-primary/5 shadow-sm mb-4">
+                <div className="relative w-full sm:w-96 group">
+                  <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors">
+                    <Search className="size-4" />
+                  </div>
+                  <Input
+                    placeholder="Cari Nama atau No. Induk..."
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    className="pl-11 h-12 rounded-2xl border-primary/10 bg-background/50 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
+                  />
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="px-4 py-2 rounded-2xl bg-muted/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground border border-transparent hover:border-primary/10 transition-all flex items-center gap-2">
+                    <Filter className="size-3 text-primary" />
+                    Global Filter Active: Unit & Period
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Main Table Area */}
