@@ -38,9 +38,8 @@ function CDCLiveIndicator({ color }: { color: string }) {
             strokeDashoffset: [0, -100, -200],
           }}
           transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "linear",
+            duration: 2.5,
+            ease: "easeOut",
           }}
         />
       </svg>
