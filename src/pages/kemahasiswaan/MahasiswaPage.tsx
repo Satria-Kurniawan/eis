@@ -105,7 +105,7 @@ export default function MahasiswaPage() {
 
       {/* Filter Toolbar */}
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-2xl bg-primary/10 text-primary">
               <Filter className="size-5" />
@@ -113,23 +113,23 @@ export default function MahasiswaPage() {
             <h2 className="text-xl font-bold tracking-tight">Opsi Pencarian</h2>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="px-4 py-2 rounded-xl bg-muted/50 hover:bg-muted text-xs font-bold transition-all border border-primary/5"
+              className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-muted/50 hover:bg-muted text-[10px] sm:text-xs font-bold transition-all border border-primary/5"
             >
-              {showFilters ? "Sembunyikan Filter" : "Tampilkan Filter"}
+              {showFilters ? "Sembunyikan" : "Tampilkan Filter"}
             </button>
             <button
               onClick={handleResetFilters}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 text-red-600 hover:bg-red-500/20 text-xs font-bold transition-all border border-red-500/10"
+              className="px-4 py-2 rounded-xl bg-red-500/10 text-red-600 hover:bg-red-500/20 text-[10px] sm:text-xs font-bold transition-all border border-red-500/10 flex items-center gap-2"
             >
               <Eraser className="size-3" />
               Reset
             </button>
             <button
               onClick={() => refetch()}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border border-primary/10 shadow-sm ${isFetching ? "bg-primary/20 text-primary animate-pulse" : "bg-card hover:bg-muted text-muted-foreground"}`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] sm:text-xs font-bold transition-all border border-primary/10 shadow-sm ${isFetching ? "bg-primary/20 text-primary animate-pulse" : "bg-card hover:bg-muted text-muted-foreground"}`}
             >
               <RefreshCw
                 className={`size-3 ${isFetching ? "animate-spin" : ""}`}
@@ -147,7 +147,7 @@ export default function MahasiswaPage() {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card/40 backdrop-blur-md p-4 rounded-3xl border border-primary/5 shadow-sm mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card/40 backdrop-blur-md p-4 rounded-3xl border border-primary/5 shadow-sm mb-4">
                 <div className="relative w-full sm:w-96 group">
                   <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted-foreground group-focus-within:text-primary transition-colors">
                     <Search className="size-4" />
@@ -159,10 +159,10 @@ export default function MahasiswaPage() {
                     className="pl-11 h-12 rounded-2xl border-primary/10 bg-background/50 focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all font-medium"
                   />
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="px-4 py-2 rounded-2xl bg-muted/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground border border-transparent hover:border-primary/10 transition-all flex items-center gap-2">
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <div className="w-full sm:w-auto px-4 py-2.5 rounded-2xl bg-muted/30 dark:bg-muted/10 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-muted-foreground border border-primary/5 transition-all flex items-center justify-center sm:justify-start gap-2">
                     <Filter className="size-3 text-primary" />
-                    Global Filter Active: Unit & Period
+                    Global Filter: Unit & Period
                   </div>
                 </div>
               </div>

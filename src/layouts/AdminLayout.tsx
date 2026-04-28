@@ -648,7 +648,7 @@ export default function AdminLayout() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.8, y: 20 }}
                 whileHover={{ y: -4 }}
-                className="fixed bottom-24 right-8 z-50"
+                className="fixed bottom-24 right-8 z-[45]"
               >
                 <div className="relative group">
                   {/* Outer Glow */}

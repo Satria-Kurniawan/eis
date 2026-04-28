@@ -20,7 +20,7 @@ export function HubFloatingButton() {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={toggleHub}
-          className="fixed bottom-6 right-6 z-150 flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.15)] ring-4 ring-white/50 dark:ring-slate-900/50 transition-colors"
+          className="fixed bottom-6 right-6 z-[45] flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.15)] ring-4 ring-white/50 dark:ring-slate-900/50 transition-colors"
           title="Open EIS Core Hub"
         >
           <LayoutDashboard size={24} />
