@@ -5,7 +5,6 @@ import {
   Building2,
   Coins,
   ExternalLink,
-  FileText,
   School,
   TrendingUp,
   Users,

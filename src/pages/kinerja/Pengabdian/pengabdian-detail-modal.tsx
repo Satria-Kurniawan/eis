@@ -8,7 +8,6 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { type Pengabdian } from "@/services/kinerja/pengabdian";
 import {
-  Building2,
   Calendar,
   Coins,
   ExternalLink,
@@ -155,8 +154,16 @@ export function PengabdianDetailModal({
                     Kaitan Akademik
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
-                    <DetailItem icon={Layers} label="ID Sinta" value={data.id_sinta} />
-                    <DetailItem icon={Layers} label="Skim Hibah" value={data.skim || data.skema} />
+                    <DetailItem
+                      icon={Layers}
+                      label="ID Sinta"
+                      value={data.id_sinta}
+                    />
+                    <DetailItem
+                      icon={Layers}
+                      label="Skim Hibah"
+                      value={data.skim || data.skema}
+                    />
                   </div>
                   <DetailItem
                     icon={Search}
@@ -196,7 +203,12 @@ export function PengabdianDetailModal({
                           members = [];
                         }
 
-                        if (members.length === 0) return <div className="text-xs italic text-muted-foreground">Tidak ada data anggota.</div>;
+                        if (members.length === 0)
+                          return (
+                            <div className="text-xs italic text-muted-foreground">
+                              Tidak ada data anggota.
+                            </div>
+                          );
 
                         return members.map((member: any, idx: number) => (
                           <div
@@ -208,7 +220,8 @@ export function PengabdianDetailModal({
                             </div>
                             <div className="flex items-center justify-between mt-1">
                               <span className="text-[10px] font-medium text-muted-foreground italic">
-                                {member.identitas.nip || member.identitas.nidn} • {member.unit_kerja.institusi}
+                                {member.identitas.nip || member.identitas.nidn}{" "}
+                                • {member.unit_kerja.institusi}
                               </span>
                               {member.peran.is_ketua && (
                                 <Badge
