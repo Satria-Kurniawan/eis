@@ -9,7 +9,9 @@ const LowSpecContext = createContext<LowSpecContextType | undefined>(undefined);
 
 export function LowSpecProvider({ children }: { children: React.ReactNode }) {
   const [isLowSpec, setIsLowSpec] = useState(() => {
-    return localStorage.getItem("lowspec") === "true";
+    const saved = localStorage.getItem("lowspec");
+    // Default to false (High Spec) if not set
+    return saved !== null ? saved === "true" : false;
   });
 
   useEffect(() => {
