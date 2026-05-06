@@ -1,4 +1,4 @@
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -34,6 +34,67 @@ export function FloatingSidebar() {
 
       <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar py-6">
         <div className="flex flex-col gap-2 px-2">
+          {/* SPECIAL MENU: strategic IKU dashboard */}
+          <div className="flex flex-col border-b border-slate-200/40 dark:border-white/5 pb-3 mb-2">
+            <button
+              onClick={() => navigate("/dashboard?view=iku")}
+              className={`group relative flex items-center gap-4 p-3 rounded-2xl transition-all duration-300 ${
+                !isHovered ? "justify-center" : ""
+              }`}
+            >
+              {/* Hover Background - Golden/Amber Glow */}
+              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-300 bg-amber-500" />
+
+              {/* Icon Container */}
+              <div className="relative shrink-0 flex items-center justify-center size-10 rounded-xl transition-transform duration-300 group-hover:scale-110">
+                {/* Glowing effect behind icon */}
+                <div className="absolute inset-0 rounded-xl opacity-25 blur-md transition-opacity duration-300 group-hover:opacity-75 bg-amber-500" />
+                {/* Icon border */}
+                <div className="absolute inset-0 rounded-xl border border-amber-500/40" />
+                {/* Icon */}
+                <div className="relative z-10 text-amber-500 drop-shadow-[0_2px_4px_rgba(245,158,11,0.4)]">
+                  <Sparkles size={20} className="animate-pulse" />
+                </div>
+              </div>
+
+              {/* Expanded Title */}
+              <AnimatePresence>
+                {isHovered && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    transition={{ duration: 0.2, delay: 0.1 }}
+                    className="flex flex-col items-start min-w-0 flex-1"
+                  >
+                    <span className="text-sm font-black text-slate-900 dark:text-white truncate w-full text-left flex items-center gap-1.5">
+                      IKU Dashboard
+                      <span className="px-1.5 py-0.5 rounded-md text-[8px] font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                        HOT
+                      </span>
+                    </span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 truncate w-full text-left">
+                      Strategic Performance
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Arrow right */}
+              <AnimatePresence>
+                {isHovered && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -5 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -5 }}
+                    className="shrink-0 text-amber-500"
+                  >
+                    <ChevronRight size={16} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </button>
+          </div>
           {sectors.map((sector) => {
             const isExpanded = expandedSector === sector.id;
 

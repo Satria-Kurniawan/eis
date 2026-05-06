@@ -1,5 +1,5 @@
 import { useHubPortal } from "@/contexts/HubPortalContext";
-import { Activity, ArrowUpRight } from "lucide-react";
+import { Activity, ArrowUpRight, Sparkles } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { nodes } from "../../pages/dashboard/dashboard-data";
@@ -32,7 +32,6 @@ export function GlobalHubPortal() {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             className="relative w-full max-w-7xl max-h-[90vh] bg-white dark:bg-[#14151a] rounded-[3rem] shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col"
-            style={{ willChange: "transform, opacity" }}
           >
             {/* Portal Header */}
             <div className="p-8 sm:p-12 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -61,13 +60,131 @@ export function GlobalHubPortal() {
 
             {/* Portal Content - Grid of Modules */}
             <div
-              className="flex-1 overflow-y-auto p-8 sm:p-12 custom-scrollbar"
+              className="flex-1 overflow-y-auto p-8 sm:p-12 custom-scrollbar touch-pan-y"
               style={{
-                willChange: "scroll-position",
                 transform: "translateZ(0)",
+                willChange: "transform",
               }}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {/* SPECIAL MENU: strategic IKU dashboard */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="group p-6 rounded-[2.5rem] bg-amber-500/5 dark:bg-amber-500/1 border border-amber-500/10 hover:border-amber-500/40 hover:bg-white dark:hover:bg-slate-900 transition-all duration-300 shadow-xl hover:shadow-amber-500/5 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="relative size-14 rounded-2xl flex items-center justify-center text-white bg-linear-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/20 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shrink-0">
+                        {/* Glow Behind */}
+                        <div className="absolute inset-0 rounded-2xl bg-amber-500 blur-md opacity-30 group-hover:opacity-60 transition-opacity" />
+                        <Sparkles
+                          size={24}
+                          className="relative z-10 animate-pulse"
+                        />
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+                          IKU Dashboard
+                          <span className="px-1.5 py-0.5 rounded-md text-[8px] font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                            SPESIAL
+                          </span>
+                        </h4>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">
+                          Strategic Performance
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      className="max-h-[420px] overflow-y-auto overscroll-contain pr-1 space-y-2.5 custom-scrollbar touch-pan-y"
+                      style={{
+                        transform: "translateZ(0)",
+                        willChange: "transform",
+                      }}
+                    >
+                      {[
+                        {
+                          id: "IKU 1",
+                          label:
+                            "Angka Efisiensi Edukasi perguruan tinggi (AEE PT)",
+                          path: "/dashboard?view=iku",
+                        },
+                        {
+                          id: "IKU 2",
+                          label:
+                            "Persentase lulusan pendidikan tinggi program diploma satu, diploma dua, diploma tiga, diploma empat/sarjana terapan, dan sarjana yang langsung bekerja, berwirausaha, atau melanjutkan studi dalam jangka waktu 1 (satu) tahun setelah kelulusan, serta sudah bekerja, atau berwirausaha sebelum lulus kuliah.",
+                          path: "/dashboard?view=iku",
+                        },
+                        {
+                          id: "IKU 3",
+                          label:
+                            "Persentase mahasiswa program Diploma dan Sarjana yang berkegiatan/meraih prestasi di luar program studi",
+                          path: "/dashboard?view=iku",
+                        },
+                        {
+                          id: "IKU 4",
+                          label:
+                            "Jumlah Dosen perguruan tinggi yang mendapatkan rekognisi internasional atau hasil penelitiannya diterapkan oleh masyarakat.",
+                          path: "/dashboard?view=iku",
+                        },
+                        {
+                          id: "IKU 5",
+                          label:
+                            "Persentase luaran hasil kerja sama dan hilirisasi antara perguruan tinggi dengan industri/Lembaga.",
+                          path: "/dashboard?view=iku",
+                        },
+                        {
+                          id: "IKU 6",
+                          label:
+                            "Persentase publikasi bereputasi internasional (Scopus/WoS)",
+                          path: "/dashboard?view=iku",
+                        },
+                        {
+                          id: "IKU 7",
+                          label:
+                            "Persentase keterlibatan perguruan tinggi dalam: 1) SDG 1 (Tanpa Kemiskinan); dan 2) SDG 4 (Pendidikan Berkualitas); 3) SDG 17 (Kemitraan) 4) 2 (dua) SDGs lain sesuai keunggulan",
+                          path: "/dashboard?view=iku",
+                        },
+                        {
+                          id: "IKU 8",
+                          label:
+                            "Persentase Sumber Daya Manusia (SDM) perguruan tinggi yang terlibat langsung dalam penyusunan kebijakan (nasional/daerah/industri)",
+                          path: "/dashboard?view=iku",
+                        },
+                        {
+                          id: "IKU 9",
+                          label:
+                            "Persentase pendapatan/penghasilan dari bidang non akademik (selain UKT/uang kuliah)",
+                          path: "/dashboard?view=iku",
+                        },
+                      ].map((item, i) => (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            navigate(item.path);
+                            setIsOpen(false);
+                          }}
+                          className="w-full flex items-start justify-between p-3.5 rounded-2xl transition-all border border-slate-100/50 dark:border-slate-800/30 bg-slate-100/30 dark:bg-slate-900/10 hover:bg-amber-500/5 hover:border-amber-500/20 hover:text-amber-600 dark:hover:text-amber-400 group/item text-left gap-3"
+                        >
+                          <div className="flex flex-col min-w-0">
+                            <span className="inline-block self-start px-2 py-0.5 rounded-md text-[9px] font-black tracking-wider bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover/item:bg-amber-500/10 group-hover/item:text-amber-600 dark:group-hover/item:text-amber-400 border border-slate-300/30 dark:border-slate-700/30">
+                              {item.id}
+                            </span>
+                            <span className="text-[11px] font-bold leading-relaxed text-slate-600 dark:text-slate-400 mt-1.5 group-hover/item:text-slate-900 dark:group-hover/item:text-slate-200 block">
+                              {item.label}
+                            </span>
+                          </div>
+                          <ArrowUpRight
+                            size={14}
+                            className="text-slate-400 group-hover/item:text-amber-500 transition-colors mt-0.5 shrink-0"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+
                 {sectors.map((sector, idx) => (
                   <motion.div
                     key={sector.id}
@@ -75,10 +192,6 @@ export function GlobalHubPortal() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
                     className="group p-6 rounded-[2.5rem] bg-slate-50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800 hover:border-primary/40 hover:bg-white dark:hover:bg-slate-900 transition-all duration-300"
-                    style={{
-                      contentVisibility: "auto",
-                      containIntrinsicSize: "0 300px",
-                    }}
                   >
                     <div className="flex items-center gap-4 mb-6">
                       <div

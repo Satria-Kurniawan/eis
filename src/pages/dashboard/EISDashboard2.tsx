@@ -26,6 +26,16 @@ const IKUView = lazy(() => import("./IKUView"));
 import { nodes, paths, SCENE_H, SCENE_W } from "./dashboard-data";
 import { useLowSpec } from "@/contexts/LowSpecContext";
 
+const ikuSignalPaths = [
+  { from: "akademik", x: 300, y: 250, color: "#0ea5e9" },
+  { from: "kemahasiswaan", x: 200, y: 550, color: "#f472b6" },
+  { from: "alumni", x: 450, y: 750, color: "#a3e635" },
+  { from: "umum", x: 750, y: 750, color: "#fb7185" },
+  { from: "kinerja", x: 1000, y: 550, color: "#c084fc" },
+  { from: "keuangan", x: 900, y: 250, color: "#2dd4bf" },
+  { from: "hub", x: 600, y: 450, color: "#ff8c42" },
+];
+
 /** Isometric cube (SVG) */
 function IsoCube({
   w = 40,
@@ -462,6 +472,42 @@ export default function EISDashboard2() {
                           style={{ offsetPath: `path('${p.d}')` }}
                         />
                       ))}
+                    {/* IKU Signal Paths and flowing particles */}
+                    {ikuSignalPaths.map((p, idx) => {
+                      const pathD = `M ${p.x} ${p.y} Q ${(p.x + 600) / 2} ${(p.y + 130) / 2 - 40} 600 130`;
+                      return (
+                        <React.Fragment key={`iku-sig-${idx}`}>
+                          {/* Curved Signal Line */}
+                          <path
+                            d={pathD}
+                            fill="none"
+                            stroke={p.color}
+                            strokeWidth={1.5}
+                            strokeDasharray="4 6"
+                            className="opacity-25"
+                          />
+                          {/* Flowing particle circle along the path */}
+                          {!isLowSpec && (
+                            <motion.circle
+                              r={3}
+                              fill="#fbbf24"
+                              className="drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]"
+                              animate={{
+                                offsetDistance: ["0%", "100%"],
+                                opacity: [0, 1, 1, 0],
+                              }}
+                              transition={{
+                                duration: 2.5 + (idx % 3) * 0.5,
+                                repeat: Infinity,
+                                ease: "linear",
+                                delay: idx * 0.25,
+                              }}
+                              style={{ offsetPath: `path('${pathD}')` }}
+                            />
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
                   </svg>
 
                   {nodes.map((node) => {
@@ -584,6 +630,127 @@ export default function EISDashboard2() {
 
                     return null;
                   })}
+
+                  {/* SPECIAL DEDICATED IKU NODE (Position: 600, 130 -> 50%, 16.25%) */}
+                  <div
+                    className="absolute z-25 -translate-x-1/2 -translate-y-1/2 group cursor-pointer hover:scale-110 transition-all duration-500 will-change-transform"
+                    style={{ left: "50%", top: "16.25%" }}
+                    onClick={() => setActiveView("iku")}
+                  >
+                    <div className="relative">
+                      {/* Ambient Aura Glow under the node */}
+                      <div
+                        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60 blur-[18px] group-hover:opacity-90 group-hover:blur-xl transition-all duration-500 bg-amber-500"
+                        style={{
+                          width: 90,
+                          height: 45,
+                          transform: "translate(-50%, -10%) rotateX(60deg)",
+                        }}
+                      />
+
+                      {/* Custom SVG Isometric Crystal Prism Shape */}
+                      <div className="relative drop-shadow-[0_15px_30px_rgba(245,158,11,0.4)]">
+                        <svg
+                          width={80}
+                          height={92}
+                          viewBox="0 0 80 92"
+                          className="overflow-visible"
+                        >
+                          {/* Base platform ring */}
+                          <polygon
+                            points="40,50 80,63 40,76 0,63"
+                            fill="rgba(245, 158, 11, 0.08)"
+                            stroke="#f59e0b"
+                            strokeWidth="1"
+                            strokeDasharray="3 3"
+                            className={isLowSpec ? "" : "animate-spin"}
+                            style={{
+                              transformOrigin: "40px 63px",
+                              animationDuration: "12s",
+                            }}
+                          />
+                          <polygon
+                            points="40,48 80,61 40,74 0,61"
+                            fill="none"
+                            stroke="#f59e0b"
+                            strokeWidth="1.5"
+                            className="opacity-40"
+                          />
+
+                          {/* Float animation grouping */}
+                          <g
+                            className={isLowSpec ? "" : "animate-bounce"}
+                            style={{ animationDuration: "3.5s" }}
+                          >
+                            {/* Outer glowing halo */}
+                            <ellipse
+                              cx={40}
+                              cy={30}
+                              rx={28}
+                              ry={12}
+                              fill="none"
+                              stroke="#fbbf24"
+                              strokeWidth="0.75"
+                              className={`opacity-30 ${isLowSpec ? "" : "animate-pulse"}`}
+                            />
+
+                            {/* Main Top pyramid facets */}
+                            {/* Top Facet */}
+                            <polygon
+                              points="40,5 58,18 40,31 22,18"
+                              fill="#fbbf24"
+                              className="fill-amber-300 dark:fill-amber-400"
+                            />
+                            {/* Left Facet */}
+                            <polygon
+                              points="22,18 40,31 40,53 22,40"
+                              fill="#f59e0b"
+                              className="fill-amber-500"
+                            />
+                            {/* Right Facet */}
+                            <polygon
+                              points="40,31 58,18 58,40 40,53"
+                              fill="#d97706"
+                              className="fill-amber-600"
+                            />
+
+                            {/* Little floating core node inside (double diamond style) */}
+                            <polygon
+                              points="40,55 48,60 40,65 32,60"
+                              fill="#f59e0b"
+                              className="opacity-80"
+                            />
+                            <polygon
+                              points="32,60 40,65 40,73 32,68"
+                              fill="#d97706"
+                              className="opacity-90"
+                            />
+                            <polygon
+                              points="40,65 48,60 48,68 40,73"
+                              fill="#b45309"
+                              className="opacity-95"
+                            />
+                          </g>
+
+                          {/* Sparkles on top */}
+                          <g
+                            transform="translate(28, -12)"
+                            className={isLowSpec ? "" : "animate-pulse"}
+                          >
+                            <Sparkles
+                              size={24}
+                              className="text-amber-400 drop-shadow-[0_0_8px_#f59e0b]"
+                            />
+                          </g>
+                        </svg>
+                      </div>
+
+                      {/* Premium Label */}
+                      <div className="absolute left-1/2 top-full z-10 mt-5 w-max -translate-x-1/2 rounded-full border border-amber-500/30 bg-amber-500/10 px-5 py-2 text-xs font-black uppercase tracking-[0.2em] text-amber-600 dark:text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.15)] backdrop-blur-md transition-all duration-500 group-hover:bg-amber-500 group-hover:text-white group-hover:border-amber-500 group-hover:shadow-[0_0_25px_rgba(245,158,11,0.4)]">
+                        IKU Dashboard
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
