@@ -12,7 +12,7 @@ import {
   Target,
   TrendingUp,
 } from "lucide-react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
@@ -1328,100 +1328,6 @@ export default function IKUView() {
         ))}
       </div>
 
-      {/* Formula Board */}
-      <div className="mx-4 overflow-hidden rounded-[2rem] border border-amber-500/20 bg-amber-500/5 p-6 space-y-4">
-        <div
-          className="flex justify-between items-center cursor-pointer select-none"
-          onClick={() => setShowFormulaBoard(!showFormulaBoard)}
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-500/10 rounded-xl text-amber-500">
-              <Calculator className="size-5" />
-            </div>
-            <div>
-              <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100 uppercase tracking-wider">
-                Panduan Formula Kebijakan IKU 1 (AEE PT)
-              </h4>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-                Klik untuk {showFormulaBoard ? "menyembunyikan" : "melihat"}{" "}
-                penjelasan rumus perhitungan
-              </p>
-            </div>
-          </div>
-          <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-[9px] font-black uppercase tracking-widest border border-amber-500/20">
-            {showFormulaBoard ? "CLOSE" : "EXPAND"}
-          </span>
-        </div>
-
-        {showFormulaBoard && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-amber-500/10"
-          >
-            <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-[8px] font-black uppercase tracking-widest border border-blue-500/20">
-                A. AEE PRODI (REALISASI)
-              </span>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-semibold">
-                Mengukur rasio mahasiswa tahun akademik yang lulus tepat waktu
-                sesuai masa tempuh kurikulum standar terhadap total mahasiswa
-                terdaftar.
-              </p>
-              <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg font-mono text-[10px] text-slate-700 dark:text-slate-300">
-                <div className="text-center border-b border-slate-300 dark:border-slate-700 pb-1">
-                  Mhs Lulus Sesuai Kurikulum
-                </div>
-                <div className="text-center pt-1">
-                  Total Mahasiswa TA Tersebut
-                </div>
-                <div className="text-center text-amber-500 font-black mt-2">
-                  x 100%
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[8px] font-black uppercase tracking-widest border border-emerald-500/20">
-                B. TINGKAT PENCAPAIAN AEE
-              </span>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-semibold">
-                Membandingkan capaian AEE realisasi dengan batas ideal nasional
-                untuk masing-masing jenjang (S1: 25%, D4: 25%, D3: 33%, S2: 50%,
-                S3: 33%).
-              </p>
-              <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg font-mono text-[10px] text-slate-700 dark:text-slate-300 flex flex-col justify-center h-[90px]">
-                <div className="text-center border-b border-slate-300 dark:border-slate-700 pb-1">
-                  AEE Realisasi
-                </div>
-                <div className="text-center pt-1">AEE Ideal Jenjang</div>
-                <div className="text-center text-emerald-500 font-black mt-2">
-                  x 100%
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-500 text-[8px] font-black uppercase tracking-widest border border-purple-500/20">
-                C. AEE PT (PERGURUAN TINGGI)
-              </span>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-semibold">
-                Rata-rata kumulatif tingkat pencapaian dari seluruh jenjang
-                akademik (D3 hingga S3) yang diselenggarakan oleh Perguruan
-                Tinggi.
-              </p>
-              <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg font-mono text-[10px] text-slate-700 dark:text-slate-300 flex flex-col justify-center items-center h-[90px]">
-                <div className="text-center text-purple-500 font-black">
-                  Σ (Tingkat Pencapaian_i)
-                </div>
-                <div className="w-1/2 border-b border-slate-300 dark:border-slate-700 my-1" />
-                <div className="text-center">n (Jumlah Jenjang)</div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </div>
-
       {/* IKU Table Section */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -1486,15 +1392,27 @@ export default function IKUView() {
                             </>
                           )}
                           <td className="px-6 py-4 border-r border-slate-200 dark:border-slate-800">
-                            <div className="flex items-start gap-4">
-                              {indicator.id && (
-                                <span className="mt-1 shrink-0 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider border border-amber-500/20">
-                                  {indicator.id}
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex items-start gap-4">
+                                {indicator.id && (
+                                  <span className="mt-1 shrink-0 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider border border-amber-500/20">
+                                    {indicator.id}
+                                  </span>
+                                )}
+                                <span className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-relaxed">
+                                  {indicator.label}
                                 </span>
+                              </div>
+                              {indicator.id === "IKU 1" && (
+                                <button
+                                  onClick={() => setShowFormulaBoard(true)}
+                                  className="shrink-0 p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 active:scale-95 transition-all flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider cursor-pointer"
+                                  title="Lihat Rumus Perhitungan"
+                                >
+                                  <Calculator className="size-3.5" />
+                                  <span>Formula</span>
+                                </button>
                               )}
-                              <span className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-relaxed">
-                                {indicator.label}
-                              </span>
                             </div>
                           </td>
                           <td className="px-6 py-4 text-center text-xs font-black text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-800">
@@ -1588,6 +1506,129 @@ export default function IKUView() {
           </div>
         </div>
       </div>
+
+      {/* Premium Formula Dialog Overlay */}
+      <AnimatePresence>
+        {showFormulaBoard && (
+          <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowFormulaBoard(false)}
+              className="absolute inset-0 bg-slate-950/60 backdrop-blur-md cursor-pointer"
+            />
+
+            {/* Modal Body */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="relative w-full max-w-4xl bg-white dark:bg-slate-950 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden z-10"
+            >
+              <div className="p-8 space-y-6">
+                {/* Modal Header */}
+                <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-900 pb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-amber-500/10 rounded-2xl text-amber-500">
+                      <Calculator className="size-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                        Panduan Formula Kebijakan IKU 1 (AEE PT)
+                      </h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                        Sistem Penjaminan Mutu & Perhitungan Efisiensi Edukasi
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowFormulaBoard(false)}
+                    className="p-2 px-4 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all active:scale-95 text-xs font-black uppercase tracking-widest border border-slate-200/50 dark:border-slate-800 cursor-pointer"
+                  >
+                    CLOSE
+                  </button>
+                </div>
+
+                {/* Formula Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Card A */}
+                  <div className="p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 space-y-3">
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-[8px] font-black uppercase tracking-widest border border-blue-500/20">
+                      A. AEE PRODI (Capaian Prodi)
+                    </span>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed font-semibold">
+                      Mengukur rasio mahasiswa lulus tepat waktu sesuai
+                      kurikulum standar terhadap total mahasiswa aktif
+                      seangkatan.
+                    </p>
+                    <div className="p-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-[10px] text-slate-700 dark:text-slate-300">
+                      <div className="text-center border-b border-slate-200 dark:border-slate-800 pb-1">
+                        Mhs Lulus Sesuai Kurikulum
+                      </div>
+                      <div className="text-center pt-1">
+                        Total Mahasiswa TA Tersebut
+                      </div>
+                      <div className="text-center text-amber-500 font-black mt-2">
+                        x 100%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card B */}
+                  <div className="p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 space-y-3">
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[8px] font-black uppercase tracking-widest border border-emerald-500/20">
+                      B. TINGKAT PENCAPAIAN AEE
+                    </span>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed font-semibold">
+                      Membandingkan AEE realisasi prodi dengan batas ideal
+                      nasional masing-masing jenjang (S1: 25%, D4: 25%, D3: 33%,
+                      S2: 50%, S3: 33%).
+                    </p>
+                    <div className="p-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-[10px] text-slate-700 dark:text-slate-300 flex flex-col justify-center h-[90px]">
+                      <div className="text-center border-b border-slate-200 dark:border-slate-800 pb-1">
+                        AEE Realisasi
+                      </div>
+                      <div className="text-center pt-1">AEE Ideal Jenjang</div>
+                      <div className="text-center text-emerald-500 font-black mt-2">
+                        x 100%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card C */}
+                  <div className="p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 space-y-3">
+                    <span className="px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-500 text-[8px] font-black uppercase tracking-widest border border-purple-500/20">
+                      C. AEE PT (Perguruan Tinggi)
+                    </span>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed font-semibold">
+                      Rata-rata tingkat pencapaian dari seluruh jenjang akademik
+                      (D3 s/d S3) yang diselenggarakan oleh perguruan tinggi.
+                    </p>
+                    <div className="p-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-mono text-[10px] text-slate-700 dark:text-slate-300 flex flex-col justify-center items-center h-[90px]">
+                      <div className="text-center text-purple-500 font-black">
+                        Σ (Tingkat Pencapaian_i)
+                      </div>
+                      <div className="w-1/2 border-b border-slate-200 dark:border-slate-800 my-1" />
+                      <div className="text-center">n (Jumlah Jenjang)</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Info Footer */}
+                <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/10 text-[11px] text-amber-700 dark:text-amber-400/80 leading-relaxed font-bold">
+                  * Catatan Penting: Capaian AEE PT Universitas Pendidikan
+                  Ganesha (Undiksha) dihitung secara berkala setiap tahun
+                  akademik selesai guna mengevaluasi efisiensi internal
+                  penyelenggaraan pendidikan.
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
