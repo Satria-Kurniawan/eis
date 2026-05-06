@@ -24,7 +24,7 @@ export function FloatingSidebar() {
         setIsHovered(false);
         setExpandedSector(null);
       }}
-      className="fixed left-4 top-32 bottom-8 z-[45] hidden md:flex flex-col rounded-3xl bg-white/40 dark:bg-[#14151a]/40 backdrop-blur-2xl border border-slate-200/50 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.12)] overflow-hidden"
+      className="fixed left-4 top-32 bottom-8 z-45 hidden md:flex flex-col rounded-3xl bg-white/40 dark:bg-[#14151a]/40 backdrop-blur-2xl border border-slate-200/50 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.12)] overflow-hidden"
       style={{
         boxShadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.1)",
       }}

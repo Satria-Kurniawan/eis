@@ -1,22 +1,24 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePeriod } from "@/contexts/PeriodContext";
 import { useTracer } from "@/hooks/alumni/use-tracer";
 import { useDebounce } from "@/hooks/use-debounce";
+import { type Tracer } from "@/services/alumni/tracer";
 import {
+  Filter,
   GraduationCap,
   Info,
-  TrendingUp,
-  Users,
   RefreshCw,
   Search,
-  Filter,
+  TrendingUp,
+  Users,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
-import { columns } from "./Tracer/columns";
+import { useEffect, useMemo, useState } from "react";
+import { createColumns } from "./Tracer/columns";
+import { TracerDetailModal } from "./Tracer/tracer-detail-modal";
 import { TracerTable } from "./Tracer/tracer-table";
-import { Input } from "@/components/ui/input";
 
 export default function TracerPage() {
   const [searchValue, setSearchValue] = useState("");
@@ -37,6 +39,15 @@ export default function TracerPage() {
 
   const { tahun, semester } = usePeriod();
   const [showFilters, setShowFilters] = useState(true);
+  const [selectedAlumni, setSelectedAlumni] = useState<Tracer | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleViewDetail = (alumni: Tracer) => {
+    setSelectedAlumni(alumni);
+    setIsModalOpen(true);
+  };
+
+  const columns = useMemo(() => createColumns(handleViewDetail), []);
 
   // Reset to page 1 when search changes
   useEffect(() => {
@@ -196,6 +207,11 @@ export default function TracerPage() {
           </span>
         </div>
       </div>
+      <TracerDetailModal
+        data={selectedAlumni}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </motion.div>
   );
 }

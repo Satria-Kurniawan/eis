@@ -617,13 +617,15 @@ export default function AdminLayout() {
 
             <button
               onClick={() => setIsLowSpec(!isLowSpec)}
-              className={`p-2 rounded-xl hover:bg-muted transition-all active:scale-90 shrink-0 ${isLowSpec ? 'text-amber-500 bg-amber-500/10 hover:bg-amber-500/20' : 'text-slate-500 hover:text-primary'}`}
-              title={isLowSpec ? "Mode Performa Aktif (Low Spec)" : "Mode Standar"}
+              className={`p-2 rounded-xl hover:bg-muted transition-all active:scale-90 shrink-0 ${isLowSpec ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" : "text-slate-500 hover:text-primary"}`}
+              title={
+                isLowSpec ? "Mode Performa Aktif (Low Spec)" : "Mode Standar"
+              }
             >
               <Gauge className="size-5" />
             </button>
-            
-            <AnimatedThemeToggler 
+
+            <AnimatedThemeToggler
               variant="circle"
               duration={600}
               className="p-2 rounded-xl hover:bg-muted transition-all text-slate-500 hover:text-primary active:scale-90 shrink-0 [&_svg]:size-5"
@@ -648,7 +650,7 @@ export default function AdminLayout() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.8, y: 20 }}
                 whileHover={{ y: -4 }}
-                className="fixed bottom-24 right-8 z-[45]"
+                className="fixed bottom-24 right-8 z-45"
               >
                 <div className="relative group">
                   {/* Outer Glow */}

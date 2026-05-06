@@ -1,17 +1,12 @@
 import { usePeriod } from "@/contexts/PeriodContext";
-import { 
-  BarChart3, 
-  GraduationCap, 
-  TrendingUp,
-  Layout
-} from "lucide-react";
+import { BarChart3, GraduationCap, TrendingUp, Layout } from "lucide-react";
 import { motion } from "motion/react";
 
 export default function DashboardMahasiswaPage() {
   const { tahun, semester } = usePeriod();
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
@@ -28,7 +23,8 @@ export default function DashboardMahasiswaPage() {
             Dashboard Mahasiswa
           </h1>
           <p className="text-muted-foreground font-medium max-w-xl text-lg">
-            Rangkuman eksekutif data kemahasiswaan, tren pertumbuhan, dan statistik prestasi.
+            Rangkuman eksekutif data kemahasiswaan, tren pertumbuhan, dan
+            statistik prestasi.
           </p>
         </div>
 
@@ -56,7 +52,10 @@ export default function DashboardMahasiswaPage() {
             </div>
             <div className="space-y-1">
               <h2 className="text-xl font-bold">Modul Dalam Pengembangan</h2>
-              <p className="text-muted-foreground">Dashboard eksekutif kemahasiswaan sedang dalam tahap perancangan visualisasi.</p>
+              <p className="text-muted-foreground">
+                Dashboard eksekutif kemahasiswaan sedang dalam tahap perancangan
+                visualisasi.
+              </p>
             </div>
           </div>
         </div>

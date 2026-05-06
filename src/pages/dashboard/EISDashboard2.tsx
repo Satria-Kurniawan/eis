@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import EISMobileDashboard from "./EISMobileDashboard";
 import StatsView from "./StatsView";
+import IKUView from "./IKUView";
 import { nodes, paths, SCENE_H, SCENE_W } from "./dashboard-data";
 import { useLowSpec } from "@/contexts/LowSpecContext";
 
@@ -163,10 +164,10 @@ export default function EISDashboard2() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [searchParams, setSearchParams] = useSearchParams();
   const activeView =
-    (searchParams.get("view") as "dashboard" | "stats") || "dashboard";
+    (searchParams.get("view") as "dashboard" | "stats" | "iku") || "dashboard";
   const { isLowSpec } = useLowSpec();
 
-  const setActiveView = (view: "dashboard" | "stats") => {
+  const setActiveView = (view: "dashboard" | "stats" | "iku") => {
     setSearchParams((prev) => {
       prev.set("view", view);
       return prev;
@@ -239,6 +240,7 @@ export default function EISDashboard2() {
           {[
             { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
             { id: "stats", label: "Statistik", icon: BarChart3 },
+            { id: "iku", label: "IKU", icon: Sparkles },
           ].map((tab) => {
             const isActive = activeView === tab.id;
             return (
@@ -275,7 +277,7 @@ export default function EISDashboard2() {
         className={`relative z-10 flex w-full flex-col items-center justify-center p-8 ${activeView === "dashboard" ? "-mt-20" : "pt-10"}`}
       >
         <AnimatePresence mode="wait">
-          {activeView === "dashboard" ? (
+          {activeView === "dashboard" && (
             <motion.div
               key="dashboard"
               initial={{ opacity: 0, scale: 0.95 }}
@@ -372,6 +374,16 @@ export default function EISDashboard2() {
                         y2="100%"
                       >
                         <stop offset="0%" stopColor="#2dd4bf" />
+                        <stop offset="100%" stopColor="#ff8c42" />
+                      </linearGradient>
+                      <linearGradient
+                        id="iot-grad-amber"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="100%"
+                      >
+                        <stop offset="0%" stopColor="#f59e0b" />
                         <stop offset="100%" stopColor="#ff8c42" />
                       </linearGradient>
                     </defs>
@@ -553,7 +565,9 @@ export default function EISDashboard2() {
                 </div>
               </div>
             </motion.div>
-          ) : (
+          )}
+
+          {activeView === "stats" && (
             <motion.div
               key="stats"
               initial={{ opacity: 0, y: 20 }}
@@ -563,6 +577,19 @@ export default function EISDashboard2() {
               className="w-full"
             >
               <StatsView />
+            </motion.div>
+          )}
+
+          {activeView === "iku" && (
+            <motion.div
+              key="iku"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: "circOut" }}
+              className="w-full"
+            >
+              <IKUView />
             </motion.div>
           )}
         </AnimatePresence>

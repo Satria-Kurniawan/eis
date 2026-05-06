@@ -9,9 +9,12 @@ import {
   Mail,
   Phone,
   User,
+  Search,
 } from "lucide-react";
 
-export const columns: ColumnDef<Tracer>[] = [
+export const createColumns = (
+  onViewDetail: (data: Tracer) => void
+): ColumnDef<Tracer>[] => [
   {
     accessorKey: "nama_mahasiswa",
     header: "Alumni",
@@ -157,6 +160,21 @@ export const columns: ColumnDef<Tracer>[] = [
             {bulan_wisuda}/{tahun_wisuda}
           </span>
         </div>
+      );
+    },
+  },
+  {
+    id: "actions",
+    header: "Aksi",
+    cell: ({ row }) => {
+      return (
+        <button
+          onClick={() => onViewDetail(row.original)}
+          className="p-2.5 rounded-xl bg-primary/5 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm border border-primary/10 active:scale-90"
+          title="Lihat Detail Alumni"
+        >
+          <Search className="size-4" />
+        </button>
       );
     },
   },
