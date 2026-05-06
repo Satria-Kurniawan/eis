@@ -1,3 +1,4 @@
+import logoUndiksha from "@/assets/logo-undiksha.png";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
@@ -557,6 +558,24 @@ export default function EISDashboard2() {
                               leftColor={node.left}
                               rightColor={node.right}
                             />
+                             {/* Holographic Undiksha Emblem on left side surface of Core Hub */}
+                             <div
+                               className="absolute pointer-events-none z-10 flex items-center justify-center select-none"
+                               style={{
+                                 width: 28,
+                                 height: 28,
+                                 left: 21,
+                                 top: 62,
+                                 transform: "translate(-50%, -50%) skewY(30deg) scaleX(0.866)",
+                               }}
+                             >
+                               <img
+                                 src={logoUndiksha}
+                                 alt="Undiksha Logo"
+                                 className="w-full h-full object-contain opacity-85 dark:opacity-95 drop-shadow-[0_0_8px_rgba(255,255,255,0.7)] animate-pulse"
+                                 style={{ animationDuration: "3s" }}
+                               />
+                             </div>
                             <div className="absolute bottom-0 right-[-8px]">
                               <IsoCube
                                 w={42}
