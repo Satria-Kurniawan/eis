@@ -13,7 +13,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { motion } from "motion/react";
-import React from "react";
+import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   PolarAngleAxis,
@@ -306,6 +306,48 @@ const IKU1_DRILLDOWN_DATA: Record<string, JenjangDetailData> = {
   },
 };
 
+// Helper to calculate AEE stats for a specific jenjang dynamically from IKU1_DRILLDOWN_DATA
+const calculateJenjangStats = (jenjang: string) => {
+  const jenjangData = IKU1_DRILLDOWN_DATA[jenjang];
+  if (!jenjangData) return { aee: 0, achievement: 0 };
+
+  const ideal = jenjangData.ideal;
+  let totalLulus = 0;
+  let totalMhs = 0;
+
+  jenjangData.faculties.forEach((f) => {
+    f.jurusans.forEach((j) => {
+      j.prodis.forEach((p) => {
+        totalLulus += p.lulus;
+        totalMhs += p.total;
+      });
+    });
+  });
+
+  const aee = totalMhs > 0 ? (totalLulus / totalMhs) * 100 : 0;
+  const achievement = ideal > 0 ? (aee / ideal) * 100 : 0;
+
+  return { aee, achievement };
+};
+
+// Helper to calculate overall AEE PT (average of Tingkat Pencapaian across all 5 active levels)
+const getOverallAeePt = () => {
+  const activeLevels = ["D3", "D4", "S1", "S2", "S3"];
+  let sumAchievement = 0;
+  activeLevels.forEach((lvl) => {
+    const stats = calculateJenjangStats(lvl);
+    sumAchievement += stats.achievement;
+  });
+  return sumAchievement / activeLevels.length;
+};
+
+const d3Stats = calculateJenjangStats("D3");
+const d4Stats = calculateJenjangStats("D4");
+const s1Stats = calculateJenjangStats("S1");
+const s2Stats = calculateJenjangStats("S2");
+const s3Stats = calculateJenjangStats("S3");
+const overallAeePt = getOverallAeePt();
+
 const ikuData = [
   {
     no: "1",
@@ -317,14 +359,57 @@ const ikuData = [
         satuan: "%",
         baseline: "57,00",
         target: "67,04",
+        realisasi: `${overallAeePt.toFixed(2)}%`,
         children: [
-          { label: "a. D1*", satuan: "%", baseline: "-", target: "-" },
-          { label: "b. D2*", satuan: "%", baseline: "-", target: "-" },
-          { label: "c. D3*", satuan: "%", baseline: "70,00", target: "75,76" },
-          { label: "d. D4", satuan: "%", baseline: "70,00", target: "80,00" },
-          { label: "e. S1", satuan: "%", baseline: "70,00", target: "80,00" },
-          { label: "f. S2**", satuan: "%", baseline: "45,00", target: "54,00" },
-          { label: "g. S3**", satuan: "%", baseline: "30,00", target: "45,45" },
+          {
+            label: "a. D1*",
+            satuan: "%",
+            baseline: "-",
+            target: "-",
+            realisasi: "-",
+          },
+          {
+            label: "b. D2*",
+            satuan: "%",
+            baseline: "-",
+            target: "-",
+            realisasi: "-",
+          },
+          {
+            label: "c. D3*",
+            satuan: "%",
+            baseline: "70,00",
+            target: "75,76",
+            realisasi: `${d3Stats.achievement.toFixed(2)}%`,
+          },
+          {
+            label: "d. D4",
+            satuan: "%",
+            baseline: "70,00",
+            target: "80,00",
+            realisasi: `${d4Stats.achievement.toFixed(2)}%`,
+          },
+          {
+            label: "e. S1",
+            satuan: "%",
+            baseline: "70,00",
+            target: "80,00",
+            realisasi: `${s1Stats.achievement.toFixed(2)}%`,
+          },
+          {
+            label: "f. S2**",
+            satuan: "%",
+            baseline: "45,00",
+            target: "54,00",
+            realisasi: `${s2Stats.achievement.toFixed(2)}%`,
+          },
+          {
+            label: "g. S3**",
+            satuan: "%",
+            baseline: "30,00",
+            target: "45,45",
+            realisasi: `${s3Stats.achievement.toFixed(2)}%`,
+          },
         ],
       },
       {
@@ -332,18 +417,21 @@ const ikuData = [
         satuan: "%",
         baseline: "11,15",
         target: "13,15",
+        realisasi: "12,45%",
         children: [
           {
             label: "a. Mahasiswa magister",
             satuan: "%",
             baseline: "8,17",
             target: "8,77",
+            realisasi: "8,35%",
           },
           {
             label: "b. Mahasiswa doktor",
             satuan: "%",
             baseline: "2,98",
             target: "4,38",
+            realisasi: "4,10%",
           },
         ],
       },
@@ -352,6 +440,7 @@ const ikuData = [
         satuan: "%",
         baseline: "0,46",
         target: "1,00",
+        realisasi: "0,85%",
       },
     ],
   },
@@ -366,6 +455,7 @@ const ikuData = [
         satuan: "%",
         baseline: "46,94",
         target: "60,00",
+        realisasi: "58,20%",
       },
       {
         id: "IKU 3",
@@ -374,6 +464,7 @@ const ikuData = [
         satuan: "%",
         baseline: "22,59",
         target: "30,00",
+        realisasi: "28,40%",
       },
       {
         id: "IKU 5",
@@ -382,6 +473,7 @@ const ikuData = [
         satuan: "%",
         baseline: "70,00",
         target: "80,00",
+        realisasi: "79,50%",
       },
       {
         id: "IKU 6",
@@ -389,18 +481,21 @@ const ikuData = [
         satuan: "Artikel",
         baseline: "170",
         target: "221",
+        realisasi: "210",
         children: [
           {
             label: "a. Persentase publikasi Top Tier",
             satuan: "%",
             baseline: "5,00",
             target: "21,10",
+            realisasi: "19,50%",
           },
           {
             label: "b. Persentase publikasi Q1",
             satuan: "%",
             baseline: "15,00",
             target: "30,70",
+            realisasi: "28,90%",
           },
         ],
       },
@@ -447,6 +542,7 @@ const getRadarLabel = (name: string): string => {
 
 export default function IKUView() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [showFormulaBoard, setShowFormulaBoard] = useState(false);
 
   const selectedJenjang = searchParams.get("jenjang");
   const selectedFaculty = searchParams.get("faculty");
@@ -1232,6 +1328,100 @@ export default function IKUView() {
         ))}
       </div>
 
+      {/* Formula Board */}
+      <div className="mx-4 overflow-hidden rounded-[2rem] border border-amber-500/20 bg-amber-500/5 p-6 space-y-4">
+        <div
+          className="flex justify-between items-center cursor-pointer select-none"
+          onClick={() => setShowFormulaBoard(!showFormulaBoard)}
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-amber-500/10 rounded-xl text-amber-500">
+              <Calculator className="size-5" />
+            </div>
+            <div>
+              <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100 uppercase tracking-wider">
+                Panduan Formula Kebijakan IKU 1 (AEE PT)
+              </h4>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                Klik untuk {showFormulaBoard ? "menyembunyikan" : "melihat"}{" "}
+                penjelasan rumus perhitungan
+              </p>
+            </div>
+          </div>
+          <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-[9px] font-black uppercase tracking-widest border border-amber-500/20">
+            {showFormulaBoard ? "CLOSE" : "EXPAND"}
+          </span>
+        </div>
+
+        {showFormulaBoard && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-amber-500/10"
+          >
+            <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-[8px] font-black uppercase tracking-widest border border-blue-500/20">
+                A. AEE PRODI (REALISASI)
+              </span>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-semibold">
+                Mengukur rasio mahasiswa tahun akademik yang lulus tepat waktu
+                sesuai masa tempuh kurikulum standar terhadap total mahasiswa
+                terdaftar.
+              </p>
+              <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg font-mono text-[10px] text-slate-700 dark:text-slate-300">
+                <div className="text-center border-b border-slate-300 dark:border-slate-700 pb-1">
+                  Mhs Lulus Sesuai Kurikulum
+                </div>
+                <div className="text-center pt-1">
+                  Total Mahasiswa TA Tersebut
+                </div>
+                <div className="text-center text-amber-500 font-black mt-2">
+                  x 100%
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[8px] font-black uppercase tracking-widest border border-emerald-500/20">
+                B. TINGKAT PENCAPAIAN AEE
+              </span>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-semibold">
+                Membandingkan capaian AEE realisasi dengan batas ideal nasional
+                untuk masing-masing jenjang (S1: 25%, D4: 25%, D3: 33%, S2: 50%,
+                S3: 33%).
+              </p>
+              <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg font-mono text-[10px] text-slate-700 dark:text-slate-300 flex flex-col justify-center h-[90px]">
+                <div className="text-center border-b border-slate-300 dark:border-slate-700 pb-1">
+                  AEE Realisasi
+                </div>
+                <div className="text-center pt-1">AEE Ideal Jenjang</div>
+                <div className="text-center text-emerald-500 font-black mt-2">
+                  x 100%
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-500 text-[8px] font-black uppercase tracking-widest border border-purple-500/20">
+                C. AEE PT (PERGURUAN TINGGI)
+              </span>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-semibold">
+                Rata-rata kumulatif tingkat pencapaian dari seluruh jenjang
+                akademik (D3 hingga S3) yang diselenggarakan oleh Perguruan
+                Tinggi.
+              </p>
+              <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg font-mono text-[10px] text-slate-700 dark:text-slate-300 flex flex-col justify-center items-center h-[90px]">
+                <div className="text-center text-purple-500 font-black">
+                  Σ (Tingkat Pencapaian_i)
+                </div>
+                <div className="w-1/2 border-b border-slate-300 dark:border-slate-700 my-1" />
+                <div className="text-center">n (Jumlah Jenjang)</div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </div>
+
       {/* IKU Table Section */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -1258,8 +1448,11 @@ export default function IKUView() {
                 <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-800 text-center bg-blue-500/5">
                   Baseline 2025
                 </th>
-                <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-center bg-amber-500/5">
+                <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-800 text-center bg-amber-500/5">
                   Target 2026
+                </th>
+                <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-center bg-emerald-500/5">
+                  Realisasi 2026
                 </th>
               </tr>
             </thead>
@@ -1310,8 +1503,11 @@ export default function IKUView() {
                           <td className="px-6 py-4 text-center text-sm font-black text-blue-600 dark:text-blue-400 border-r border-slate-200 dark:border-slate-800 bg-blue-500/2">
                             {indicator.baseline}
                           </td>
-                          <td className="px-6 py-4 text-center text-sm font-black text-amber-600 dark:text-amber-400 bg-amber-500/2">
+                          <td className="px-6 py-4 text-center text-sm font-black text-amber-600 dark:text-amber-400 border-r border-slate-200 dark:border-slate-800 bg-amber-500/2">
                             {indicator.target}
+                          </td>
+                          <td className="px-6 py-4 text-center text-sm font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/2">
+                            {indicator.realisasi || "-"}
                           </td>
                         </tr>
 
@@ -1350,8 +1546,11 @@ export default function IKUView() {
                               <td className="px-6 py-3 text-center text-[13px] font-bold text-slate-400 border-r border-slate-200 dark:border-slate-800 bg-blue-500/1">
                                 {sub.baseline}
                               </td>
-                              <td className="px-6 py-3 text-center text-[13px] font-bold text-slate-400 bg-amber-500/1">
+                              <td className="px-6 py-3 text-center text-[13px] font-bold text-slate-400 border-r border-slate-200 dark:border-slate-800 bg-amber-500/1">
                                 {sub.target}
+                              </td>
+                              <td className="px-6 py-3 text-center text-[13px] font-bold text-emerald-500/80 bg-emerald-500/1">
+                                {sub.realisasi || "-"}
                               </td>
                             </tr>
                           );

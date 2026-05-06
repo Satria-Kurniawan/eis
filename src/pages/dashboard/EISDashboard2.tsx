@@ -16,11 +16,13 @@ import {
   Sparkles,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import EISMobileDashboard from "./EISMobileDashboard";
-import StatsView from "./StatsView";
-import IKUView from "./IKUView";
+
+const StatsView = lazy(() => import("./StatsView"));
+const IKUView = lazy(() => import("./IKUView"));
+
 import { nodes, paths, SCENE_H, SCENE_W } from "./dashboard-data";
 import { useLowSpec } from "@/contexts/LowSpecContext";
 
@@ -150,6 +152,26 @@ function FloatingCard({
 }
 
 // All nodes and paths data moved to dashboard-data.tsx
+
+function TabSkeletonLoader() {
+  return (
+    <div className="w-full max-w-7xl mx-auto space-y-8 py-10 px-4 animate-pulse">
+      <div className="h-8 bg-slate-200 dark:bg-slate-800/40 rounded-xl w-1/4" />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="h-32 bg-slate-200 dark:bg-slate-800/30 rounded-[2rem]"
+          />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-5 h-[350px] bg-slate-200 dark:bg-slate-800/20 rounded-[2.5rem]" />
+        <div className="lg:col-span-7 h-[350px] bg-slate-200 dark:bg-slate-800/20 rounded-[2.5rem]" />
+      </div>
+    </div>
+  );
+}
 
 export default function EISDashboard2() {
   const navigate = useNavigate();
@@ -576,7 +598,9 @@ export default function EISDashboard2() {
               transition={{ duration: 0.5, ease: "circOut" }}
               className="w-full"
             >
-              <StatsView />
+              <Suspense fallback={<TabSkeletonLoader />}>
+                <StatsView />
+              </Suspense>
             </motion.div>
           )}
 
@@ -589,7 +613,9 @@ export default function EISDashboard2() {
               transition={{ duration: 0.5, ease: "circOut" }}
               className="w-full"
             >
-              <IKUView />
+              <Suspense fallback={<TabSkeletonLoader />}>
+                <IKUView />
+              </Suspense>
             </motion.div>
           )}
         </AnimatePresence>

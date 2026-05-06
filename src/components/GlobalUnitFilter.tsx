@@ -77,9 +77,11 @@ export function GlobalUnitFilter() {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <button className="relative flex items-center justify-center h-10 px-3 sm:px-4 rounded-full border border-primary/20 bg-background/50 backdrop-blur-md shadow-sm hover:border-primary/40 hover:bg-primary/5 transition-all text-xs font-bold uppercase tracking-wider group shrink-0">
-          <Filter className="size-4 text-primary sm:mr-2 group-hover:scale-110 transition-transform" />
-          <span className="hidden sm:inline">Filter Unit</span>
+        <button
+          className="relative flex items-center justify-center h-10 w-10 rounded-full border border-primary/20 bg-background/50 backdrop-blur-md shadow-sm hover:border-primary/40 hover:bg-primary/5 transition-all group shrink-0"
+          title="Filter Unit"
+        >
+          <Filter className="size-4 text-primary group-hover:scale-110 transition-transform" />
           {hasActiveFilters && (
             <span className="absolute -top-1 -right-1 flex size-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>

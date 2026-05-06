@@ -551,7 +551,7 @@ export default function AdminLayout() {
                 alt="Logo E-Ganesha"
                 className="h-7 object-contain hidden sm:block drop-shadow-sm"
               />
-              <h1 className="font-bold text-xs sm:text-sm tracking-tight text-slate-900 dark:text-white hidden lg:block">
+              <h1 className="font-bold text-xs sm:text-sm tracking-tight text-slate-900 dark:text-white hidden xl:block">
                 EIS <span className="text-primary">Undiksha</span>
               </h1>
             </div>
@@ -563,14 +563,14 @@ export default function AdminLayout() {
               <div className="absolute -inset-0.5 bg-linear-to-r from-primary to-purple-600 rounded-full blur-sm opacity-20 group-hover:opacity-40 transition duration-1000"></div>
               <Popover open={isPeriodOpen} onOpenChange={setIsPeriodOpen}>
                 <PopoverTrigger asChild>
-                  <button className="relative flex items-center justify-center h-10 px-3 sm:px-4 rounded-full border border-primary/20 bg-background/50 backdrop-blur-md shadow-sm hover:border-primary/40 hover:bg-primary/5 transition-all text-[10px] sm:text-xs font-bold uppercase tracking-wider group shrink-0">
-                    <Calendar className="size-4 text-primary sm:mr-2 group-hover:scale-110 transition-transform" />
-                    <span className="hidden sm:inline">
+                  <button className="relative flex items-center justify-center h-10 w-10 xl:w-auto xl:px-4 rounded-full border border-primary/20 bg-background/50 backdrop-blur-md shadow-sm hover:border-primary/40 hover:bg-primary/5 transition-all text-[10px] sm:text-xs font-bold uppercase tracking-wider group shrink-0" title="Pilih Periode">
+                    <Calendar className="size-4 text-primary xl:mr-2 group-hover:scale-110 transition-transform" />
+                    <span className="hidden xl:inline">
                       {currentPeriod.label}
                     </span>
                     <ChevronDown
                       size={14}
-                      className="ml-2 text-slate-400 group-hover:text-primary transition-colors"
+                      className="ml-2 text-slate-400 group-hover:text-primary transition-colors hidden xl:block"
                     />
                   </button>
                 </PopoverTrigger>
