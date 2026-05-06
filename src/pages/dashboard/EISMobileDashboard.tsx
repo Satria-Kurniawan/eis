@@ -8,9 +8,10 @@ import {
   Sparkles,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import StatsView from "./StatsView";
+const IKUView = lazy(() => import("./IKUView"));
 import { nodes } from "./dashboard-data";
 
 function CDCLiveIndicator({ color }: { color: string }) {
@@ -64,7 +65,7 @@ function CDCLiveIndicator({ color }: { color: string }) {
 export default function EISMobileDashboard() {
   const navigate = useNavigate();
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [activeView, setActiveView] = useState<"dashboard" | "stats">(
+  const [activeView, setActiveView] = useState<"dashboard" | "stats" | "iku">(
     "dashboard",
   );
 
@@ -104,6 +105,99 @@ export default function EISMobileDashboard() {
 
             {/* Grid of Cards */}
             <div className="grid gap-4">
+              {/* SPECIAL GOLD IKU CARD */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`overflow-hidden rounded-[2.5rem] border transition-all duration-500 ${
+                  expandedId === "iku-card"
+                    ? "bg-amber-500/5 dark:bg-amber-500/5 border-amber-500/30 shadow-xl shadow-amber-500/5"
+                    : "bg-white/80 dark:bg-[#14151a]/80 border-slate-200 dark:border-[#2e303a] shadow-sm backdrop-blur-md"
+                }`}
+              >
+                {/* Header Container */}
+                <div
+                  onClick={() =>
+                    setExpandedId(expandedId === "iku-card" ? null : "iku-card")
+                  }
+                  className="p-5 flex items-center justify-between gap-4 cursor-pointer"
+                >
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="relative size-12 rounded-full flex items-center justify-center text-white bg-linear-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/20 shrink-0">
+                      <div className="absolute inset-0 rounded-full bg-amber-500 blur-md opacity-30 animate-pulse" />
+                      <Sparkles size={18} className="relative z-10" />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        IKU Dashboard
+                        <span className="px-1.5 py-0.5 rounded-md text-[8px] font-black bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                          HOT
+                        </span>
+                      </h3>
+                      <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest truncate">
+                        Strategic Performance
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <motion.div
+                      animate={{ rotate: expandedId === "iku-card" ? 180 : 0 }}
+                      className="p-2 rounded-full bg-slate-100 dark:bg-slate-800"
+                    >
+                      <ChevronDown size={16} className="text-slate-500" />
+                    </motion.div>
+                  </div>
+                </div>
+
+                <AnimatePresence>
+                  {expandedId === "iku-card" && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="border-t border-slate-100 dark:border-slate-800"
+                    >
+                      <div className="p-6 space-y-6">
+                        <div className="p-5 rounded-3xl bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/10">
+                          <div className="flex justify-between items-center mb-4">
+                            <div className="flex flex-col">
+                              <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">
+                                IKU Core Hub Monitor
+                              </span>
+                              <div className="flex items-center gap-2 mt-1">
+                                <motion.div
+                                  animate={{ opacity: [1, 0.4, 1] }}
+                                  transition={{ duration: 2, repeat: Infinity }}
+                                  className="size-2 rounded-full bg-amber-500"
+                                />
+                                <span className="text-[10px] font-bold text-amber-500 uppercase tracking-wider">
+                                  9 Indicators Synced
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400 pl-1">
+                            Sistem pemantauan target capaian Indikator Kinerja
+                            Utama Perguruan Tinggi yang diintegrasikan langsung
+                            dari seluruh sektor.
+                          </p>
+                        </div>
+
+                        {/* Action Navigation Button */}
+                        <button
+                          onClick={() => setActiveView("iku")}
+                          className="w-full flex items-center justify-center gap-3 p-4 bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-lg shadow-amber-500/20 active:scale-95 transition-all"
+                        >
+                          <span>Buka IKU Dashboard</span>
+                          <ArrowUpRight size={16} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
               {sectors.map((node, index) => {
                 const isExpanded = expandedId === node.id;
                 return (
@@ -278,7 +372,7 @@ export default function EISMobileDashboard() {
               })}
             </div>
           </motion.div>
-        ) : (
+        ) : activeView === "stats" ? (
           <motion.div
             key="stats"
             initial={{ opacity: 0, x: 20 }}
@@ -289,6 +383,25 @@ export default function EISMobileDashboard() {
           >
             <StatsView />
           </motion.div>
+        ) : (
+          <motion.div
+            key="iku"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3 }}
+            className="pt-4"
+          >
+            <Suspense
+              fallback={
+                <div className="flex h-[50vh] items-center justify-center">
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-amber-500 border-t-transparent" />
+                </div>
+              }
+            >
+              <IKUView />
+            </Suspense>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -298,13 +411,14 @@ export default function EISMobileDashboard() {
           {[
             { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
             { id: "stats", label: "Statistik", icon: BarChart3 },
+            { id: "iku", label: "IKU", icon: Sparkles },
           ].map((tab) => {
             const isActive = activeView === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveView(tab.id as any)}
-                className={`relative flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 ${
+                className={`relative flex items-center gap-2 ${tab.id === "stats" ? "px-4" : "px-6"} py-3 rounded-full transition-all duration-300 ${
                   isActive
                     ? "text-white dark:text-slate-950"
                     : "text-slate-500 active:scale-90"
@@ -318,9 +432,11 @@ export default function EISMobileDashboard() {
                   />
                 )}
                 <tab.icon size={18} className="relative z-10" />
-                <span className="relative z-10 text-[10px] font-black uppercase tracking-widest">
-                  {tab.label}
-                </span>
+                {tab.id !== "stats" && (
+                  <span className="relative z-10 text-[10px] font-black uppercase tracking-widest">
+                    {tab.label}
+                  </span>
+                )}
               </button>
             );
           })}

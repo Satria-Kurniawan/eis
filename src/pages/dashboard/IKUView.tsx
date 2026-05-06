@@ -904,11 +904,11 @@ export default function IKUView() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-wider border border-blue-500/20">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 shrink-0">
+            <span className="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[9px] sm:text-[10px] font-black uppercase tracking-wider border border-blue-500/20 whitespace-nowrap">
               AEE Ideal: {ideal}%
             </span>
-            <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider border border-amber-500/20">
+            <span className="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[9px] sm:text-[10px] font-black uppercase tracking-wider border border-amber-500/20 whitespace-nowrap">
               Target: {jenjangData?.target}%
             </span>
             <button
@@ -921,10 +921,10 @@ export default function IKUView() {
                 }
                 handleSelectStudentUnit(unitName);
               }}
-              className="px-3 py-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-[10px] font-black uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-2.5 py-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer whitespace-nowrap"
               title="Lihat Data Mahasiswa Unit Kerja Aktif"
             >
-              <Users className="size-3" />
+              <Users className="size-2.5 sm:size-3" />
               <span>Data Mahasiswa</span>
             </button>
           </div>
@@ -1133,7 +1133,7 @@ export default function IKUView() {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="lg:col-span-7 overflow-hidden rounded-[2.5rem] border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 backdrop-blur-xl shadow-2xl p-8"
+            className="lg:col-span-7 overflow-hidden rounded-[2.5rem] border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 backdrop-blur-xl shadow-2xl p-4 sm:p-6 md:p-8"
           >
             <div className="flex justify-between items-center mb-6">
               <div className="space-y-1">
@@ -1152,7 +1152,10 @@ export default function IKUView() {
               </div>
             </div>
 
-            <div className="space-y-4 max-h-[550px] overflow-y-auto pr-2 custom-scrollbar">
+            <div
+              style={{ WebkitOverflowScrolling: "touch" }}
+              className="space-y-4 max-h-[550px] overflow-y-auto pr-2 custom-scrollbar overscroll-behavior-y-contain transform-gpu"
+            >
               {/* 1. Fakultas Scope */}
               {!selectedFaculty &&
                 jenjangData?.faculties.map((f, idx) => {
@@ -1171,17 +1174,17 @@ export default function IKUView() {
                     <div
                       key={idx}
                       onClick={() => setSelectedFaculty(f.name)}
-                      className="group flex flex-col md:flex-row md:items-center justify-between p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 bg-white dark:bg-slate-900 hover:border-amber-500/40 hover:shadow-xl dark:hover:shadow-none transition-all duration-300 cursor-pointer gap-4"
+                      className="group flex flex-col md:flex-row md:items-center justify-between p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 bg-white dark:bg-slate-900 hover:border-amber-500/40 hover:shadow-xl dark:hover:shadow-none transition-all duration-300 cursor-pointer gap-4 transform-gpu will-change-transform"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="size-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
+                      <div className="flex items-start gap-4">
+                        <div className="size-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0 mt-0.5 md:mt-0">
                           <School className="size-5" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100 group-hover:text-amber-500 transition-colors">
+                          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100 group-hover:text-amber-500 transition-colors leading-snug">
                             {f.name}
                           </h4>
-                          <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                          <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 mt-1">
                             {f.jurusans.length} Jurusan •{" "}
                             {f.jurusans.reduce(
                               (s, j) => s + j.prodis.length,
@@ -1192,45 +1195,50 @@ export default function IKUView() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-6 self-end md:self-auto shrink-0">
-                        <div className="text-right">
-                          <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block">
-                            AEE Realisasi
-                          </span>
-                          <span className="text-sm font-black text-slate-800 dark:text-slate-100">
-                            {fAee.toFixed(2)}%
-                          </span>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full md:w-auto mt-2 md:mt-0 pl-14 md:pl-0 gap-3 sm:gap-4">
+                        <div className="flex items-center gap-4 sm:gap-6 justify-between sm:justify-start w-full sm:w-auto">
+                          <div className="text-left md:text-right">
+                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block leading-none mb-1">
+                              AEE Realisasi
+                            </span>
+                            <span className="text-sm font-black text-slate-800 dark:text-slate-100">
+                              {fAee.toFixed(2)}%
+                            </span>
+                          </div>
+
+                          <div className="text-left md:text-right w-auto md:w-24">
+                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block leading-none mb-1">
+                              Pencapaian
+                            </span>
+                            <span
+                              className={`text-xs font-black px-2 py-0.5 rounded-full inline-block ${
+                                fAch >= parseFloat(jenjangData?.target)
+                                  ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                                  : fAch >= parseFloat(jenjangData?.baseline)
+                                    ? "bg-blue-500/10 text-blue-500 border border-blue-500/20"
+                                    : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                              }`}
+                            >
+                              {fAch.toFixed(2)}%
+                            </span>
+                          </div>
                         </div>
 
-                        <div className="text-right w-24">
-                          <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block">
-                            Pencapaian
-                          </span>
-                          <span
-                            className={`text-xs font-black px-2 py-0.5 rounded-full inline-block ${
-                              fAch >= parseFloat(jenjangData?.target)
-                                ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                                : fAch >= parseFloat(jenjangData?.baseline)
-                                  ? "bg-blue-500/10 text-blue-500 border border-blue-500/20"
-                                  : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                            }`}
+                        <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-3 shrink-0 border-t border-slate-100 dark:border-slate-800/40 sm:border-t-0 pt-2 sm:pt-0">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectStudentUnit(f.name);
+                            }}
+                            className="flex-grow sm:flex-initial p-2 px-3 sm:p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer text-[10px] font-extrabold uppercase tracking-wider"
+                            title="Lihat Data Mahasiswa Fakultas"
                           >
-                            {fAch.toFixed(2)}%
-                          </span>
+                            <Users className="size-4 shrink-0" />
+                            <span className="sm:hidden">Data Mahasiswa</span>
+                          </button>
+
+                          <ChevronRight className="size-4 text-slate-300 group-hover:text-amber-500 group-hover:translate-x-1 transition-all shrink-0" />
                         </div>
-
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSelectStudentUnit(f.name);
-                          }}
-                          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all active:scale-90 flex items-center justify-center cursor-pointer"
-                          title="Lihat Data Mahasiswa Fakultas"
-                        >
-                          <Users className="size-4" />
-                        </button>
-
-                        <ChevronRight className="size-4 text-slate-300 group-hover:text-amber-500 group-hover:translate-x-1 transition-all" />
                       </div>
                     </div>
                   );
@@ -1249,61 +1257,66 @@ export default function IKUView() {
                     <div
                       key={idx}
                       onClick={() => setSelectedJurusan(j.name)}
-                      className="group flex flex-col md:flex-row md:items-center justify-between p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 bg-white dark:bg-slate-900 hover:border-amber-500/40 hover:shadow-xl dark:hover:shadow-none transition-all duration-300 cursor-pointer gap-4"
+                      className="group flex flex-col md:flex-row md:items-center justify-between p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 bg-white dark:bg-slate-900 hover:border-amber-500/40 hover:shadow-xl dark:hover:shadow-none transition-all duration-300 cursor-pointer gap-4 transform-gpu will-change-transform"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="size-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500 shrink-0">
+                      <div className="flex items-start gap-4">
+                        <div className="size-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500 shrink-0 mt-0.5 md:mt-0">
                           <BookOpen className="size-5" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100 group-hover:text-amber-500 transition-colors">
+                          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100 group-hover:text-amber-500 transition-colors leading-snug">
                             {j.name}
                           </h4>
-                          <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                          <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 mt-1">
                             {j.prodis.length} Program Studi
                           </p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-6 self-end md:self-auto shrink-0">
-                        <div className="text-right">
-                          <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block">
-                            AEE Realisasi
-                          </span>
-                          <span className="text-sm font-black text-slate-800 dark:text-slate-100">
-                            {jAee.toFixed(2)}%
-                          </span>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full md:w-auto mt-2 md:mt-0 pl-14 md:pl-0 gap-3 sm:gap-4">
+                        <div className="flex items-center gap-4 sm:gap-6 justify-between sm:justify-start w-full sm:w-auto">
+                          <div className="text-left md:text-right">
+                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block leading-none mb-1">
+                              AEE Realisasi
+                            </span>
+                            <span className="text-sm font-black text-slate-800 dark:text-slate-100">
+                              {jAee.toFixed(2)}%
+                            </span>
+                          </div>
+
+                          <div className="text-left md:text-right w-auto md:w-24">
+                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block leading-none mb-1">
+                              Pencapaian
+                            </span>
+                            <span
+                              className={`text-xs font-black px-2 py-0.5 rounded-full inline-block ${
+                                jAch >= parseFloat(jenjangData?.target)
+                                  ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                                  : jAch >= parseFloat(jenjangData?.baseline)
+                                    ? "bg-blue-500/10 text-blue-500 border border-blue-500/20"
+                                    : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                              }`}
+                            >
+                              {jAch.toFixed(2)}%
+                            </span>
+                          </div>
                         </div>
 
-                        <div className="text-right w-24">
-                          <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block">
-                            Pencapaian
-                          </span>
-                          <span
-                            className={`text-xs font-black px-2 py-0.5 rounded-full inline-block ${
-                              jAch >= parseFloat(jenjangData?.target)
-                                ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                                : jAch >= parseFloat(jenjangData?.baseline)
-                                  ? "bg-blue-500/10 text-blue-500 border border-blue-500/20"
-                                  : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                            }`}
+                        <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-3 shrink-0 border-t border-slate-100 dark:border-slate-800/40 sm:border-t-0 pt-2 sm:pt-0">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectStudentUnit(j.name);
+                            }}
+                            className="flex-grow sm:flex-initial p-2 px-3 sm:p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer text-[10px] font-extrabold uppercase tracking-wider"
+                            title="Lihat Data Mahasiswa Jurusan"
                           >
-                            {jAch.toFixed(2)}%
-                          </span>
+                            <Users className="size-4 shrink-0" />
+                            <span className="sm:hidden">Data Mahasiswa</span>
+                          </button>
+
+                          <ChevronRight className="size-4 text-slate-300 group-hover:text-amber-500 group-hover:translate-x-1 transition-all shrink-0" />
                         </div>
-
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSelectStudentUnit(j.name);
-                          }}
-                          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all active:scale-90 flex items-center justify-center cursor-pointer"
-                          title="Lihat Data Mahasiswa Jurusan"
-                        >
-                          <Users className="size-4" />
-                        </button>
-
-                        <ChevronRight className="size-4 text-slate-300 group-hover:text-amber-500 group-hover:translate-x-1 transition-all" />
                       </div>
                     </div>
                   );
@@ -1318,102 +1331,107 @@ export default function IKUView() {
                   return (
                     <div
                       key={idx}
-                      className="flex flex-col p-6 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 bg-white dark:bg-slate-900 gap-6 shadow-sm hover:shadow-md transition-shadow"
+                      className="flex flex-col p-5 md:p-6 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 bg-white dark:bg-slate-900 gap-6 shadow-sm hover:shadow-md transition-shadow transform-gpu will-change-transform"
                     >
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                          <div className="size-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                        <div className="flex items-start gap-4">
+                          <div className="size-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0 mt-0.5 md:mt-0">
                             <GraduationCap className="size-5" />
                           </div>
                           <div>
-                            <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100">
+                            <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100 leading-snug">
                               {p.name}
                             </h4>
-                            <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                            <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 mt-1">
                               Lulus: {p.lulus} • Total Mahasiswa: {p.total}
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-6 self-end md:self-auto shrink-0">
-                          <div className="text-right">
-                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block">
-                              AEE Realisasi
-                            </span>
-                            <span className="text-sm font-black text-slate-800 dark:text-slate-100">
-                              {pAee.toFixed(2)}%
-                            </span>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full md:w-auto mt-2 md:mt-0 pl-14 md:pl-0 gap-3 sm:gap-4">
+                          <div className="flex items-center gap-4 sm:gap-6 justify-between sm:justify-start w-full sm:w-auto">
+                            <div className="text-left md:text-right">
+                              <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block leading-none mb-1">
+                                AEE Realisasi
+                              </span>
+                              <span className="text-sm font-black text-slate-800 dark:text-slate-100">
+                                {pAee.toFixed(2)}%
+                              </span>
+                            </div>
+
+                            <div className="text-left md:text-right w-auto md:w-24">
+                              <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block leading-none mb-1">
+                                Pencapaian
+                              </span>
+                              <span
+                                className={`text-xs font-black px-2 py-0.5 rounded-full inline-block ${
+                                  pAch >= parseFloat(jenjangData?.target)
+                                    ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                                    : pAch >= parseFloat(jenjangData?.baseline)
+                                      ? "bg-blue-500/10 text-blue-500 border border-blue-500/20"
+                                      : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                                }`}
+                              >
+                                {pAch.toFixed(2)}%
+                              </span>
+                            </div>
                           </div>
 
-                          <div className="text-right w-24">
-                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block">
-                              Pencapaian
-                            </span>
-                            <span
-                              className={`text-xs font-black px-2 py-0.5 rounded-full inline-block ${
-                                pAch >= parseFloat(jenjangData?.target)
-                                  ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                                  : pAch >= parseFloat(jenjangData?.baseline)
-                                    ? "bg-blue-500/10 text-blue-500 border border-blue-500/20"
-                                    : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                              }`}
+                          <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-3 shrink-0 border-t border-slate-100 dark:border-slate-800/40 sm:border-t-0 pt-2 sm:pt-0">
+                            <button
+                              onClick={() => handleSelectStudentUnit(p.name)}
+                              className="flex-grow sm:flex-initial p-2 px-3 sm:p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer text-[10px] font-extrabold uppercase tracking-wider shrink-0"
+                              title="Lihat Data Mahasiswa Prodi"
                             >
-                              {pAch.toFixed(2)}%
-                            </span>
+                              <Users className="size-4 shrink-0" />
+                              <span className="sm:hidden">Data Mahasiswa</span>
+                            </button>
                           </div>
-
-                          <button
-                            onClick={() => handleSelectStudentUnit(p.name)}
-                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all active:scale-90 flex items-center justify-center cursor-pointer animate-none"
-                            title="Lihat Data Mahasiswa Prodi"
-                          >
-                            <Users className="size-4" />
-                          </button>
                         </div>
                       </div>
 
                       {/* Mathematical Formula Display panel */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-slate-100 dark:border-slate-800/60 pt-4 bg-slate-50/50 dark:bg-slate-900/40 p-4 rounded-xl">
-                        <div className="flex items-start gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 border-t border-slate-100 dark:border-slate-800/60 pt-4 bg-slate-50/50 dark:bg-slate-900/40 p-3 sm:p-4 rounded-xl">
+                        <div className="flex items-start gap-2.5 sm:gap-3">
                           <Calculator className="text-amber-500 size-4 mt-1 shrink-0" />
-                          <div className="text-[11px] font-medium leading-relaxed">
-                            <span className="font-extrabold text-slate-500 dark:text-slate-400 block uppercase tracking-wider text-[9px] mb-1">
+                          <div className="text-[10px] sm:text-[11px] font-medium leading-relaxed w-full">
+                            <span className="font-extrabold text-slate-500 dark:text-slate-400 block uppercase tracking-wider text-[8px] sm:text-[9px] mb-1">
                               Formula AEE Realisasi (AEE Prodi)
                             </span>
-                            <div className="flex items-center gap-2 font-mono text-slate-700 dark:text-slate-300">
-                              <div className="flex flex-col items-center">
-                                <span className="border-b border-slate-300 dark:border-slate-700 pb-0.5 px-2">
+                            <div className="flex flex-wrap items-center gap-1 sm:gap-2 font-mono text-[10px] sm:text-xs text-slate-700 dark:text-slate-300">
+                              <div className="flex flex-col items-center shrink-0">
+                                <span className="border-b border-slate-300 dark:border-slate-700 pb-0.5 px-1 sm:px-2 text-center">
                                   Graduates ({p.lulus})
                                 </span>
-                                <span className="pt-0.5 px-2">
+                                <span className="pt-0.5 px-1 sm:px-2 text-center">
                                   Total Mhs ({p.total})
                                 </span>
                               </div>
-                              <span>x 100% =</span>
-                              <span className="text-amber-500 font-extrabold">
+                              <span className="shrink-0">x 100% =</span>
+                              <span className="text-amber-500 font-extrabold shrink-0">
                                 {pAee.toFixed(2)}%
                               </span>
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-3">
+                        <div className="flex items-start gap-2.5 sm:gap-3">
                           <Target className="text-blue-500 size-4 mt-1 shrink-0" />
-                          <div className="text-[11px] font-medium leading-relaxed">
-                            <span className="font-extrabold text-slate-500 dark:text-slate-400 block uppercase tracking-wider text-[9px] mb-1">
+                          <div className="text-[10px] sm:text-[11px] font-medium leading-relaxed w-full">
+                            <span className="font-extrabold text-slate-500 dark:text-slate-400 block uppercase tracking-wider text-[8px] sm:text-[9px] mb-1">
                               Formula Tingkat Pencapaian AEE
                             </span>
-                            <div className="flex items-center gap-2 font-mono text-slate-700 dark:text-slate-300">
-                              <div className="flex flex-col items-center">
-                                <span className="border-b border-slate-300 dark:border-slate-700 pb-0.5 px-2">
+                            <div className="flex flex-wrap items-center gap-1 sm:gap-2 font-mono text-[10px] sm:text-xs text-slate-700 dark:text-slate-300">
+                              <div className="flex flex-col items-center shrink-0">
+                                <span className="border-b border-slate-300 dark:border-slate-700 pb-0.5 px-1 sm:px-2 text-center">
                                   AEE Realisasi ({pAee.toFixed(2)}%)
                                 </span>
-                                <span className="pt-0.5 px-2">
+                                <span className="pt-0.5 px-1 sm:px-2 text-center">
                                   AEE Ideal ({ideal}%)
                                 </span>
                               </div>
-                              <span>x 100% =</span>
-                              <span className="text-blue-500 font-extrabold">
+                              <span className="shrink-0">x 100% =</span>
+                              <span className="text-blue-500 font-extrabold shrink-0">
                                 {pAch.toFixed(2)}%
                               </span>
                             </div>
@@ -1895,10 +1913,10 @@ export function StudentList({ unitName, jenjang }: StudentListProps) {
         <table className="w-full text-left border-collapse min-w-[800px]">
           <thead>
             <tr className="bg-slate-100/50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800">
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-center w-16 sticky left-0 bg-slate-100/90 dark:bg-slate-900/90 backdrop-blur-md z-20 border-r border-slate-200 dark:border-slate-800">
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-center w-16 md:sticky md:left-0 bg-slate-100/90 dark:bg-slate-900/90 md:backdrop-blur-md md:z-20 border-r border-slate-200 dark:border-slate-800">
                 No.
               </th>
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 sticky left-16 bg-slate-100/90 dark:bg-slate-900/90 backdrop-blur-md z-20 border-r border-slate-200 dark:border-slate-800">
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 md:sticky md:left-16 bg-slate-100/90 dark:bg-slate-900/90 md:backdrop-blur-md md:z-20 border-r border-slate-200 dark:border-slate-800">
                 Nama Lengkap
               </th>
               <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
@@ -1931,10 +1949,10 @@ export function StudentList({ unitName, jenjang }: StudentListProps) {
                   key={sIdx}
                   className="group hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors"
                 >
-                  <td className="px-6 py-3.5 text-center text-xs font-black text-slate-400 sticky left-0 bg-white dark:bg-slate-950 group-hover:bg-slate-50 dark:group-hover:bg-slate-900 transition-colors z-10 border-r border-slate-100 dark:border-slate-900">
+                  <td className="px-6 py-3.5 text-center text-xs font-black text-slate-400 md:sticky md:left-0 bg-white dark:bg-slate-950 md:group-hover:bg-slate-50 md:dark:group-hover:bg-slate-900 transition-colors md:z-10 border-r border-slate-100 dark:border-slate-900">
                     {student.no}
                   </td>
-                  <td className="px-6 py-3.5 text-sm font-black text-slate-800 dark:text-slate-100 sticky left-16 bg-white dark:bg-slate-950 group-hover:bg-slate-50 dark:group-hover:bg-slate-900 transition-colors z-10 border-r border-slate-100 dark:border-slate-900 whitespace-nowrap">
+                  <td className="px-6 py-3.5 text-sm font-black text-slate-800 dark:text-slate-100 md:sticky md:left-16 bg-white dark:bg-slate-950 md:group-hover:bg-slate-50 md:dark:group-hover:bg-slate-900 transition-colors md:z-10 border-r border-slate-100 dark:border-slate-900 whitespace-nowrap">
                     {student.nama}
                   </td>
                   <td className="px-6 py-3.5 text-xs font-mono font-bold text-slate-600 dark:text-slate-400">
