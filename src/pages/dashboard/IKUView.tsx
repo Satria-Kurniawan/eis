@@ -11,6 +11,7 @@ import {
   Sparkles,
   Target,
   TrendingUp,
+  Users,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import React, { useState } from "react";
@@ -540,9 +541,136 @@ const getRadarLabel = (name: string): string => {
     .toUpperCase();
 };
 
+// Helper to generate dummy students dynamically based on a unit name
+const generateDummyStudents = (unitName: string, jenjang: string) => {
+  const firstNames = [
+    "Kadek",
+    "Made",
+    "Nyoman",
+    "Ketut",
+    "Gede",
+    "Wayan",
+    "Putu",
+    "Komang",
+    "Luh",
+    "Ni",
+    "I",
+    "Anak",
+    "Agung",
+    "Ida",
+    "Tjokorda",
+    "Dewi",
+    "Sari",
+    "Aditya",
+    "Wira",
+    "Dharma",
+    "Yuda",
+    "Agus",
+    "Sari",
+    "Ratna",
+    "Mega",
+    "Bayu",
+    "Raka",
+    "Saka",
+    "Narendra",
+    "Krisna",
+  ];
+  const lastNames = [
+    "Kurniawan",
+    "Saraswati",
+    "Putra",
+    "Pratama",
+    "Wibawa",
+    "Arta",
+    "Wijaya",
+    "Sastra",
+    "Mahardika",
+    "Sanjaya",
+    "Dwipa",
+    "Utami",
+    "Lestari",
+    "Paramita",
+    "Wulandari",
+    "Yasa",
+    "Sudharma",
+    "Widarta",
+    "Nugraha",
+    "Astiti",
+    "Rahayu",
+    "Budiasa",
+    "Guna",
+    "Sentosa",
+  ];
+
+  // Helper to resolve parent names based on unitName
+  let resolvedFakultas = "Fakultas Teknik dan Kejuruan";
+  let resolvedJurusan = "Jurusan Teknik Informatika";
+  let resolvedProdi = "S1 Teknik Informatika";
+
+  if (unitName.includes("Fakultas")) {
+    resolvedFakultas = unitName;
+    resolvedJurusan = "Jurusan Teknik Informatika";
+    resolvedProdi = `${jenjang} Sistem Informasi`;
+  } else if (unitName.includes("Jurusan")) {
+    resolvedJurusan = unitName;
+    resolvedProdi = `${jenjang} Pendidikan Teknik Informatika`;
+  } else if (
+    unitName.includes("S1") ||
+    unitName.includes("D3") ||
+    unitName.includes("S2") ||
+    unitName.includes("S3") ||
+    unitName.includes("D4")
+  ) {
+    resolvedProdi = unitName;
+  }
+
+  const list = [];
+  for (let i = 1; i <= 15; i++) {
+    const fIdx = (i * 7) % firstNames.length;
+    const lIdx = (i * 11) % lastNames.length;
+    const name = `${firstNames[fIdx]} ${lastNames[lIdx]}`;
+
+    // NIM format: e.g., 2215051012 (22: Tahun Masuk, 1505: Kode Prodi, 1000 + i: No Urut)
+    const yearCode = 26 - ((i % 3) + 1); // 23, 24, or 25
+    const prodiCode = (1000 + (unitName.charCodeAt(0) % 900)).toString();
+    const nim = `${yearCode}150${prodiCode}${10 + i}`;
+
+    const yearIn = `20${yearCode}`;
+    const semester = (26 - yearCode) * 2 - (i % 2); // Calculated semester based on current year 2026
+
+    const statusKelulusan = i % 5 !== 0 ? "Tepat Waktu" : "Tidak Tepat Waktu";
+
+    list.push({
+      no: i,
+      nama: name,
+      nim: nim,
+      fakultas: resolvedFakultas,
+      jurusan: resolvedJurusan,
+      prodi: resolvedProdi,
+      tahunMasuk: yearIn,
+      semester: semester,
+      statusKelulusan: statusKelulusan,
+    });
+  }
+  return list;
+};
+
 export default function IKUView() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showFormulaBoard, setShowFormulaBoard] = useState(false);
+  const [activeStudentUnitName, setActiveStudentUnitName] = useState<
+    string | null
+  >(null);
+
+  const handleSelectStudentUnit = (unitName: string) => {
+    setActiveStudentUnitName(unitName);
+    setTimeout(() => {
+      const el = document.getElementById("student-list-section");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  };
 
   const selectedJenjang = searchParams.get("jenjang");
   const selectedFaculty = searchParams.get("faculty");
@@ -783,6 +911,22 @@ export default function IKUView() {
             <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider border border-amber-500/20">
               Target: {jenjangData?.target}%
             </span>
+            <button
+              onClick={() => {
+                let unitName = `Jenjang ${selectedJenjang}`;
+                if (selectedJurusan) {
+                  unitName = selectedJurusan;
+                } else if (selectedFaculty) {
+                  unitName = selectedFaculty;
+                }
+                handleSelectStudentUnit(unitName);
+              }}
+              className="px-3 py-1 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-[10px] font-black uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+              title="Lihat Data Mahasiswa Unit Kerja Aktif"
+            >
+              <Users className="size-3" />
+              <span>Data Mahasiswa</span>
+            </button>
           </div>
         </div>
 
@@ -793,7 +937,7 @@ export default function IKUView() {
               ? selectedJurusan
               : selectedFaculty
                 ? selectedFaculty
-                : `Analisis Efisiensi Edukasi - Jenjang ${selectedJenjang}`}
+                : `Angka Efisiensi Edukasi - Jenjang ${selectedJenjang}`}
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-widest leading-relaxed max-w-3xl">
             {selectedJurusan
@@ -1075,6 +1219,17 @@ export default function IKUView() {
                           </span>
                         </div>
 
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectStudentUnit(f.name);
+                          }}
+                          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all active:scale-90 flex items-center justify-center cursor-pointer"
+                          title="Lihat Data Mahasiswa Fakultas"
+                        >
+                          <Users className="size-4" />
+                        </button>
+
                         <ChevronRight className="size-4 text-slate-300 group-hover:text-amber-500 group-hover:translate-x-1 transition-all" />
                       </div>
                     </div>
@@ -1137,6 +1292,17 @@ export default function IKUView() {
                           </span>
                         </div>
 
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectStudentUnit(j.name);
+                          }}
+                          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all active:scale-90 flex items-center justify-center cursor-pointer"
+                          title="Lihat Data Mahasiswa Jurusan"
+                        >
+                          <Users className="size-4" />
+                        </button>
+
                         <ChevronRight className="size-4 text-slate-300 group-hover:text-amber-500 group-hover:translate-x-1 transition-all" />
                       </div>
                     </div>
@@ -1195,6 +1361,14 @@ export default function IKUView() {
                               {pAch.toFixed(2)}%
                             </span>
                           </div>
+
+                          <button
+                            onClick={() => handleSelectStudentUnit(p.name)}
+                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all active:scale-90 flex items-center justify-center cursor-pointer animate-none"
+                            title="Lihat Data Mahasiswa Prodi"
+                          >
+                            <Users className="size-4" />
+                          </button>
                         </div>
                       </div>
 
@@ -1251,6 +1425,22 @@ export default function IKUView() {
                 })}
             </div>
           </motion.div>
+        </div>
+
+        {/* Dynamic active student database view inline at the bottom of the page */}
+        <div
+          id="student-list-section"
+          className="px-4 max-w-7xl mx-auto w-full"
+        >
+          <StudentList
+            unitName={
+              activeStudentUnitName ||
+              selectedJurusan ||
+              selectedFaculty ||
+              `Jenjang ${selectedJenjang}`
+            }
+            jenjang={selectedJenjang || "S1"}
+          />
         </div>
       </div>
     );
@@ -1540,7 +1730,7 @@ export default function IKUView() {
                         Panduan Formula Kebijakan IKU 1 (AEE PT)
                       </h3>
                       <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-                        Sistem Penjaminan Mutu & Perhitungan Efisiensi Edukasi
+                        Perhitungan Angka Efisiensi Edukasi
                       </p>
                     </div>
                   </div>
@@ -1630,5 +1820,175 @@ export default function IKUView() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+// Separate highly-optimized Student List component to display the list of active students directly at the bottom
+interface StudentListProps {
+  unitName: string;
+  jenjang: string;
+}
+
+export function StudentList({ unitName, jenjang }: StudentListProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const currentStudentsData = generateDummyStudents(unitName, jenjang);
+
+  const filteredStudents = currentStudentsData.filter(
+    (s) =>
+      s.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.nim.includes(searchQuery),
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2 }}
+      className="overflow-hidden rounded-[2.5rem] border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 backdrop-blur-xl shadow-2xl p-8 space-y-6 mt-12"
+    >
+      {/* Header & Search */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 dark:border-slate-900 pb-5 gap-4">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-500">
+            <Users className="size-6" />
+          </div>
+          <div>
+            <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+              Daftar Mahasiswa Aktif
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+              Unit: <span className="text-blue-500 font-black">{unitName}</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Search Input */}
+        <div className="relative w-full sm:w-72 shrink-0">
+          <input
+            type="text"
+            placeholder="Cari NIM atau Nama..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-11 pl-4 pr-10 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-sm font-bold placeholder:text-slate-400 focus:outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/40 transition-all"
+          />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+            <svg
+              className="size-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2.5}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      {/* Table container */}
+      <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-[1.5rem] bg-slate-50/20 dark:bg-slate-950/20 custom-scrollbar">
+        <table className="w-full text-left border-collapse min-w-[800px]">
+          <thead>
+            <tr className="bg-slate-100/50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800">
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-center w-16 sticky left-0 bg-slate-100/90 dark:bg-slate-900/90 backdrop-blur-md z-20 border-r border-slate-200 dark:border-slate-800">
+                No.
+              </th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 sticky left-16 bg-slate-100/90 dark:bg-slate-900/90 backdrop-blur-md z-20 border-r border-slate-200 dark:border-slate-800">
+                Nama Lengkap
+              </th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                NIM
+              </th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                Program Studi
+              </th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                Jurusan
+              </th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                Fakultas
+              </th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-center">
+                Tahun Masuk
+              </th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-center">
+                Semester
+              </th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-center">
+                Kelulusan Tepat Waktu
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-900">
+            {filteredStudents.length > 0 ? (
+              filteredStudents.map((student, sIdx) => (
+                <tr
+                  key={sIdx}
+                  className="group hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors"
+                >
+                  <td className="px-6 py-3.5 text-center text-xs font-black text-slate-400 sticky left-0 bg-white dark:bg-slate-950 group-hover:bg-slate-50 dark:group-hover:bg-slate-900 transition-colors z-10 border-r border-slate-100 dark:border-slate-900">
+                    {student.no}
+                  </td>
+                  <td className="px-6 py-3.5 text-sm font-black text-slate-800 dark:text-slate-100 sticky left-16 bg-white dark:bg-slate-950 group-hover:bg-slate-50 dark:group-hover:bg-slate-900 transition-colors z-10 border-r border-slate-100 dark:border-slate-900 whitespace-nowrap">
+                    {student.nama}
+                  </td>
+                  <td className="px-6 py-3.5 text-xs font-mono font-bold text-slate-600 dark:text-slate-400">
+                    {student.nim}
+                  </td>
+                  <td className="px-6 py-3.5 text-xs font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                    {student.prodi}
+                  </td>
+                  <td className="px-6 py-3.5 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    {student.jurusan.replace("Jurusan ", "")}
+                  </td>
+                  <td className="px-6 py-3.5 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    {student.fakultas.replace("Fakultas ", "")}
+                  </td>
+                  <td className="px-6 py-3.5 text-xs font-black text-center text-slate-600 dark:text-slate-400">
+                    {student.tahunMasuk}
+                  </td>
+                  <td className="px-6 py-3.5 text-xs font-black text-center text-emerald-500 bg-emerald-500/5 dark:bg-emerald-500/1 rounded-md">
+                    {student.semester}
+                  </td>
+                  <td className="px-6 py-3.5 text-center whitespace-nowrap">
+                    <span
+                      className={`inline-block px-3 py-1 text-[9px] font-black uppercase tracking-wider rounded-full border whitespace-nowrap ${
+                        student.statusKelulusan === "Tepat Waktu"
+                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                          : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
+                      }`}
+                    >
+                      {student.statusKelulusan}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={9}
+                  className="px-6 py-12 text-center text-xs font-black text-slate-400 uppercase tracking-widest"
+                >
+                  Tidak ditemukan data mahasiswa.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Footer summary */}
+      <div className="flex justify-between items-center pt-2">
+        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+          Menampilkan {filteredStudents.length} dari{" "}
+          {currentStudentsData.length} Mahasiswa Aktif
+        </span>
+      </div>
+    </motion.div>
   );
 }
