@@ -642,10 +642,7 @@ export function IKU1Drilldown({
                       letterSpacing: "0.1em",
                       marginBottom: "4px",
                     }}
-                    formatter={(value: any, name: any) => [
-                      `${value}%`,
-                      name,
-                    ]}
+                    formatter={(value: any, name: any) => [`${value}%`, name]}
                     labelFormatter={(label: any) => {
                       const item = radarChartData.find(
                         (d) => d.subject === label,
@@ -680,8 +677,14 @@ export function IKU1Drilldown({
             </p>
           </div>
 
-          <div className="flex-1 overflow-y-auto max-h-[500px] custom-scrollbar bg-slate-50/50 dark:bg-slate-950/50">
-            {/* 1. Show Faculties if no faculty is selected */}
+          <div
+            className="flex-1 overflow-y-auto max-h-[500px] custom-scrollbar bg-slate-50/50 dark:bg-slate-950/50"
+            style={{
+              willChange: "transform",
+              transform: "translateZ(0)",
+              WebkitOverflowScrolling: "touch",
+            }}
+          >
             {/* 1. Show Faculties if no faculty is selected */}
             {!selectedFaculty && liveFaculties.length > 0
               ? liveFaculties.map((f, i) => {
@@ -697,6 +700,10 @@ export function IKU1Drilldown({
                         setSelectedFaculty(f.kode);
                       }}
                       className="p-6 border-b border-slate-100 dark:border-slate-800/80 hover:bg-white dark:hover:bg-slate-800/50 cursor-pointer transition-colors group flex flex-col sm:flex-row gap-6 sm:items-center justify-between"
+                      style={{
+                        contentVisibility: "auto",
+                        containIntrinsicSize: "110px",
+                      }}
                     >
                       <div className="flex items-start gap-4 flex-1">
                         <div className="mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-amber-500/10 group-hover:text-amber-500 transition-colors">
@@ -817,6 +824,10 @@ export function IKU1Drilldown({
                       key={i}
                       onClick={() => setSelectedJurusan(j.kode)}
                       className="p-6 border-b border-slate-100 dark:border-slate-800/80 hover:bg-white dark:hover:bg-slate-800/50 cursor-pointer transition-colors group flex flex-col sm:flex-row gap-6 sm:items-center justify-between"
+                      style={{
+                        contentVisibility: "auto",
+                        containIntrinsicSize: "110px",
+                      }}
                     >
                       <div className="flex items-start gap-4 flex-1">
                         <div className="mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-blue-500/10 group-hover:text-blue-500 transition-colors">
@@ -873,6 +884,10 @@ export function IKU1Drilldown({
                       key={i}
                       onClick={() => setSelectedJurusan(j.name)}
                       className="p-6 border-b border-slate-100 dark:border-slate-800/80 hover:bg-white dark:hover:bg-slate-800/50 cursor-pointer transition-colors group flex flex-col sm:flex-row gap-6 sm:items-center justify-between"
+                      style={{
+                        contentVisibility: "auto",
+                        containIntrinsicSize: "110px",
+                      }}
                     >
                       <div className="flex items-start gap-4 flex-1">
                         <div className="mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-blue-500/10 group-hover:text-blue-500 transition-colors">
@@ -938,6 +953,10 @@ export function IKU1Drilldown({
                       key={i}
                       onClick={() => handleSelectStudentUnit(p.nama_unit)}
                       className="p-6 border-b border-slate-100 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/20 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors flex flex-col gap-6"
+                      style={{
+                        contentVisibility: "auto",
+                        containIntrinsicSize: "230px",
+                      }}
                     >
                       <div className="flex items-start gap-4">
                         <div className="mt-1 p-2 rounded-xl bg-purple-500/10 text-purple-500">
@@ -1032,6 +1051,10 @@ export function IKU1Drilldown({
                       key={i}
                       onClick={() => handleSelectStudentUnit(p.name)}
                       className="p-6 border-b border-slate-100 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/20 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors flex flex-col gap-6"
+                      style={{
+                        contentVisibility: "auto",
+                        containIntrinsicSize: "230px",
+                      }}
                     >
                       <div className="flex items-start gap-4">
                         <div className="mt-1 p-2 rounded-xl bg-purple-500/10 text-purple-500">

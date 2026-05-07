@@ -166,7 +166,8 @@ export default function LandingPage() {
             {/* CTA: Login SSO */}
             <button
               onClick={() => {
-                alert("Modul sedang dalam pengembangan");
+                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "";
+                window.location.href = `${apiBaseUrl}/api/v1/auth/login`;
               }}
               className="group pointer-events-auto relative flex items-center gap-4 px-10 py-5 rounded-full bg-white/80 dark:bg-[#0a0a0a] backdrop-blur-md border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:bg-slate-50 dark:hover:bg-black shadow-[0_10px_30px_rgba(0,0,0,0.02)]"
             >

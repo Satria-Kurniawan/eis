@@ -1,5 +1,3 @@
-const TOKEN = import.meta.env.VITE_API_TOKEN;
-
 const getCookie = (name: string) => {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -12,7 +10,7 @@ export async function apiClient<T>(
   options: RequestInit = {},
 ): Promise<T> {
   const cookieToken = getCookie("auth_token");
-  const activeToken = cookieToken || TOKEN;
+  const activeToken = cookieToken;
 
   const url = `${endpoint}`;
   const response = await fetch(url, {
