@@ -2,7 +2,6 @@ import eGanesha from "@/assets/e-ganesha.png";
 import logoUndiksha from "@/assets/logo-undiksha.png";
 import Antigravity from "@/components/Antigravity";
 import {
-  ArrowRight,
   BookOpen,
   Building,
   GraduationCap,
@@ -13,12 +12,10 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
 export default function LandingPage() {
-  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [_, setIsDark] = useState(
@@ -148,34 +145,21 @@ export default function LandingPage() {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="mt-14 flex flex-col sm:flex-row items-center gap-6"
           >
-            {/* CTA: Akses Dashboard */}
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="group pointer-events-auto relative flex items-center gap-4 px-10 py-5 rounded-full bg-slate-950 dark:bg-white overflow-hidden transition-all duration-500 hover:scale-[1.02] shadow-[0_12px_24px_rgba(0,0,0,0.1)] dark:shadow-[0_12px_24px_rgba(255,255,255,0.1)] border border-transparent dark:border-white/10"
-            >
-              <div className="absolute inset-0 bg-sky-600 dark:bg-slate-200 translate-y-[110%] group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.2,1,0.2,1)]" />
-
-              <span className="relative z-10 text-white dark:text-slate-900 group-hover:text-white dark:group-hover:text-slate-900 font-bold tracking-widest uppercase text-xs transition-colors duration-300">
-                Akses Dashboard
-              </span>
-              <div className="relative z-10 flex items-center justify-center p-2 rounded-full bg-white/10 dark:bg-black/5 group-hover:bg-white/20 dark:group-hover:bg-slate-300 transition-colors duration-300">
-                <ArrowRight className="size-4 text-white dark:text-slate-900 transition-all duration-300 group-hover:-rotate-45 group-hover:translate-x-1" />
-              </div>
-            </button>
-
-            {/* CTA: Login SSO */}
+            {/* CTA: Login SSO (Highlighted) */}
             <button
               onClick={() => {
                 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "";
                 window.location.href = `${apiBaseUrl}/api/v1/auth/login`;
               }}
-              className="group pointer-events-auto relative flex items-center gap-4 px-10 py-5 rounded-full bg-white/80 dark:bg-[#0a0a0a] backdrop-blur-md border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:bg-slate-50 dark:hover:bg-black shadow-[0_10px_30px_rgba(0,0,0,0.02)]"
+              className="group pointer-events-auto relative flex items-center gap-4 px-10 py-5 rounded-full bg-slate-950 dark:bg-white overflow-hidden transition-all duration-500 hover:scale-[1.02] shadow-[0_12px_24px_rgba(0,0,0,0.1)] dark:shadow-[0_12px_24px_rgba(255,255,255,0.1)] border border-transparent dark:border-white/10 cursor-pointer"
             >
-              <span className="relative z-10 text-slate-800 dark:text-slate-300 font-bold tracking-widest uppercase text-xs transition-colors duration-300">
+              <div className="absolute inset-0 bg-sky-600 dark:bg-slate-200 translate-y-[110%] group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.2,1,0.2,1)]" />
+
+              <span className="relative z-10 text-white dark:text-slate-900 group-hover:text-white dark:group-hover:text-slate-900 font-bold tracking-widest uppercase text-xs transition-colors duration-300">
                 Login SSO
               </span>
-              <div className="relative z-10 flex items-center justify-center p-2 rounded-full bg-slate-100 dark:bg-slate-800 transition-colors duration-300 border border-slate-200 dark:border-slate-700 group-hover:border-slate-300 dark:group-hover:border-slate-600">
-                <LogIn className="size-4 text-slate-800 dark:text-slate-300 transition-all duration-300 group-hover:translate-x-1" />
+              <div className="relative z-10 flex items-center justify-center p-2 rounded-full bg-white/10 dark:bg-black/5 group-hover:bg-white/20 dark:group-hover:bg-slate-300 transition-colors duration-300">
+                <LogIn className="size-4 text-white dark:text-slate-900 transition-all duration-300 group-hover:translate-x-1" />
               </div>
             </button>
           </motion.div>

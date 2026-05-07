@@ -1,9 +1,10 @@
-import logoUndiksha from "@/assets/logo-undiksha.png";
 import eGanesha from "@/assets/e-ganesha.png";
+import logoUndiksha from "@/assets/logo-undiksha.png";
 import { FloatingSidebar } from "@/components/dashboard/FloatingSidebar";
 import { GlobalHubPortal } from "@/components/dashboard/GlobalHubPortal";
 import { HubFloatingButton } from "@/components/dashboard/HubFloatingButton";
 import { GlobalUnitFilter } from "@/components/GlobalUnitFilter";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import {
   Collapsible,
   CollapsibleContent,
@@ -37,8 +38,12 @@ import {
   SidebarMenuSubItem,
   SidebarProvider,
 } from "@/components/ui/sidebar";
+import { useLowSpec } from "@/contexts/LowSpecContext";
 import { usePeriod } from "@/contexts/PeriodContext";
+import { apiClient } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
+import UnauthorizedPage from "@/pages/error/UnauthorizedPage";
+import { useQuery } from "@tanstack/react-query";
 import {
   Activity,
   BookOpen,
@@ -50,6 +55,8 @@ import {
   Home,
   LayoutDashboard,
   LineChart,
+  Loader2,
+  LogOut,
   Sparkles,
   Users,
   Wallet,
@@ -57,8 +64,6 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useLowSpec } from "@/contexts/LowSpecContext";
-import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -67,6 +72,18 @@ export default function AdminLayout() {
   const location = useLocation();
   const period = usePeriod();
   const { isLowSpec, setIsLowSpec } = useLowSpec();
+
+  // Guard: Get authenticated user details
+  const {
+    data: user,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["userDetails"],
+    queryFn: () => apiClient<any>("/api/v1/user/details"),
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
 
   useEffect(() => {
     const isDarkGlobal = localStorage.getItem("theme") === "dark";
@@ -112,6 +129,51 @@ export default function AdminLayout() {
       period.setSemester(selected.semester);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-500">
+        <div className="flex flex-col items-center gap-6 p-10 rounded-[3rem] bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800/80 shadow-2xl max-w-sm w-full mx-4 relative overflow-hidden backdrop-blur-md">
+          {/* Subtle ambient glow */}
+          <div className="absolute -inset-10 bg-primary/10 rounded-full blur-3xl opacity-50 animate-pulse pointer-events-none" />
+
+          <div className="relative flex items-center justify-center size-16 rounded-3xl bg-primary/10 text-primary shadow-xl shadow-primary/5">
+            <Loader2 className="size-8 text-primary animate-spin" />
+          </div>
+
+          <div className="text-center relative z-10">
+            <h2 className="text-lg font-black text-slate-800 dark:text-white uppercase tracking-widest leading-none">
+              Memuat Sesi...
+            </h2>
+            <p className="text-slate-400 dark:text-slate-500 text-xs mt-2 font-bold uppercase tracking-wider">
+              Sedang memvalidasi kredensial login Anda
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !user || user.status !== "success") {
+    return <UnauthorizedPage />;
+  }
+
+  // Check path-based access restriction for Keuangan
+  const isKeuanganPath =
+    location.pathname.startsWith("/keuangan/realisasi-unit") ||
+    location.pathname.startsWith("/keuangan/realisasi-bulan");
+
+  const isRestrictedUnit = user?.datas?.unit?.uk_id !== 1;
+
+  if (isKeuanganPath && isRestrictedUnit) {
+    return (
+      <UnauthorizedPage
+        title="Akses Terbatas"
+        message="Halaman realisasi keuangan ini hanya diperuntukkan bagi Unit Rektorat (uk_id = 1). Akun Anda terdaftar di unit lain sehingga tidak memiliki izin untuk melihat data ini."
+        showSsoButton={false}
+      />
+    );
+  }
 
   return (
     <SidebarProvider defaultOpen={false}>
@@ -475,45 +537,47 @@ export default function AdminLayout() {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
-              <Collapsible asChild className="group/collapsible">
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip="Keuangan">
-                      <Wallet />
-                      <span>Keuangan</span>
-                      <ChevronDown className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={
-                            location.pathname === "/keuangan/realisasi-unit"
-                          }
-                        >
-                          <Link to="/keuangan/realisasi-unit">
-                            <span>Realisasi Unit</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={
-                            location.pathname === "/keuangan/realisasi-bulan"
-                          }
-                        >
-                          <Link to="/keuangan/realisasi-bulan">
-                            <span>Realisasi Bulan</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
+              {user?.datas?.unit?.uk_id === 1 && (
+                <Collapsible asChild className="group/collapsible">
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton tooltip="Keuangan">
+                        <Wallet />
+                        <span>Keuangan</span>
+                        <ChevronDown className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={
+                              location.pathname === "/keuangan/realisasi-unit"
+                            }
+                          >
+                            <Link to="/keuangan/realisasi-unit">
+                              <span>Realisasi Unit</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={
+                              location.pathname === "/keuangan/realisasi-bulan"
+                            }
+                          >
+                            <Link to="/keuangan/realisasi-bulan">
+                              <span>Realisasi Bulan</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              )}
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
@@ -636,6 +700,82 @@ export default function AdminLayout() {
               className="p-2 rounded-xl hover:bg-muted transition-all text-slate-500 hover:text-primary active:scale-90 shrink-0 [&_svg]:size-5"
               title={isDark ? "Mode Terang" : "Mode Gelap"}
             />
+
+            {/* Premium User Profile Popover */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  className="flex items-center gap-2 p-1 rounded-full hover:bg-muted/80 transition-all cursor-pointer border border-transparent hover:border-slate-200/50 dark:hover:border-slate-800/50 active:scale-95 shrink-0"
+                  title="Profil Pengguna"
+                >
+                  <div className="size-8 rounded-full bg-linear-to-tr from-amber-500 via-orange-500 to-rose-600 flex items-center justify-center text-white font-black text-xs shadow-md select-none">
+                    {(user?.datas?.profile?.email || "U")
+                      .charAt(0)
+                      .toUpperCase()}
+                  </div>
+                  <span className="hidden md:inline font-bold text-xs max-w-[120px] truncate pr-1 select-none text-slate-700 dark:text-slate-300">
+                    {(user?.datas?.profile?.email || "User").split("@")[0]}
+                  </span>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-[280px] p-5 rounded-[2rem] border-primary/10 dark:border-slate-800/80 backdrop-blur-2xl shadow-2xl"
+                align="end"
+              >
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800/80">
+                    <div className="size-12 rounded-full bg-linear-to-tr from-amber-500 via-orange-500 to-rose-600 flex items-center justify-center text-white font-black text-sm shadow-md select-none">
+                      {(user?.datas?.profile?.email || "U")
+                        .charAt(0)
+                        .toUpperCase()}
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="font-extrabold text-sm text-slate-900 dark:text-white truncate">
+                        {(user?.datas?.profile?.email || "User").split("@")[0]}
+                      </span>
+                      <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 truncate">
+                        {user?.datas?.profile?.email}
+                      </span>
+                      {user?.datas?.auth_info?.jenis && (
+                        <span className="mt-1.5 self-start px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[8px] font-black uppercase tracking-widest leading-none">
+                          {user.datas.auth_info.jenis}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                      Informasi Sesi
+                    </div>
+                    <div className="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-950/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/50">
+                      <span>ID Level</span>
+                      <span className="text-slate-900 dark:text-white font-mono">
+                        {user?.datas?.auth_info?.id_level}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      // Delete authentication cookies
+                      document.cookie =
+                        "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+                      document.cookie =
+                        "auth_username=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+                      // Redirect to API logout endpoint
+                      const apiBaseUrl =
+                        import.meta.env.VITE_API_BASE_URL || "";
+                      window.location.href = `${apiBaseUrl}/api/v1/auth/logout`;
+                    }}
+                    className="w-full mt-2 flex items-center justify-center gap-2 py-3 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-rose-500/20 active:scale-[0.98] transition-all cursor-pointer"
+                  >
+                    <LogOut className="size-4 animate-pulse" />
+                    <span>Keluar (Logout)</span>
+                  </button>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </header>
         <FloatingSidebar />
