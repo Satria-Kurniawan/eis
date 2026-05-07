@@ -90,12 +90,14 @@ export default function AdminLayout() {
   }, []);
 
   const academicPeriods = [
-    { label: "2023/2024 Ganjil", tahun: "2023", semester: "2" },
-    { label: "2023/2024 Genap", tahun: "2023", semester: "1" },
-    { label: "2024/2025 Ganjil", tahun: "2024", semester: "2" },
-    { label: "2024/2025 Genap", tahun: "2024", semester: "1" },
-    { label: "2025/2026 Ganjil", tahun: "2025", semester: "2" },
-    { label: "2025/2026 Genap", tahun: "2025", semester: "1" },
+    { label: "2023/2024 Ganjil", tahun: "2023", semester: "1" },
+    { label: "2023/2024 Genap", tahun: "2023", semester: "2" },
+
+    { label: "2024/2025 Ganjil", tahun: "2024", semester: "1" },
+    { label: "2024/2025 Genap", tahun: "2024", semester: "2" },
+
+    { label: "2025/2026 Ganjil", tahun: "2025", semester: "1" },
+    { label: "2025/2026 Genap", tahun: "2025", semester: "2" },
   ];
 
   const currentPeriod =
@@ -563,7 +565,10 @@ export default function AdminLayout() {
               <div className="absolute -inset-0.5 bg-linear-to-r from-primary to-purple-600 rounded-full blur-sm opacity-20 group-hover:opacity-40 transition duration-1000"></div>
               <Popover open={isPeriodOpen} onOpenChange={setIsPeriodOpen}>
                 <PopoverTrigger asChild>
-                  <button className="relative flex items-center justify-center h-10 w-10 xl:w-auto xl:px-4 rounded-full border border-primary/20 bg-background/50 backdrop-blur-md shadow-sm hover:border-primary/40 hover:bg-primary/5 transition-all text-[10px] sm:text-xs font-bold uppercase tracking-wider group shrink-0" title="Pilih Periode">
+                  <button
+                    className="relative flex items-center justify-center h-10 w-10 xl:w-auto xl:px-4 rounded-full border border-primary/20 bg-background/50 backdrop-blur-md shadow-sm hover:border-primary/40 hover:bg-primary/5 transition-all text-[10px] sm:text-xs font-bold uppercase tracking-wider group shrink-0"
+                    title="Pilih Periode"
+                  >
                     <Calendar className="size-4 text-primary xl:mr-2 group-hover:scale-110 transition-transform" />
                     <span className="hidden xl:inline">
                       {currentPeriod.label}
