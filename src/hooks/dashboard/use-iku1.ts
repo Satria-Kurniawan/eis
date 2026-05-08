@@ -1,5 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchIku1, fetchIkuFakultas, fetchIkuStudents, fetchIkuJurusan, fetchIkuProdi } from "@/services/dashboard/iku";
+import {
+  fetchIku1,
+  fetchIkuFakultas,
+  fetchIkuStudents,
+  fetchIkuJurusan,
+  fetchIkuProdi,
+} from "@/services/dashboard/iku";
 
 export const useIku1 = () => {
   const currentYear = new Date().getFullYear().toString();
@@ -39,12 +45,18 @@ export const useIkuProdi = (jrsKode: string | null) => {
   });
 };
 
-export const useIkuStudents = (jenjang: string) => {
+export const useIkuStudents = (
+  jenjang: string,
+  parentFilterKey?: string,
+  parentFilterValue?: string,
+  page?: number,
+  limit?: number,
+) => {
   const currentYear = new Date().getFullYear().toString();
 
   return useQuery({
-    queryKey: ["ikuStudents", currentYear, jenjang],
-    queryFn: () => fetchIkuStudents(currentYear, jenjang),
+    queryKey: ["ikuStudents", currentYear, jenjang, parentFilterKey, parentFilterValue, page, limit],
+    queryFn: () => fetchIkuStudents(currentYear, jenjang, parentFilterKey, parentFilterValue, page, limit),
     enabled: !!jenjang,
   });
 };

@@ -1,7 +1,15 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Users } from "lucide-react";
+import { AlertCircle, ChevronLeft, ChevronRight, Users } from "lucide-react";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useIkuStudents } from "../../../../hooks/dashboard/use-iku1";
 
 // Determine "Kelulusan Tepat Waktu" based on the user's specific guidelines:
@@ -30,16 +38,56 @@ export const checkTepatWaktu = (
 interface StudentListProps {
   unitName: string;
   jenjang: string;
+  parentFilterKey?: string;
+  parentFilterValue?: string;
 }
 
-export function StudentList({ unitName, jenjang }: StudentListProps) {
+export function StudentList({
+  unitName,
+  jenjang,
+  parentFilterKey,
+  parentFilterValue,
+}: StudentListProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
+  const pageParam = searchParams.get("studentPage");
+  const limitParam = searchParams.get("studentLimit");
+
+  const parsedPage = pageParam ? parseInt(pageParam, 10) : 1;
+  const page = isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
+
+  const parsedLimit = limitParam ? parseInt(limitParam, 10) : 10;
+  const limit = isNaN(parsedLimit) || parsedLimit < 1 ? 10 : parsedLimit;
+
+  const setPage = (newPage: number) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("studentPage", newPage.toString());
+    setSearchParams(newParams, { replace: true });
+  };
+
+  const setLimit = (newLimit: number) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("studentLimit", newLimit.toString());
+    newParams.set("studentPage", "1");
+    setSearchParams(newParams, { replace: true });
+  };
+
+  // Reset page to 1 when filters change
+  useEffect(() => {
+    const currentStudentPage = searchParams.get("studentPage");
+    if (currentStudentPage && currentStudentPage !== "1") {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set("studentPage", "1");
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [parentFilterKey, parentFilterValue, jenjang]);
+
   const {
     data: studentsResponse,
     isLoading,
     isError,
     refetch,
-  } = useIkuStudents(jenjang);
+  } = useIkuStudents(jenjang, parentFilterKey, parentFilterValue, page, limit);
 
   const allStudents = studentsResponse?.datas ?? [];
 
@@ -64,46 +112,19 @@ export function StudentList({ unitName, jenjang }: StudentListProps) {
     }
   }
 
-  // Filter students based on the selected drill-down unit
-  const drilledStudents = allStudents.filter((student) => {
-    // If unitName is the general level (starts with "Jenjang"), don't filter out by faculty/department
-    if (unitName.toUpperCase().startsWith("JENJANG")) {
-      return true;
-    }
-
-    const target = unitName.toLowerCase();
-
-    // Check if matching faculty name or code
-    const matchFakultas =
-      student.nama_fakultas?.toLowerCase() === target ||
-      student.unit?.fakultas?.toLowerCase() === target ||
-      student.unit?.fkt_kode?.toLowerCase() === target;
-
-    if (matchFakultas) return true;
-
-    // Check if matching jurusan name or code
-    const matchJurusan =
-      student.unit?.jurusan?.toLowerCase() === target ||
-      student.unit?.jrs_kode?.toLowerCase() === target;
-
-    if (matchJurusan) return true;
-
-    // Check if matching prodi name or code
-    const matchProdi =
-      student.nama_prodi?.toLowerCase() === target ||
-      student.unit?.prodi?.toLowerCase() === target ||
-      student.unit?.prd_kode?.toLowerCase() === target;
-
-    if (matchProdi) return true;
-
-    return false;
-  });
-
   // Calculate the graduation label and map items for representation
-  const formattedStudents = drilledStudents.map((s, idx) => {
-    const isTepatWaktu = checkTepatWaktu(jenjang, s.semester_posisi, s.tahun_lulus);
+  const paginationInfo = studentsResponse?.pagination;
+  const startNo =
+    ((paginationInfo?.page ?? 1) - 1) * (paginationInfo?.limit ?? limit) + 1;
+
+  const formattedStudents = allStudents.map((s, idx) => {
+    const isTepatWaktu = checkTepatWaktu(
+      jenjang,
+      s.semester_posisi,
+      s.tahun_lulus,
+    );
     return {
-      no: idx + 1,
+      no: startNo + idx,
       nama: s.nama_lengkap,
       nim: s.nim,
       prodi: s.nama_prodi,
@@ -144,6 +165,52 @@ export function StudentList({ unitName, jenjang }: StudentListProps) {
     );
   }
 
+  const renderPageNumbers = () => {
+    const totalPages = paginationInfo?.pages || 1;
+    const pages: (number | string)[] = [];
+
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (page <= 3) {
+        pages.push(1, 2, 3, "...", totalPages);
+      } else if (page >= totalPages - 2) {
+        pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, "...", page - 1, page, page + 1, "...", totalPages);
+      }
+    }
+
+    return pages.map((p, idx) => {
+      if (p === "...") {
+        return (
+          <span
+            key={`dots-${idx}`}
+            className="px-1 text-xs font-black text-slate-400 dark:text-slate-500"
+          >
+            ...
+          </span>
+        );
+      }
+
+      const isCurrent = p === page;
+      return (
+        <button
+          key={`page-${p}`}
+          onClick={() => setPage(p as number)}
+          disabled={isLoading}
+          className={`min-w-8 h-8 flex items-center justify-center rounded-lg text-xs font-black transition-all cursor-pointer disabled:opacity-50 ${
+            isCurrent
+              ? "bg-blue-500 text-white shadow-md shadow-blue-500/20"
+              : "border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-600 dark:text-slate-400"
+          }`}
+        >
+          {p}
+        </button>
+      );
+    });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -162,7 +229,10 @@ export function StudentList({ unitName, jenjang }: StudentListProps) {
               Daftar Mahasiswa Aktif
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-              Unit: <span className="text-blue-500 font-black">{displayUnitName}</span>
+              Unit:{" "}
+              <span className="text-blue-500 font-black">
+                {displayUnitName}
+              </span>
             </p>
           </div>
         </div>
@@ -319,14 +389,81 @@ export function StudentList({ unitName, jenjang }: StudentListProps) {
         </table>
       </div>
 
-      {/* Footer summary */}
-      <div className="flex justify-between items-center pt-2">
-        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-          {isLoading
-            ? "Memuat data..."
-            : `Menampilkan ${filteredStudents.length} dari ${drilledStudents.length} Mahasiswa`}
-        </span>
-      </div>
+      {/* Footer summary & Pagination */}
+      {paginationInfo ? (
+        <div className="flex flex-col md:flex-row items-center justify-between border-t border-slate-100 dark:border-slate-800/80 pt-6 gap-4">
+          {/* Summary */}
+          <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+            {isLoading
+              ? "Memuat data..."
+              : `Menampilkan ${allStudents.length} dari ${paginationInfo.total} Mahasiswa`}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+            {/* Limit Selector */}
+            <div className="flex items-center gap-2.5">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                Baris per halaman:
+              </span>
+              <Select
+                value={limit.toString()}
+                onValueChange={(val) => {
+                  setLimit(Number(val));
+                }}
+                disabled={isLoading}
+              >
+                <SelectTrigger className="h-8 min-w-[70px] bg-white/50 dark:bg-slate-950/50 text-xs font-black border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300">
+                  <SelectValue placeholder={limit.toString()} />
+                </SelectTrigger>
+                <SelectContent className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-300 font-bold">
+                  {[5, 10, 25, 50, 100].map((size) => (
+                    <SelectItem
+                      key={size}
+                      value={size.toString()}
+                      className="text-xs font-bold focus:bg-slate-50 dark:focus:bg-slate-900 cursor-pointer"
+                    >
+                      {size}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Page Buttons */}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setPage(Math.max(page - 1, 1))}
+                disabled={page === 1 || isLoading}
+                className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500 dark:text-slate-400 disabled:opacity-30 disabled:hover:bg-transparent transition-all cursor-pointer"
+                title="Halaman Sebelumnya"
+              >
+                <ChevronLeft size={16} />
+              </button>
+
+              {renderPageNumbers()}
+
+              <button
+                onClick={() =>
+                  setPage(Math.min(page + 1, paginationInfo.pages))
+                }
+                disabled={page === paginationInfo.pages || isLoading}
+                className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500 dark:text-slate-400 disabled:opacity-30 disabled:hover:bg-transparent transition-all cursor-pointer"
+                title="Halaman Selanjutnya"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="flex justify-between items-center pt-2">
+          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+            {isLoading
+              ? "Memuat data..."
+              : `Menampilkan ${filteredStudents.length} dari ${allStudents.length} Mahasiswa`}
+          </span>
+        </div>
+      )}
     </motion.div>
   );
 }

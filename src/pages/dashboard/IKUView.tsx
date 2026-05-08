@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useIku1, useIkuFakultas, useIkuJurusan, useIkuProdi } from "../../hooks/dashboard/use-iku1";
 import { IKU1Drilldown } from "./components/iku/IKU1Drilldown";
@@ -63,6 +63,14 @@ export default function IKUView() {
   const [activeStudentUnitName, setActiveStudentUnitName] = useState<
     string | null
   >(null);
+  const [activeStudentUnitCode, setActiveStudentUnitCode] = useState<
+    string | null
+  >(null);
+
+  useEffect(() => {
+    setActiveStudentUnitName(null);
+    setActiveStudentUnitCode(null);
+  }, [selectedFaculty, selectedJurusan, selectedJenjang]);
 
   // Loading skeleton screen
   if (isLoading) {
@@ -157,8 +165,9 @@ export default function IKUView() {
   const s3Ach = getDetailForJenjang("S3")?.tingkat_pencapaian ?? 0;
   const proAch = getDetailForJenjang("Pro")?.tingkat_pencapaian ?? 0;
 
-  const handleSelectStudentUnit = (unitName: string) => {
+  const handleSelectStudentUnit = (unitName: string, unitCode?: string) => {
     setActiveStudentUnitName(unitName);
+    setActiveStudentUnitCode(unitCode || null);
     setTimeout(() => {
       const el = document.getElementById("student-list-section");
       if (el) {
@@ -180,6 +189,7 @@ export default function IKUView() {
         selectedFaculty={selectedFaculty}
         selectedJurusan={selectedJurusan}
         activeStudentUnitName={activeStudentUnitName}
+        activeStudentUnitCode={activeStudentUnitCode}
         handleSelectStudentUnit={handleSelectStudentUnit}
       />
     );

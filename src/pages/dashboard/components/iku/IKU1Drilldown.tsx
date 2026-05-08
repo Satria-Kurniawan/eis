@@ -44,7 +44,8 @@ interface IKU1DrilldownProps {
   selectedFaculty: string | null;
   selectedJurusan: string | null;
   activeStudentUnitName: string | null;
-  handleSelectStudentUnit: (unitName: string) => void;
+  activeStudentUnitCode: string | null;
+  handleSelectStudentUnit: (unitName: string, unitCode?: string) => void;
 }
 
 export function IKU1Drilldown({
@@ -58,6 +59,7 @@ export function IKU1Drilldown({
   selectedFaculty,
   selectedJurusan,
   activeStudentUnitName,
+  activeStudentUnitCode,
   handleSelectStudentUnit,
 }: IKU1DrilldownProps) {
   const [, setSearchParams] = useSearchParams();
@@ -951,7 +953,7 @@ export function IKU1Drilldown({
                   return (
                     <div
                       key={i}
-                      onClick={() => handleSelectStudentUnit(p.nama_unit)}
+                      onClick={() => handleSelectStudentUnit(p.nama_unit, p.kode_unit)}
                       className="p-6 border-b border-slate-100 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/20 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors flex flex-col gap-6"
                       style={{
                         contentVisibility: "auto",
@@ -970,7 +972,7 @@ export function IKU1Drilldown({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleSelectStudentUnit(p.nama_unit);
+                                handleSelectStudentUnit(p.nama_unit, p.kode_unit);
                               }}
                               className="px-2 py-1 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-[9px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1 transition-colors"
                             >
@@ -1153,6 +1155,21 @@ export function IKU1Drilldown({
             `Jenjang ${selectedJenjang}`
           }
           jenjang={selectedJenjang || "S1"}
+          parentFilterKey={
+            activeStudentUnitCode
+              ? "prd_kode"
+              : selectedJurusan
+                ? "jrs_kode"
+                : selectedFaculty
+                  ? "fkt_kode"
+                  : undefined
+          }
+          parentFilterValue={
+            activeStudentUnitCode ||
+            selectedJurusan ||
+            selectedFaculty ||
+            undefined
+          }
         />
       </div>
     </div>

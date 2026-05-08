@@ -61,23 +61,33 @@ export interface StudentItem {
   unit: StudentUnit;
 }
 
+export interface PaginationInfo {
+  limit: number;
+  page: number;
+  pages: number;
+  total: number;
+}
+
 export interface StudentResponse {
   datas: StudentItem[];
   message: string;
+  pagination?: PaginationInfo;
 }
 
 export const fetchIku1 = async (tahun: string) => {
   const params = new URLSearchParams();
   if (tahun) params.append("tahun", tahun);
-  
+
   return apiClient<Iku1Response>(`/api/v1/iku1?${params.toString()}`);
 };
 
 export const fetchIkuFakultas = async (tahun: string) => {
   const params = new URLSearchParams();
   if (tahun) params.append("tahun", tahun);
-  
-  return apiClient<IkuFakultasResponse>(`/api/v1/iku1/fakultas?${params.toString()}`);
+
+  return apiClient<IkuFakultasResponse>(
+    `/api/v1/iku1/fakultas?${params.toString()}`,
+  );
 };
 
 export interface IkuJurusanItem {
@@ -104,8 +114,10 @@ export const fetchIkuJurusan = async (tahun: string, fktKode: string) => {
   const params = new URLSearchParams();
   if (tahun) params.append("tahun", tahun);
   if (fktKode) params.append("fktKode", fktKode);
-  
-  return apiClient<IkuJurusanResponse>(`/api/v1/iku1/jurusan?${params.toString()}`);
+
+  return apiClient<IkuJurusanResponse>(
+    `/api/v1/iku1/jurusan?${params.toString()}`,
+  );
 };
 
 export interface IkuProdiItem {
@@ -132,14 +144,27 @@ export const fetchIkuProdi = async (tahun: string, jrsKode: string) => {
   const params = new URLSearchParams();
   if (tahun) params.append("tahun", tahun);
   if (jrsKode) params.append("jrsKode", jrsKode);
-  
+
   return apiClient<IkuProdiResponse>(`/api/v1/iku1/prodi?${params.toString()}`);
 };
 
-export const fetchIkuStudents = async (year: string, jenjang: string) => {
+export const fetchIkuStudents = async (
+  year: string,
+  jenjang: string,
+  parentFilterKey?: string,
+  parentFilterValue?: string,
+  page?: number,
+  limit?: number,
+) => {
   const params = new URLSearchParams();
   if (year) params.append("year", year);
   if (jenjang) params.append("jenjang", jenjang);
-  
-  return apiClient<StudentResponse>(`/api/v1/iku1/mhs-data?${params.toString()}`);
+  if (parentFilterKey) params.append("parentFilterKey", parentFilterKey);
+  if (parentFilterValue) params.append("parentFilterValue", parentFilterValue);
+  if (page !== undefined) params.append("page", page.toString());
+  if (limit !== undefined) params.append("limit", limit.toString());
+
+  return apiClient<StudentResponse>(
+    `/api/v1/iku1/mhs-data?${params.toString()}`,
+  );
 };
