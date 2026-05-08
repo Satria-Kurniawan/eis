@@ -35,5 +35,10 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    preview: {
+      port: 4173,
+      host: true,
+      allowedHosts: ["localhost", "https://eis-alpha-dev.undiksha.ac.id"],
+    },
   };
 });
