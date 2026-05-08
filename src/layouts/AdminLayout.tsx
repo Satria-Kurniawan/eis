@@ -713,9 +713,9 @@ export default function AdminLayout() {
                       .charAt(0)
                       .toUpperCase()}
                   </div>
-                  <span className="hidden md:inline font-bold text-xs max-w-[120px] truncate pr-1 select-none text-slate-700 dark:text-slate-300">
+                  {/* <span className="hidden md:inline font-bold text-xs max-w-[120px] truncate pr-1 select-none text-slate-700 dark:text-slate-300">
                     {(user?.datas?.profile?.email || "User").split("@")[0]}
-                  </span>
+                  </span> */}
                 </button>
               </PopoverTrigger>
               <PopoverContent

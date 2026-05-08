@@ -18,21 +18,23 @@ export const checkTepatWaktu = (
   jenjang: string,
   semesterPosisi: number,
   tahunLulus: number,
+  is_lulus: boolean,
 ): boolean => {
   const code = jenjang.toUpperCase();
-  if (code.includes("D4") || code.includes("S1")) {
+
+  if ((code.includes("D4") || code.includes("S1")) && is_lulus) {
     return semesterPosisi <= 8;
   }
-  if (code.includes("D3") || code.includes("S3")) {
+  if ((code.includes("D3") || code.includes("S3")) && is_lulus) {
     return semesterPosisi <= 6;
   }
-  if (code.includes("S2")) {
+  if (code.includes("S2") && is_lulus) {
     return semesterPosisi <= 4;
   }
-  if (code.includes("PRO")) {
+  if (code.includes("PRO") && is_lulus) {
     return semesterPosisi <= 2 || tahunLulus === 2025;
   }
-  return semesterPosisi <= 8;
+  return semesterPosisi <= 8 && is_lulus;
 };
 
 interface StudentListProps {
@@ -103,11 +105,11 @@ export function StudentList({
     );
     if (matchingStudent) {
       if (matchingStudent.unit?.fkt_kode === unitName) {
-        displayUnitName = matchingStudent.nama_fakultas;
+        displayUnitName = matchingStudent.unit?.fakultas || unitName;
       } else if (matchingStudent.unit?.jrs_kode === unitName) {
         displayUnitName = matchingStudent.unit.jurusan;
       } else if (matchingStudent.unit?.prd_kode === unitName) {
-        displayUnitName = matchingStudent.nama_prodi;
+        displayUnitName = matchingStudent.unit?.prodi || unitName;
       }
     }
   }
@@ -122,17 +124,24 @@ export function StudentList({
       jenjang,
       s.semester_posisi,
       s.tahun_lulus,
+      s.is_lulus,
     );
     return {
       no: startNo + idx,
       nama: s.nama_lengkap,
       nim: s.nim,
-      prodi: s.nama_prodi,
+      prodi: s.unit?.prodi || "Prodi",
       jurusan: s.unit?.jurusan || "Jurusan",
-      fakultas: s.nama_fakultas || "Fakultas",
-      tahunMasuk: s.angkatan,
+      fakultas: s.unit?.fakultas || "Fakultas",
+      tahunMasuk: s.tahun_masuk.toString(),
+      tahunLulus:
+        s.tahun_lulus && s.tahun_lulus > 0 ? s.tahun_lulus.toString() : "-",
       semester: s.semester_posisi,
-      statusKelulusan: isTepatWaktu ? "Tepat Waktu" : "Tidak Tepat Waktu",
+      statusKelulusan: isTepatWaktu
+        ? "Tepat Waktu"
+        : s.is_lulus
+          ? "Tidak Tepat Waktu"
+          : "Belum Lulus",
     };
   });
 
@@ -292,6 +301,9 @@ export function StudentList({
                 Tahun Masuk
               </th>
               <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-center">
+                Tahun Lulus
+              </th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-center">
                 Semester Posisi
               </th>
               <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-center">
@@ -320,6 +332,9 @@ export function StudentList({
                   </td>
                   <td className="px-6 py-4">
                     <Skeleton className="h-4 w-36 rounded" />
+                  </td>
+                  <td className="px-6 py-4">
+                    <Skeleton className="h-4 w-12 mx-auto rounded" />
                   </td>
                   <td className="px-6 py-4">
                     <Skeleton className="h-4 w-12 mx-auto rounded" />
@@ -358,6 +373,9 @@ export function StudentList({
                   </td>
                   <td className="px-6 py-3.5 text-xs font-black text-center text-slate-600 dark:text-slate-400">
                     {student.tahunMasuk}
+                  </td>
+                  <td className="px-6 py-3.5 text-xs font-black text-center text-slate-600 dark:text-slate-400">
+                    {student.tahunLulus}
                   </td>
                   <td className="px-6 py-3.5 text-xs font-black text-center text-emerald-500 bg-emerald-500/5 dark:bg-emerald-500/1 rounded-md">
                     {student.semester}

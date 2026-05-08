@@ -24,11 +24,13 @@ import {
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useQueries } from "@tanstack/react-query";
 import {
   type Iku1Response,
   type IkuFakultasResponse,
   type IkuJurusanResponse,
   type IkuProdiResponse,
+  fetchIkuProdi,
 } from "../../../../services/dashboard/iku";
 import { IKU1_DRILLDOWN_DATA, getRadarLabel } from "./iku1-data";
 import { StudentList } from "./StudentList";
@@ -207,6 +209,17 @@ export function IKU1Drilldown({
       })
       .filter((j): j is NonNullable<typeof j> => j !== null) ?? [];
 
+  const currentYear = new Date().getFullYear().toString();
+
+  // Fetch prodis for all liveJurusans in parallel using useQueries
+  const prodisQueries = useQueries({
+    queries: liveJurusans.map((j) => ({
+      queryKey: ["ikuProdi", currentYear, j.kode],
+      queryFn: () => fetchIkuProdi(currentYear, j.kode),
+      enabled: !!j.kode && !!selectedFaculty && !selectedJurusan,
+    })),
+  });
+
   // Find live jurusan by name or code
   const activeLiveJurusan = liveJurusans.find(
     (lj) =>
@@ -325,27 +338,45 @@ export function IKU1Drilldown({
           }) || [];
     radarTitle = `Sebaran AEE Fakultas - Jenjang ${selectedJenjang}`;
   } else if (!selectedJurusan) {
-    // 2. Faculty level radar: Compare AEE across all jurusans in this faculty
+    // 2. Faculty level radar: Compare AEE across all prodis in this faculty
+    const allFacultyProdis = prodisQueries
+      .flatMap((q) => q.data?.datas ?? [])
+      .map((p) => {
+        const detailForJenjang = p.detail?.find(
+          (d) => d.jenjang.toUpperCase() === selectedJenjang.toUpperCase(),
+        );
+        if (!detailForJenjang) return null;
+        return {
+          subject: getRadarLabel(p.nama_unit),
+          AEE: parseFloat(detailForJenjang.aee_realisasi.toFixed(2)),
+          Ideal: detailForJenjang.aee_ideal,
+          fullSubject: p.nama_unit,
+        };
+      })
+      .filter((p): p is NonNullable<typeof p> => p !== null);
+
     radarChartData =
-      liveJurusans.length > 0
-        ? liveJurusans.map((j) => ({
-            subject: getRadarLabel(j.name),
-            AEE: parseFloat(j.aeeRealisasi.toFixed(2)),
-            Ideal: j.ideal,
-            fullSubject: j.name,
-          }))
-        : activeFacultyData?.jurusans.map((j) => {
-            const jLulus = j.prodis.reduce((acc, p) => acc + p.lulus, 0);
-            const jTotal = j.prodis.reduce((acc, p) => acc + p.total, 0);
-            const jAee = jTotal > 0 ? (jLulus / jTotal) * 100 : 0;
-            return {
+      allFacultyProdis.length > 0
+        ? allFacultyProdis
+        : liveJurusans.length > 0
+          ? liveJurusans.map((j) => ({
               subject: getRadarLabel(j.name),
-              AEE: parseFloat(jAee.toFixed(2)),
-              Ideal: ideal,
+              AEE: parseFloat(j.aeeRealisasi.toFixed(2)),
+              Ideal: j.ideal,
               fullSubject: j.name,
-            };
-          }) || [];
-    radarTitle = `Sebaran AEE Jurusan - ${getRadarLabel(selectedFacultyName || "")}`;
+            }))
+          : activeFacultyData?.jurusans.map((j) => {
+              const jLulus = j.prodis.reduce((acc, p) => acc + p.lulus, 0);
+              const jTotal = j.prodis.reduce((acc, p) => acc + p.total, 0);
+              const jAee = jTotal > 0 ? (jLulus / jTotal) * 100 : 0;
+              return {
+                subject: getRadarLabel(j.name),
+                AEE: parseFloat(jAee.toFixed(2)),
+                Ideal: ideal,
+                fullSubject: j.name,
+              };
+            }) || [];
+    radarTitle = `Sebaran AEE Program Studi - ${getRadarLabel(selectedFacultyName || "")}`;
   } else {
     // 3. Jurusan level radar: Compare AEE across all prodis in this jurusan
     radarChartData =
@@ -821,55 +852,139 @@ export function IKU1Drilldown({
                   const jAee = j.aeeRealisasi;
                   const jAch = j.tingkatPencapaian;
 
+                  const matchingProdisQuery = prodisQueries[i];
+                  const prodiDatas = matchingProdisQuery?.data?.datas ?? [];
+
                   return (
                     <div
                       key={i}
-                      onClick={() => setSelectedJurusan(j.kode)}
-                      className="p-6 border-b border-slate-100 dark:border-slate-800/80 hover:bg-white dark:hover:bg-slate-800/50 cursor-pointer transition-colors group flex flex-col sm:flex-row gap-6 sm:items-center justify-between"
+                      className="p-6 border-b border-slate-100 dark:border-slate-800/80 hover:bg-slate-50/20 dark:hover:bg-slate-800/10 transition-colors flex flex-col gap-4"
                       style={{
                         contentVisibility: "auto",
-                        containIntrinsicSize: "110px",
+                        containIntrinsicSize: "200px",
                       }}
                     >
-                      <div className="flex items-start gap-4 flex-1">
-                        <div className="mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-blue-500/10 group-hover:text-blue-500 transition-colors">
-                          <Award className="size-5" />
+                      {/* Jurusan Header Clickable Area */}
+                      <div
+                        onClick={() => setSelectedJurusan(j.kode)}
+                        className="cursor-pointer group flex flex-col sm:flex-row gap-6 sm:items-center justify-between"
+                      >
+                        <div className="flex items-start gap-4 flex-1">
+                          <div className="mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-blue-500/10 group-hover:text-blue-500 transition-colors">
+                            <Award className="size-5" />
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-black text-slate-800 dark:text-slate-100 leading-relaxed group-hover:text-blue-500 transition-colors">
+                              {j.name}
+                            </h4>
+                            <div className="flex items-center gap-4 mt-2">
+                              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <GraduationCap className="size-3" />
+                                {jTotal} Mhs
+                              </span>
+                              <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1.5">
+                                <CheckCircle2 className="size-3" />
+                                {jLulus} Lulus
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="text-sm font-black text-slate-800 dark:text-slate-100 leading-relaxed">
-                            {j.name}
-                          </h4>
-                          <div className="flex items-center gap-4 mt-2">
-                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                              <GraduationCap className="size-3" />
-                              {jTotal} Mhs
+                        <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 sm:gap-1 shrink-0 bg-slate-50 sm:bg-transparent dark:bg-slate-900 sm:dark:bg-transparent p-3 sm:p-0 rounded-xl">
+                          <div className="text-right flex items-center sm:items-end flex-col">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                              AEE Prodi
                             </span>
-                            <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1.5">
-                              <CheckCircle2 className="size-3" />
-                              {jLulus} Lulus
+                            <span className="text-lg font-black text-slate-900 dark:text-white">
+                              {jAee.toFixed(2)}%
+                            </span>
+                          </div>
+                          <div className="w-px h-8 bg-slate-200 dark:bg-slate-700 sm:hidden mx-2" />
+                          <div className="text-right flex items-center sm:items-end flex-col">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                              Pencapaian
+                            </span>
+                            <span className="text-lg font-black text-amber-500">
+                              {jAch.toFixed(2)}%
                             </span>
                           </div>
                         </div>
                       </div>
-                      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 sm:gap-1 shrink-0 bg-slate-50 sm:bg-transparent dark:bg-slate-900 sm:dark:bg-transparent p-3 sm:p-0 rounded-xl">
-                        <div className="text-right flex items-center sm:items-end flex-col">
-                          <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">
-                            AEE Prodi
-                          </span>
-                          <span className="text-lg font-black text-slate-900 dark:text-white">
-                            {jAee.toFixed(2)}%
-                          </span>
+
+                      {/* Nested Prodi List */}
+                      {prodiDatas.length > 0 && (
+                        <div className="mt-2 pl-11 space-y-3 border-l-2 border-slate-100 dark:border-slate-800/60 ml-5">
+                          <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 flex items-center gap-2">
+                            <School className="size-3.5 text-blue-500" />
+                            Program Studi ({prodiDatas.length})
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {prodiDatas.map((p, pIdx) => {
+                              const detailForJenjang = p.detail?.find(
+                                (d) =>
+                                  d.jenjang.toUpperCase() ===
+                                  selectedJenjang.toUpperCase(),
+                              );
+                              if (!detailForJenjang) return null;
+
+                              const pTotal = detailForJenjang.total_lulusan;
+                              const pLulus = detailForJenjang.lulus_tepat_waktu;
+                              const pAee = detailForJenjang.aee_realisasi;
+                              const pAch = detailForJenjang.tingkat_pencapaian;
+
+                              return (
+                                <div
+                                  key={pIdx}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleSelectStudentUnit(
+                                      p.nama_unit,
+                                      p.kode_unit,
+                                    );
+                                  }}
+                                  className="p-3.5 rounded-2xl border border-slate-200/50 dark:border-slate-800/60 bg-white/40 dark:bg-slate-900/30 hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:border-blue-500/30 dark:hover:border-blue-500/30 transition-all flex flex-col justify-between cursor-pointer group/prodi"
+                                >
+                                  <div className="flex justify-between items-start gap-2 mb-2">
+                                    <span className="text-xs font-black text-slate-700 dark:text-slate-300 leading-tight group-hover/prodi:text-blue-500 transition-colors">
+                                      {p.nama_unit}
+                                    </span>
+                                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 whitespace-nowrap shrink-0">
+                                      {p.kode_unit}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-center gap-4 mt-auto pt-2 border-t border-slate-100/50 dark:border-slate-800/50">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400">
+                                        {pTotal} Mhs
+                                      </span>
+                                      <span className="text-[9px] font-bold text-emerald-500">
+                                        {pLulus} Lulus
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <div className="text-right">
+                                        <span className="text-[8px] font-black uppercase tracking-widest text-slate-400 block">
+                                          AEE
+                                        </span>
+                                        <span className="text-xs font-black text-slate-800 dark:text-slate-200">
+                                          {pAee.toFixed(1)}%
+                                        </span>
+                                      </div>
+                                      <div className="text-right">
+                                        <span className="text-[8px] font-black uppercase tracking-widest text-slate-400 block">
+                                          Ach
+                                        </span>
+                                        <span className="text-xs font-black text-amber-500">
+                                          {pAch.toFixed(1)}%
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
-                        <div className="w-px h-8 bg-slate-200 dark:bg-slate-700 sm:hidden mx-2" />
-                        <div className="text-right flex items-center sm:items-end flex-col">
-                          <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">
-                            Pencapaian
-                          </span>
-                          <span className="text-lg font-black text-amber-500">
-                            {jAch.toFixed(2)}%
-                          </span>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   );
                 })
@@ -953,7 +1068,9 @@ export function IKU1Drilldown({
                   return (
                     <div
                       key={i}
-                      onClick={() => handleSelectStudentUnit(p.nama_unit, p.kode_unit)}
+                      onClick={() =>
+                        handleSelectStudentUnit(p.nama_unit, p.kode_unit)
+                      }
                       className="p-6 border-b border-slate-100 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/20 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors flex flex-col gap-6"
                       style={{
                         contentVisibility: "auto",
@@ -972,7 +1089,10 @@ export function IKU1Drilldown({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleSelectStudentUnit(p.nama_unit, p.kode_unit);
+                                handleSelectStudentUnit(
+                                  p.nama_unit,
+                                  p.kode_unit,
+                                );
                               }}
                               className="px-2 py-1 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-[9px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1 transition-colors"
                             >

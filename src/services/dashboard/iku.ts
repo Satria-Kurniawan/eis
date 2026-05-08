@@ -45,19 +45,23 @@ export interface StudentUnit {
 
 export interface StudentItem {
   id_mahasiswa: number;
-  angkatan: string;
-  bulan_studi: number;
-  nama_fakultas: string;
-  nama_jenjang: string;
-  nama_lengkap: string;
-  nama_prodi: string;
   nim: string;
-  no_ijasah: string;
+  nama_lengkap: string;
+  nama_jenjang: string;
   semester_posisi: number;
+  bulan_studi: number;
+  tahun_masuk: number;
   tahun_lulus: number;
   tahun_studi: number;
+  tahun_akademik: string;
+  is_lulus: boolean;
+  is_aktif: boolean;
+  is_target_iku: boolean;
+  jenis_kelas: string;
+  no_ijasah: string | null;
   tgl_ijasah: string;
   cdc_synced_at: string;
+  last_eis_sync: string;
   unit: StudentUnit;
 }
 
