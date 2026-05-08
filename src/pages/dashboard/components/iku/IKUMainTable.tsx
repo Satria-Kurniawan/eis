@@ -310,7 +310,21 @@ export function IKUMainTable({
                       {sasaran.indicators.map((indicator, iIndex) => {
                         return (
                           <React.Fragment key={iIndex}>
-                            <tr className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors group">
+                            <tr
+                              onClick={() => {
+                                if (indicator.id === "IKU 2") {
+                                  setSearchParams((prev) => {
+                                    prev.set("subview", "iku2");
+                                    return prev;
+                                  });
+                                }
+                              }}
+                              className={`transition-colors group ${
+                                indicator.id === "IKU 2"
+                                  ? "hover:bg-amber-50/40 dark:hover:bg-amber-500/5 cursor-pointer"
+                                  : "hover:bg-slate-50/50 dark:hover:bg-slate-900/30"
+                              }`}
+                            >
                               {iIndex === 0 && (
                                 <td
                                   rowSpan={totalRows}
@@ -340,13 +354,22 @@ export function IKUMainTable({
                                   </div>
                                   {indicator.id === "IKU 1" && (
                                     <button
-                                      onClick={() => setShowFormulaBoard(true)}
+                                      onClick={(e) => {
+                                        e.stopPropagation(); // Prevent row click
+                                        setShowFormulaBoard(true);
+                                      }}
                                       className="shrink-0 p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/20 active:scale-95 transition-all flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider cursor-pointer"
                                       title="Lihat Rumus Perhitungan"
                                     >
                                       <Calculator className="size-3.5" />
                                       <span>Formula</span>
                                     </button>
+                                  )}
+                                  {indicator.id === "IKU 2" && (
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-amber-500 dark:text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shrink-0 ml-2 self-center bg-amber-500/10 border border-amber-500/20 rounded-full px-2.5 py-1">
+                                      <span>Tracer Study</span>
+                                      <ChevronRight className="size-3" />
+                                    </span>
                                   )}
                                 </div>
                               </td>

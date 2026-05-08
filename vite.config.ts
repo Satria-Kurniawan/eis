@@ -26,6 +26,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      allowedHosts: ["localhost", "https://eis-alpha-dev.undiksha.ac.id"],
       port: 5174,
       proxy: {
         "/api": {

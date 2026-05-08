@@ -3,8 +3,14 @@ import { AlertCircle, RefreshCw } from "lucide-react";
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useIku1, useIkuFakultas, useIkuJurusan, useIkuProdi } from "../../hooks/dashboard/use-iku1";
+import {
+  useIku1,
+  useIkuFakultas,
+  useIkuJurusan,
+  useIkuProdi,
+} from "../../hooks/dashboard/use-iku1";
 import { IKU1Drilldown } from "./components/iku/IKU1Drilldown";
+import { IKU2Drilldown } from "./components/iku/IKU2Drilldown";
 import { IKUMainTable } from "./components/iku/IKUMainTable";
 
 export default function IKUView() {
@@ -71,6 +77,12 @@ export default function IKUView() {
     setActiveStudentUnitName(null);
     setActiveStudentUnitCode(null);
   }, [selectedFaculty, selectedJurusan, selectedJenjang]);
+
+  const selectedSubview = searchParams.get("subview");
+
+  if (selectedSubview === "iku2") {
+    return <IKU2Drilldown />;
+  }
 
   // Loading skeleton screen
   if (isLoading) {
