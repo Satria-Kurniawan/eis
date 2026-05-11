@@ -1,3 +1,6 @@
+import { useUnitKerja } from "@/hooks/use-unit-kerja";
+import { apiClient } from "@/lib/api-client";
+import { useQuery } from "@tanstack/react-query";
 import {
   AlertCircle,
   Calculator,
@@ -6,10 +9,35 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { type Iku1Response } from "../../../../services/dashboard/iku";
 import { getJenjangKey } from "./iku1-data";
+import { useIkuFakultas } from "@/hooks/dashboard/use-iku1";
+
+function getAbbreviation(name: string): string {
+  if (!name) return "";
+  return name
+    .split(/\s+/)
+    .filter(
+      (word) =>
+        ![
+          "dan",
+          "di",
+          "ke",
+          "dari",
+          "yang",
+          "untuk",
+          "dengan",
+          "atau",
+          "and",
+          "of",
+          "&",
+        ].includes(word.toLowerCase()),
+    )
+    .map((word) => word[0]?.toUpperCase())
+    .join("");
+}
 
 interface IKUMainTableProps {
   iku1Response?: Iku1Response;
@@ -38,16 +66,57 @@ export function IKUMainTable({
   overallAeePtVal,
 }: IKUMainTableProps) {
   const [, setSearchParams] = useSearchParams();
+  const { data: user } = useQuery({
+    queryKey: ["userDetails"],
+    queryFn: () => apiClient<any>("/api/v1/user/details"),
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  const { getFakultas, isLoading } = useUnitKerja(true);
+  const { data: ikuFakultasResponse } = useIkuFakultas();
+  const ikuFakultasData = ikuFakultasResponse?.datas || [];
+  const fakultasOptions = useMemo(() => {
+    const list = getFakultas()
+      .filter((f) => {
+        const code = parseInt(f.uk_kode, 10);
+        return !isNaN(code) && code >= 1 && code <= 9;
+      })
+      .map((f) => ({
+        ...f,
+        abbrev: getAbbreviation(f.uk_nama),
+      }));
+
+    const levelAkun = user?.datas?.auth_info?.level_akun;
+    const userUkKode = user?.datas?.unit?.uk_kode;
+
+    if (levelAkun !== undefined && levelAkun !== 1) {
+      if (userUkKode) {
+        return list.filter((f) => f.uk_kode === userUkKode);
+      }
+    }
+
+    return list;
+  }, [getFakultas, isLoading, user]);
+
   const [showFormulaBoard, setShowFormulaBoard] = useState(false);
 
   const setSelectedJenjang = (val: string | null) => {
     setSearchParams((prev) => {
       if (val) {
         prev.set("jenjang", val);
+
+        const levelAkun = user?.datas?.auth_info?.level_akun;
+        const userUkKode = user?.datas?.unit?.uk_kode;
+
+        if (levelAkun !== undefined && levelAkun !== 1 && userUkKode) {
+          prev.set("faculty", userUkKode);
+        } else {
+          prev.delete("faculty");
+        }
       } else {
         prev.delete("jenjang");
+        prev.delete("faculty");
       }
-      prev.delete("faculty");
       prev.delete("jurusan");
       return prev;
     });
@@ -274,14 +343,14 @@ export function IKUMainTable({
           {/* Table Header Decoration */}
           <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-blue-500 via-amber-500 to-emerald-500" />
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto transform-[translate3d(0,0,0)] contain-[paint] will-change-scroll">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800">
-                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-800 w-16 text-center">
+                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-800 w-16 text-center sticky left-0 z-20 bg-slate-50 dark:bg-slate-950 will-change-transform">
                     No
                   </th>
-                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-800">
+                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-800 sticky left-16 z-20 bg-slate-50 dark:bg-slate-950 min-w-[450px] will-change-transform">
                     Indikator Utama & Sub Indikator
                   </th>
                   <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-800 text-center">
@@ -293,9 +362,24 @@ export function IKUMainTable({
                   <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-800 text-center bg-amber-500/5">
                     Target 2026
                   </th>
-                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-center bg-emerald-500/5">
+                  <th className="px-6 py-5 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 text-center bg-emerald-500/5 border-r border-slate-200 dark:border-slate-800">
                     Realisasi 2026
                   </th>
+                  {fakultasOptions.map((f, index) => {
+                    const abbrev = f.abbrev;
+                    return (
+                      <th
+                        key={f.uk_id}
+                        className={`px-6 py-5 text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 text-center bg-indigo-500/5 whitespace-nowrap ${
+                          index < fakultasOptions.length - 1
+                            ? "border-r border-slate-200 dark:border-slate-800"
+                            : ""
+                        }`}
+                      >
+                        Realisasi {abbrev}
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
@@ -328,7 +412,7 @@ export function IKUMainTable({
                               {iIndex === 0 && (
                                 <td
                                   rowSpan={totalRows}
-                                  className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center align-top bg-slate-50/30 dark:bg-slate-950/30"
+                                  className="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center align-top bg-slate-50 dark:bg-slate-950 sticky left-0 z-10 w-16 will-change-transform"
                                 >
                                   <div className="flex flex-col items-center gap-2">
                                     <span className="text-sm font-black text-slate-900 dark:text-white bg-white dark:bg-slate-800 size-8 flex items-center justify-center rounded-full shadow-sm border border-slate-200 dark:border-slate-700">
@@ -340,7 +424,7 @@ export function IKUMainTable({
                                   </div>
                                 </td>
                               )}
-                              <td className="px-6 py-5 border-r border-slate-200 dark:border-slate-800">
+                              <td className="px-6 py-5 border-r border-slate-200 dark:border-slate-800 sticky left-16 z-10 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-colors min-w-[450px] will-change-transform">
                                 <div className="flex items-start justify-between gap-4">
                                   <div className="flex flex-col gap-1">
                                     {indicator.id && (
@@ -382,9 +466,42 @@ export function IKUMainTable({
                               <td className="px-6 py-4 text-center text-sm font-black text-amber-600 dark:text-amber-400 border-r border-slate-200 dark:border-slate-800 bg-amber-500/2">
                                 {indicator.target}
                               </td>
-                              <td className="px-6 py-4 text-center text-sm font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/2">
+                              <td className="px-6 py-4 text-center text-sm font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/2 border-r border-slate-200 dark:border-slate-800">
                                 {indicator.realisasi || "-"}
                               </td>
+                              {fakultasOptions.map((f, index) => {
+                                let displayValue = "-";
+                                let hasValue = false;
+                                if (indicator.id === "IKU 1") {
+                                  const facultyDetail = ikuFakultasData.find(
+                                    (item: any) => item.kode_unit === f.uk_kode,
+                                  );
+                                  if (
+                                    facultyDetail &&
+                                    facultyDetail.aee_pt_final !== undefined &&
+                                    facultyDetail.aee_pt_final !== null
+                                  ) {
+                                    displayValue = `${facultyDetail.aee_pt_final.toFixed(2)}%`;
+                                    hasValue = true;
+                                  }
+                                }
+                                return (
+                                  <td
+                                    key={f.uk_id}
+                                    className={`px-6 py-4 text-center text-sm font-black bg-indigo-500/2 ${
+                                      hasValue
+                                        ? "text-indigo-600 dark:text-indigo-400"
+                                        : "text-indigo-500/40 dark:text-indigo-400/40"
+                                    } ${
+                                      index < fakultasOptions.length - 1
+                                        ? "border-r border-slate-200 dark:border-slate-800"
+                                        : ""
+                                    }`}
+                                  >
+                                    {displayValue}
+                                  </td>
+                                );
+                              })}
                             </tr>
 
                             {/* Sub Indicators */}
@@ -405,7 +522,7 @@ export function IKUMainTable({
                                       : "hover:bg-slate-50/50 dark:hover:bg-slate-800/20"
                                   }`}
                                 >
-                                  <td className="px-6 py-3 border-r border-slate-200 dark:border-slate-800 bg-slate-50/5 dark:bg-slate-900/5">
+                                  <td className="px-6 py-3 border-r border-slate-200 dark:border-slate-800 sticky left-16 z-10 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-colors min-w-[450px] will-change-transform">
                                     <div className="pl-14 text-[13px] font-medium text-slate-500 dark:text-slate-400 italic flex items-center justify-between">
                                       <span>{sub.label}</span>
                                       {isClickable && (
@@ -425,9 +542,52 @@ export function IKUMainTable({
                                   <td className="px-6 py-3 text-center text-[13px] font-bold text-slate-400 border-r border-slate-200 dark:border-slate-800 bg-amber-500/1">
                                     {sub.target}
                                   </td>
-                                  <td className="px-6 py-3 text-center text-[13px] font-bold text-emerald-500/80 bg-emerald-500/1">
+                                  <td className="px-6 py-3 text-center text-[13px] font-bold text-emerald-500/80 bg-emerald-500/1 border-r border-slate-200 dark:border-slate-800">
                                     {sub.realisasi || "-"}
                                   </td>
+                                  {fakultasOptions.map((f, index) => {
+                                    let displayValue = "-";
+                                    let hasValue = false;
+                                    const facultyDetail = ikuFakultasData.find(
+                                      (item: any) =>
+                                        item.kode_unit === f.uk_kode,
+                                    );
+                                    const jenjangKey = getJenjangKey(sub.label);
+                                    if (jenjangKey) {
+                                      const jenjangDetail =
+                                        facultyDetail?.detail?.find(
+                                          (d: any) =>
+                                            d.jenjang?.toUpperCase() ===
+                                            jenjangKey.toUpperCase(),
+                                        );
+                                      if (
+                                        jenjangDetail &&
+                                        jenjangDetail.tingkat_pencapaian !==
+                                          undefined &&
+                                        jenjangDetail.tingkat_pencapaian !==
+                                          null
+                                      ) {
+                                        displayValue = `${jenjangDetail.tingkat_pencapaian.toFixed(2)}%`;
+                                        hasValue = true;
+                                      }
+                                    }
+                                    return (
+                                      <td
+                                        key={f.uk_id}
+                                        className={`px-6 py-3 text-center text-[13px] font-bold bg-indigo-500/1 ${
+                                          hasValue
+                                            ? "text-indigo-600 dark:text-indigo-400"
+                                            : "text-indigo-500/40 dark:text-indigo-400/40"
+                                        } ${
+                                          index < fakultasOptions.length - 1
+                                            ? "border-r border-slate-200 dark:border-slate-800"
+                                            : ""
+                                        }`}
+                                      >
+                                        {displayValue}
+                                      </td>
+                                    );
+                                  })}
                                 </tr>
                               );
                             })}

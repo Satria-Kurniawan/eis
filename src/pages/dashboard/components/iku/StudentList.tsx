@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, ChevronLeft, ChevronRight, Users } from "lucide-react";
 import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   Select,
@@ -11,6 +11,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useIkuStudents } from "../../../../hooks/dashboard/use-iku1";
+
+const formatSyncDateShort = (dateStr?: string) => {
+  if (!dateStr) return "-";
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const day = d.getDate().toString().padStart(2, "0");
+    const month = (d.getMonth() + 1).toString().padStart(2, "0");
+    const year = d.getFullYear();
+    const hours = d.getHours().toString().padStart(2, "0");
+    const minutes = d.getMinutes().toString().padStart(2, "0");
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  } catch (e) {
+    return dateStr;
+  }
+};
 
 // Determine "Kelulusan Tepat Waktu" based on the user's specific guidelines:
 // d4/s1 = 4 years, d3/s3 = 3 years, s2 = 2 years, profesi = 2025 graduation year or study duration limit
@@ -119,38 +135,42 @@ export function StudentList({
   const startNo =
     ((paginationInfo?.page ?? 1) - 1) * (paginationInfo?.limit ?? limit) + 1;
 
-  const formattedStudents = allStudents.map((s, idx) => {
-    const isTepatWaktu = checkTepatWaktu(
-      jenjang,
-      s.semester_posisi,
-      s.tahun_lulus,
-      s.is_lulus,
-    );
-    return {
-      no: startNo + idx,
-      nama: s.nama_lengkap,
-      nim: s.nim,
-      prodi: s.unit?.prodi || "Prodi",
-      jurusan: s.unit?.jurusan || "Jurusan",
-      fakultas: s.unit?.fakultas || "Fakultas",
-      tahunMasuk: s.tahun_masuk.toString(),
-      tahunLulus:
-        s.tahun_lulus && s.tahun_lulus > 0 ? s.tahun_lulus.toString() : "-",
-      semester: s.semester_posisi,
-      statusKelulusan: isTepatWaktu
-        ? "Tepat Waktu"
-        : s.is_lulus
-          ? "Tidak Tepat Waktu"
-          : "Belum Lulus",
-    };
-  });
+  const formattedStudents = useMemo(() => {
+    return allStudents.map((s, idx) => {
+      const isTepatWaktu = checkTepatWaktu(
+        jenjang,
+        s.semester_posisi,
+        s.tahun_lulus,
+        s.is_lulus,
+      );
+      return {
+        no: startNo + idx,
+        nama: s.nama_lengkap,
+        nim: s.nim,
+        prodi: s.unit?.prodi || "Prodi",
+        jurusan: s.unit?.jurusan || "Jurusan",
+        fakultas: s.unit?.fakultas || "Fakultas",
+        tahunMasuk: s.tahun_masuk.toString(),
+        tahunLulus:
+          s.tahun_lulus && s.tahun_lulus > 0 ? s.tahun_lulus.toString() : "-",
+        semester: s.semester_posisi,
+        statusKelulusan: isTepatWaktu
+          ? "Tepat Waktu"
+          : s.is_lulus
+            ? "Tidak Tepat Waktu"
+            : "Belum Lulus",
+        lastSync: s.last_eis_sync,
+      };
+    });
+  }, [allStudents, jenjang, startNo]);
 
   // Apply search filtering on top
-  const filteredStudents = formattedStudents.filter(
-    (s) =>
-      s.nama?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.nim?.includes(searchQuery),
-  );
+  const filteredStudents = useMemo(() => {
+    const q = searchQuery.toLowerCase();
+    return formattedStudents.filter(
+      (s) => s.nama?.toLowerCase().includes(q) || s.nim?.includes(searchQuery),
+    );
+  }, [formattedStudents, searchQuery]);
 
   // Error fetching state
   if (isError) {
@@ -286,6 +306,9 @@ export function StudentList({
                 Nama Lengkap
               </th>
               <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                Last Sync
+              </th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
                 NIM
               </th>
               <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
@@ -322,6 +345,9 @@ export function StudentList({
                     <Skeleton className="h-4 w-40 rounded" />
                   </td>
                   <td className="px-6 py-4">
+                    <Skeleton className="h-4 w-28 rounded" />
+                  </td>
+                  <td className="px-6 py-4">
                     <Skeleton className="h-4 w-24 rounded" />
                   </td>
                   <td className="px-6 py-4">
@@ -352,12 +378,28 @@ export function StudentList({
                 <tr
                   key={sIdx}
                   className="group hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors"
+                  style={{
+                    contentVisibility: "auto",
+                    containIntrinsicSize: "53px",
+                  }}
                 >
                   <td className="px-6 py-3.5 text-center text-xs font-black text-slate-400 md:sticky md:left-0 bg-white dark:bg-slate-950 md:group-hover:bg-slate-50 md:dark:group-hover:bg-slate-900 transition-colors md:z-10 border-r border-slate-100 dark:border-slate-900">
                     {student.no}
                   </td>
                   <td className="px-6 py-3.5 text-sm font-black text-slate-800 dark:text-slate-100 md:sticky md:left-16 bg-white dark:bg-slate-950 md:group-hover:bg-slate-50 md:dark:group-hover:bg-slate-900 transition-colors md:z-10 border-r border-slate-100 dark:border-slate-900 whitespace-nowrap">
                     {student.nama}
+                  </td>
+                  <td className="px-6 py-3.5 text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                    {student.lastSync ? (
+                      <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 w-fit">
+                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span>{formatSyncDateShort(student.lastSync)}</span>
+                      </div>
+                    ) : (
+                      <span className="text-slate-400 dark:text-slate-600">
+                        -
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-3.5 text-xs font-mono font-bold text-slate-600 dark:text-slate-400">
                     {student.nim}
@@ -396,7 +438,7 @@ export function StudentList({
             ) : (
               <tr>
                 <td
-                  colSpan={9}
+                  colSpan={11}
                   className="px-6 py-12 text-center text-xs font-black text-slate-400 uppercase tracking-widest"
                 >
                   Tidak ditemukan data mahasiswa.

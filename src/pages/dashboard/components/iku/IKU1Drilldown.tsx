@@ -1,3 +1,5 @@
+import { useQueries, useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api-client";
 import {
   AlertCircle,
   ArrowLeft,
@@ -24,7 +26,6 @@ import {
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useQueries } from "@tanstack/react-query";
 import {
   type Iku1Response,
   type IkuFakultasResponse,
@@ -65,6 +66,12 @@ export function IKU1Drilldown({
   handleSelectStudentUnit,
 }: IKU1DrilldownProps) {
   const [, setSearchParams] = useSearchParams();
+  const { data: user } = useQuery({
+    queryKey: ["userDetails"],
+    queryFn: () => apiClient<any>("/api/v1/user/details"),
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
 
   // Scroll to top of window and main layout when navigating to a new drilldown tier or clearing it
   useEffect(() => {
@@ -414,9 +421,10 @@ export function IKU1Drilldown({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-4">
         <button
           onClick={() => {
+            const levelAkun = user?.datas?.auth_info?.level_akun;
             if (selectedJurusan) {
               setSelectedJurusan(null);
-            } else if (selectedFaculty) {
+            } else if (selectedFaculty && levelAkun === 1) {
               setSelectedFaculty(null);
             } else {
               setSelectedJenjang(null);
@@ -429,7 +437,7 @@ export function IKU1Drilldown({
             KEMBALI{" "}
             {selectedJurusan
               ? "KE FAKULTAS"
-              : selectedFaculty
+              : selectedFaculty && user?.datas?.auth_info?.level_akun === 1
                 ? "KE JENJANG"
                 : "KE UTAMA"}
           </span>
